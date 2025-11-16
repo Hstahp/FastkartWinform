@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMainAdmin));
             this.pnlSidebar = new System.Windows.Forms.Panel();
             this.pnlRolesSub = new System.Windows.Forms.Panel();
             this.btnCreateRole = new System.Windows.Forms.Button();
@@ -103,7 +102,7 @@
             this.pnlSidebar.Location = new System.Drawing.Point(0, 0);
             this.pnlSidebar.Margin = new System.Windows.Forms.Padding(0);
             this.pnlSidebar.Name = "pnlSidebar";
-            this.pnlSidebar.Size = new System.Drawing.Size(250, 720);
+            this.pnlSidebar.Size = new System.Drawing.Size(250, 834);
             this.pnlSidebar.TabIndex = 0;
             // 
             // pnlRolesSub
@@ -112,7 +111,7 @@
             this.pnlRolesSub.Controls.Add(this.btnCreateRole);
             this.pnlRolesSub.Controls.Add(this.btnAllRoles);
             this.pnlRolesSub.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlRolesSub.Location = new System.Drawing.Point(0, 730);
+            this.pnlRolesSub.Location = new System.Drawing.Point(0, 410);
             this.pnlRolesSub.Margin = new System.Windows.Forms.Padding(0);
             this.pnlRolesSub.Name = "pnlRolesSub";
             this.pnlRolesSub.Size = new System.Drawing.Size(250, 0);
@@ -162,7 +161,7 @@
             this.btnRoles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRoles.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRoles.ForeColor = System.Drawing.Color.White;
-            this.btnRoles.Location = new System.Drawing.Point(0, 680);
+            this.btnRoles.Location = new System.Drawing.Point(0, 360);
             this.btnRoles.Margin = new System.Windows.Forms.Padding(0);
             this.btnRoles.Name = "btnRoles";
             this.btnRoles.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
@@ -193,7 +192,7 @@
             this.pnlUserSub.Controls.Add(this.btnAddUser);
             this.pnlUserSub.Controls.Add(this.btnAllUser);
             this.pnlUserSub.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlUserSub.Location = new System.Drawing.Point(0, 600);
+            this.pnlUserSub.Location = new System.Drawing.Point(0, 360);
             this.pnlUserSub.Margin = new System.Windows.Forms.Padding(0);
             this.pnlUserSub.Name = "pnlUserSub";
             this.pnlUserSub.Size = new System.Drawing.Size(250, 0);
@@ -243,7 +242,7 @@
             this.btnUser.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUser.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnUser.ForeColor = System.Drawing.Color.White;
-            this.btnUser.Location = new System.Drawing.Point(0, 550);
+            this.btnUser.Location = new System.Drawing.Point(0, 310);
             this.btnUser.Margin = new System.Windows.Forms.Padding(0);
             this.btnUser.Name = "btnUser";
             this.btnUser.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
@@ -274,7 +273,7 @@
             this.pnlAttributesSub.Controls.Add(this.btnAddAttribute);
             this.pnlAttributesSub.Controls.Add(this.btnAttributesList);
             this.pnlAttributesSub.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlAttributesSub.Location = new System.Drawing.Point(0, 470);
+            this.pnlAttributesSub.Location = new System.Drawing.Point(0, 310);
             this.pnlAttributesSub.Margin = new System.Windows.Forms.Padding(0);
             this.pnlAttributesSub.Name = "pnlAttributesSub";
             this.pnlAttributesSub.Size = new System.Drawing.Size(250, 0);
@@ -324,7 +323,7 @@
             this.btnAttributes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAttributes.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAttributes.ForeColor = System.Drawing.Color.White;
-            this.btnAttributes.Location = new System.Drawing.Point(0, 420);
+            this.btnAttributes.Location = new System.Drawing.Point(0, 260);
             this.btnAttributes.Margin = new System.Windows.Forms.Padding(0);
             this.btnAttributes.Name = "btnAttributes";
             this.btnAttributes.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
@@ -355,7 +354,7 @@
             this.pnlCategorySub.Controls.Add(this.btnAddCategory);
             this.pnlCategorySub.Controls.Add(this.btnCategoryList);
             this.pnlCategorySub.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlCategorySub.Location = new System.Drawing.Point(0, 340);
+            this.pnlCategorySub.Location = new System.Drawing.Point(0, 260);
             this.pnlCategorySub.Margin = new System.Windows.Forms.Padding(0);
             this.pnlCategorySub.Name = "pnlCategorySub";
             this.pnlCategorySub.Size = new System.Drawing.Size(250, 0);
@@ -405,7 +404,7 @@
             this.btnCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCategory.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnCategory.ForeColor = System.Drawing.Color.White;
-            this.btnCategory.Location = new System.Drawing.Point(0, 290);
+            this.btnCategory.Location = new System.Drawing.Point(0, 210);
             this.btnCategory.Margin = new System.Windows.Forms.Padding(0);
             this.btnCategory.Name = "btnCategory";
             this.btnCategory.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
@@ -546,9 +545,9 @@
             this.lblLogo.AutoSize = true;
             this.lblLogo.Font = new System.Drawing.Font("Segoe UI Semibold", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblLogo.ForeColor = System.Drawing.Color.White;
-            this.lblLogo.Location = new System.Drawing.Point(71, 39);
+            this.lblLogo.Location = new System.Drawing.Point(12, 23);
             this.lblLogo.Name = "lblLogo";
-            this.lblLogo.Size = new System.Drawing.Size(108, 32);
+            this.lblLogo.Size = new System.Drawing.Size(199, 65);
             this.lblLogo.TabIndex = 0;
             this.lblLogo.Text = "Fastkart";
             // 
@@ -561,7 +560,7 @@
             this.pnlHeader.Location = new System.Drawing.Point(250, 0);
             this.pnlHeader.Margin = new System.Windows.Forms.Padding(0);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(834, 110);
+            this.pnlHeader.Size = new System.Drawing.Size(1161, 110);
             this.pnlHeader.TabIndex = 1;
             // 
             // pnlUserInfo
@@ -571,7 +570,7 @@
             this.pnlUserInfo.Controls.Add(this.lblName);
             this.pnlUserInfo.Controls.Add(this.picUser);
             this.pnlUserInfo.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pnlUserInfo.Location = new System.Drawing.Point(595, 0);
+            this.pnlUserInfo.Location = new System.Drawing.Point(922, 0);
             this.pnlUserInfo.Name = "pnlUserInfo";
             this.pnlUserInfo.Size = new System.Drawing.Size(239, 110);
             this.pnlUserInfo.TabIndex = 1;
@@ -596,7 +595,7 @@
             this.lblRole.ForeColor = System.Drawing.Color.Gray;
             this.lblRole.Location = new System.Drawing.Point(74, 62);
             this.lblRole.Name = "lblRole";
-            this.lblRole.Size = new System.Drawing.Size(46, 17);
+            this.lblRole.Size = new System.Drawing.Size(90, 36);
             this.lblRole.TabIndex = 2;
             this.lblRole.Text = "Admin";
             // 
@@ -607,13 +606,12 @@
             this.lblName.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.lblName.Location = new System.Drawing.Point(73, 42);
             this.lblName.Name = "lblName";
-            this.lblName.Size = new System.Drawing.Size(95, 20);
+            this.lblName.Size = new System.Drawing.Size(190, 41);
             this.lblName.TabIndex = 1;
             this.lblName.Text = "Emay Walter";
             // 
             // picUser
             // 
-            this.picUser.Image = ((System.Drawing.Image)(resources.GetObject("picUser.Image")));
             this.picUser.Location = new System.Drawing.Point(17, 36);
             this.picUser.Name = "picUser";
             this.picUser.Size = new System.Drawing.Size(50, 50);
@@ -629,7 +627,7 @@
             this.txtSearch.Location = new System.Drawing.Point(26, 46);
             this.txtSearch.MinimumSize = new System.Drawing.Size(200, 4);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(350, 29);
+            this.txtSearch.Size = new System.Drawing.Size(677, 50);
             this.txtSearch.TabIndex = 0;
             this.txtSearch.Text = "Tìm kiếm...";
             // 
@@ -640,14 +638,14 @@
             this.pnlMainContent.Location = new System.Drawing.Point(250, 110);
             this.pnlMainContent.Margin = new System.Windows.Forms.Padding(0);
             this.pnlMainContent.Name = "pnlMainContent";
-            this.pnlMainContent.Size = new System.Drawing.Size(834, 610);
+            this.pnlMainContent.Size = new System.Drawing.Size(1161, 724);
             this.pnlMainContent.TabIndex = 2;
             // 
             // frmMainAdmin
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 36F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1084, 720);
+            this.ClientSize = new System.Drawing.Size(1411, 834);
             this.Controls.Add(this.pnlMainContent);
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.pnlSidebar);
