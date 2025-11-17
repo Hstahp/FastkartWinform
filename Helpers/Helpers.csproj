@@ -80,7 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataTableExtensions.cs" />
+    <Compile Include="EmailHelper.cs" />
     <Compile Include="ExportHelper.cs" />
+    <Compile Include="OtpHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ValidationHelper.cs" />
   </ItemGroup>

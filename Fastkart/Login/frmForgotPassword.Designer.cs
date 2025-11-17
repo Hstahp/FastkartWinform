@@ -1,6 +1,6 @@
 ﻿namespace GUI
 {
-    partial class frmLogin
+    partial class frmForgotPassword
     {
         /// <summary>
         /// Required designer variable.
@@ -29,53 +29,39 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.panelLogin = new Guna.UI2.WinForms.Guna2Panel();
-            this.linkForgotPassword = new System.Windows.Forms.LinkLabel(); // Thêm LinkLabel
+            // Panel bên phải (Form Quên Mật Khẩu)
+            this.panelForgotPassword = new Guna.UI2.WinForms.Guna2Panel();
             this.labelSubtitle = new System.Windows.Forms.Label();
             this.labelTitle = new System.Windows.Forms.Label();
             this.controlBoxClose = new Guna.UI2.WinForms.Guna2ControlBox();
-            this.btnLogin = new Guna.UI2.WinForms.Guna2Button();
-            this.txtPassword = new Guna.UI2.WinForms.Guna2TextBox();
+            this.btnForgotPassword = new Guna.UI2.WinForms.Guna2Button();
             this.txtEmail = new Guna.UI2.WinForms.Guna2TextBox();
+            // Panel bên trái (Ảnh Nền)
             this.panelImage = new Guna.UI2.WinForms.Guna2Panel();
             this.picBackground = new Guna.UI2.WinForms.Guna2PictureBox();
+            // Các component hiệu ứng
             this.borderlessForm = new Guna.UI2.WinForms.Guna2BorderlessForm(this.components);
             this.guna2DragControl1 = new Guna.UI2.WinForms.Guna2DragControl(this.components);
             this.guna2ShadowForm1 = new Guna.UI2.WinForms.Guna2ShadowForm(this.components);
-            this.panelLogin.SuspendLayout();
+
+            this.panelForgotPassword.SuspendLayout();
             this.panelImage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picBackground)).BeginInit();
             this.SuspendLayout();
             // 
-            // panelLogin
+            // panelForgotPassword
             // 
-            this.panelLogin.BackColor = System.Drawing.Color.White;
-            this.panelLogin.Controls.Add(this.linkForgotPassword); // Thêm
-            this.panelLogin.Controls.Add(this.labelSubtitle);
-            this.panelLogin.Controls.Add(this.labelTitle);
-            this.panelLogin.Controls.Add(this.controlBoxClose);
-            this.panelLogin.Controls.Add(this.btnLogin);
-            this.panelLogin.Controls.Add(this.txtPassword);
-            this.panelLogin.Controls.Add(this.txtEmail);
-            this.panelLogin.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelLogin.Location = new System.Drawing.Point(450, 0);
-            this.panelLogin.Name = "panelLogin";
-            this.panelLogin.Size = new System.Drawing.Size(450, 550);
-            this.panelLogin.TabIndex = 1;
-            // 
-            // linkForgotPassword
-            // 
-            this.linkForgotPassword.ActiveLinkColor = System.Drawing.Color.Black;
-            this.linkForgotPassword.AutoSize = true;
-            this.linkForgotPassword.Font = new System.Drawing.Font("Segoe UI", 9.75F);
-            this.linkForgotPassword.LinkColor = System.Drawing.Color.Gray;
-            this.linkForgotPassword.Location = new System.Drawing.Point(300, 320); // Vị trí
-            this.linkForgotPassword.Name = "linkForgotPassword";
-            this.linkForgotPassword.Size = new System.Drawing.Size(104, 17);
-            this.linkForgotPassword.TabIndex = 9;
-            this.linkForgotPassword.TabStop = true;
-            this.linkForgotPassword.Text = "Forgot Password?";
-            this.linkForgotPassword.Click += new System.EventHandler(this.linkForgotPassword_Click);
+            this.panelForgotPassword.BackColor = System.Drawing.Color.White;
+            this.panelForgotPassword.Controls.Add(this.labelSubtitle);
+            this.panelForgotPassword.Controls.Add(this.labelTitle);
+            this.panelForgotPassword.Controls.Add(this.controlBoxClose);
+            this.panelForgotPassword.Controls.Add(this.btnForgotPassword);
+            this.panelForgotPassword.Controls.Add(this.txtEmail);
+            this.panelForgotPassword.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelForgotPassword.Location = new System.Drawing.Point(450, 0); // Vị trí sau panel ảnh
+            this.panelForgotPassword.Name = "panelForgotPassword";
+            this.panelForgotPassword.Size = new System.Drawing.Size(450, 550); // Kích thước còn lại
+            this.panelForgotPassword.TabIndex = 1;
             // 
             // labelSubtitle
             // 
@@ -84,9 +70,9 @@
             this.labelSubtitle.ForeColor = System.Drawing.Color.Gray;
             this.labelSubtitle.Location = new System.Drawing.Point(50, 150);
             this.labelSubtitle.Name = "labelSubtitle";
-            this.labelSubtitle.Size = new System.Drawing.Size(147, 21);
+            this.labelSubtitle.Size = new System.Drawing.Size(142, 21);
             this.labelSubtitle.TabIndex = 12;
-            this.labelSubtitle.Text = "Log In Your Account";
+            this.labelSubtitle.Text = "Forgot your password";
             // 
             // labelTitle
             // 
@@ -108,37 +94,18 @@
             this.controlBoxClose.Size = new System.Drawing.Size(35, 29);
             this.controlBoxClose.TabIndex = 10;
             // 
-            // btnLogin
+            // btnForgotPassword
             // 
-            this.btnLogin.BorderRadius = 8;
-            this.btnLogin.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(221)))), ((int)(((byte)(75)))), ((int)(((byte)(57)))));
-            this.btnLogin.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.btnLogin.ForeColor = System.Drawing.Color.White;
-            this.btnLogin.Location = new System.Drawing.Point(54, 350);
-            this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(350, 45);
-            this.btnLogin.TabIndex = 10; // Đổi TabIndex
-            this.btnLogin.Text = "Log In";
-            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
-            // 
-            // txtPassword
-            // 
-            this.txtPassword.BorderRadius = 8;
-            this.txtPassword.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtPassword.DefaultText = "";
-            this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 9.75F);
-            this.txtPassword.IconRight = global::GUI.Properties.Resources.eye_open;
-            this.txtPassword.IconRightCursor = System.Windows.Forms.Cursors.Hand;
-            this.txtPassword.Location = new System.Drawing.Point(54, 270);
-            this.txtPassword.Name = "txtPassword";
-            this.txtPassword.PasswordChar = '●';
-            this.txtPassword.PlaceholderText = "Password";
-            this.txtPassword.SelectedText = "";
-            this.txtPassword.Size = new System.Drawing.Size(350, 45);
-            this.txtPassword.TabIndex = 8;
-            this.txtPassword.UseSystemPasswordChar = true;
-            this.txtPassword.IconRightClick += new System.EventHandler(this.txtPassword_IconRightClick);
-            this.txtPassword.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPassword_KeyDown);
+            this.btnForgotPassword.BorderRadius = 8;
+            this.btnForgotPassword.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(221)))), ((int)(((byte)(75)))), ((int)(((byte)(57)))));
+            this.btnForgotPassword.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+            this.btnForgotPassword.ForeColor = System.Drawing.Color.White;
+            this.btnForgotPassword.Location = new System.Drawing.Point(54, 280); // Vị trí button
+            this.btnForgotPassword.Name = "btnForgotPassword";
+            this.btnForgotPassword.Size = new System.Drawing.Size(350, 45);
+            this.btnForgotPassword.TabIndex = 9;
+            this.btnForgotPassword.Text = "Forgot Password";
+            this.btnForgotPassword.Click += new System.EventHandler(this.btnForgotPassword_Click);
             // 
             // txtEmail
             // 
@@ -146,7 +113,7 @@
             this.txtEmail.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtEmail.DefaultText = "";
             this.txtEmail.Font = new System.Drawing.Font("Segoe UI", 9.75F);
-            this.txtEmail.Location = new System.Drawing.Point(54, 210);
+            this.txtEmail.Location = new System.Drawing.Point(54, 210); // Vị trí textbox
             this.txtEmail.Name = "txtEmail";
             this.txtEmail.PasswordChar = '\0';
             this.txtEmail.PlaceholderText = "Email Address";
@@ -157,16 +124,16 @@
             // panelImage
             // 
             this.panelImage.Controls.Add(this.picBackground);
-            this.panelImage.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panelImage.Dock = System.Windows.Forms.DockStyle.Left; // Panel Ảnh bên trái
             this.panelImage.Location = new System.Drawing.Point(0, 0);
             this.panelImage.Name = "panelImage";
-            this.panelImage.Size = new System.Drawing.Size(450, 550);
+            this.panelImage.Size = new System.Drawing.Size(450, 550); // Kích thước cố định
             this.panelImage.TabIndex = 0;
             // 
             // picBackground
             // 
             this.picBackground.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.picBackground.Image = global::GUI.Properties.Resources.log_in;
+            this.picBackground.Image = global::GUI.Properties.Resources.forgot; // Sử dụng ảnh "forgot"
             this.picBackground.ImageRotate = 0F;
             this.picBackground.Location = new System.Drawing.Point(0, 0);
             this.picBackground.Name = "picBackground";
@@ -184,27 +151,27 @@
             // guna2DragControl1
             // 
             this.guna2DragControl1.DockIndicatorTransparencyValue = 0.6D;
-            this.guna2DragControl1.TargetControl = this.panelLogin;
+            this.guna2DragControl1.TargetControl = this.panelForgotPassword; // Kéo thả bằng panel form
             this.guna2DragControl1.UseTransparentDrag = true;
             // 
             // guna2ShadowForm1
             // 
             this.guna2ShadowForm1.TargetForm = this;
             // 
-            // frmLogin
+            // frmForgotPassword
             // 
-            this.AcceptButton = this.btnLogin;
+            this.AcceptButton = this.btnForgotPassword;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(900, 550);
-            this.Controls.Add(this.panelLogin);
+            this.ClientSize = new System.Drawing.Size(900, 550); // Tổng kích thước
+            this.Controls.Add(this.panelForgotPassword);
             this.Controls.Add(this.panelImage);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "frmLogin";
+            this.Name = "frmForgotPassword";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "frmLogin";
-            this.panelLogin.ResumeLayout(false);
-            this.panelLogin.PerformLayout();
+            this.Text = "frmForgotPassword";
+            this.panelForgotPassword.ResumeLayout(false);
+            this.panelForgotPassword.PerformLayout();
             this.panelImage.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picBackground)).EndInit();
             this.ResumeLayout(false);
@@ -213,18 +180,17 @@
 
         #endregion
 
+        // Đổi tên các control cho phù hợp với frmForgotPassword
         private Guna.UI2.WinForms.Guna2Panel panelImage;
         private Guna.UI2.WinForms.Guna2PictureBox picBackground;
-        private Guna.UI2.WinForms.Guna2Panel panelLogin;
+        private Guna.UI2.WinForms.Guna2Panel panelForgotPassword;
         private System.Windows.Forms.Label labelSubtitle;
         private System.Windows.Forms.Label labelTitle;
         private Guna.UI2.WinForms.Guna2ControlBox controlBoxClose;
-        private Guna.UI2.WinForms.Guna2Button btnLogin;
-        private Guna.UI2.WinForms.Guna2TextBox txtPassword;
+        private Guna.UI2.WinForms.Guna2Button btnForgotPassword;
         private Guna.UI2.WinForms.Guna2TextBox txtEmail;
         private Guna.UI2.WinForms.Guna2BorderlessForm borderlessForm;
         private Guna.UI2.WinForms.Guna2DragControl guna2DragControl1;
         private Guna.UI2.WinForms.Guna2ShadowForm guna2ShadowForm1;
-        private System.Windows.Forms.LinkLabel linkForgotPassword; // Thêm
     }
 }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GUI;
 
 namespace Fastkart
 {
@@ -19,16 +20,13 @@ namespace Fastkart
         private Label currentArrowLabel = null;
         private Button currentActiveButton = null;
 
-        // Định nghĩa màu sắc
-        private Color parentColor = Color.FromArgb(46, 139, 87);
-        private Color parentHoverColor = Color.FromArgb(34, 102, 64);
-        private Color childColor = Color.FromArgb(60, 150, 100);
-
-        // === THAY ĐỔI THEO YÊU CẦU CỦA BẠN ===
-        // Đặt màu hover của button CON giống hệt màu hover của button CHA
-        private Color childHoverColor = Color.FromArgb(34, 102, 64); // Giống parentHoverColor
-
-        private Color activeColor = Color.FromArgb(52, 152, 219);
+        private Color sidebarBg = Color.FromArgb(31, 41, 55);     
+        private Color sidebarHover = Color.FromArgb(55, 65, 81);      
+        private Color submenuBg = Color.FromArgb(17, 24, 39);        
+        private Color activeColor = Color.FromArgb(59, 130, 246);     
+        private Color activeBg = Color.FromArgb(37, 99, 235);        
+        private Color textNormal = Color.FromArgb(229, 231, 235);     
+        private Color textMuted = Color.FromArgb(156, 163, 175);       
 
         public frmMainAdmin()
         {
@@ -36,7 +34,51 @@ namespace Fastkart
             this.WindowState = FormWindowState.Maximized;
             CollapseAllSubMenus();
             AddHoverEvents();
+            InitializeSearchBox();
+ 
+            this.FormClosing += frmMainAdmin_FormClosing;
         }
+
+        private void frmMainAdmin_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Hiển thị xác nhận đăng xuất
+            DialogResult result = MessageBox.Show(
+                "Bạn có chắc chắn muốn đăng xuất?",
+                "Xác nhận đăng xuất",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                // Tìm hoặc tạo mới form Login
+                Form loginForm = Application.OpenForms["frmLogin"];
+                if (loginForm != null)
+                {
+                    loginForm.Show();
+                }
+                else
+                {
+                    frmLogin newLoginForm = new frmLogin();
+                    newLoginForm.Show();
+                }
+            }
+            else
+            {
+                // Hủy việc đóng form
+                e.Cancel = true;
+            }
+        }
+
+        /*
+        private void ClearUserSession()
+        {
+            // Ví dụ: Xóa thông tin user đã lưu
+            Properties.Settings.Default.LoggedInUserId = 0;
+            Properties.Settings.Default.LoggedInUserEmail = string.Empty;
+            Properties.Settings.Default.Save();
+        }
+        */
 
         // Sự kiện Form Load
         private void frmMainAdmin_Load(object sender, EventArgs e)
@@ -48,12 +90,45 @@ namespace Fastkart
             }
         }
 
-        // Làm tròn ảnh
+        // Làm tròn ảnh user
         private void picUser_Paint(object sender, PaintEventArgs e)
         {
             GraphicsPath gp = new GraphicsPath();
             gp.AddEllipse(0, 0, picUser.Width - 1, picUser.Height - 1);
             picUser.Region = new Region(gp);
+
+            // Thêm border cho ảnh
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            using (Pen pen = new Pen(Color.FromArgb(209, 213, 219), 2))
+            {
+                e.Graphics.DrawEllipse(pen, 1, 1, picUser.Width - 3, picUser.Height - 3);
+            }
+        }
+
+        // Khởi tạo search box
+        private void InitializeSearchBox()
+        {
+            txtSearch.GotFocus += (s, e) =>
+            {
+                if (txtSearch.Text == "🔍  Search products, orders, customers...")
+                {
+                    txtSearch.Text = "";
+                    txtSearch.ForeColor = Color.FromArgb(31, 41, 55);
+                }
+            };
+
+            txtSearch.LostFocus += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(txtSearch.Text))
+                {
+                    txtSearch.Text = "🔍  Search products, orders, customers...";
+                    txtSearch.ForeColor = Color.FromArgb(107, 114, 128);
+                }
+            };
+
+            // Thêm padding cho TextBox
+            txtSearch.Padding = new Padding(12, 8, 12, 8);
+            txtSearch.Height = 40;
         }
 
         // Mở 1 form con vào pnlMainContent
@@ -92,7 +167,7 @@ namespace Fastkart
             }
             if (currentArrowLabel != null)
             {
-                currentArrowLabel.Text = "❯";
+                currentArrowLabel.Text = "›";
             }
             currentSubMenuPanel = null;
             currentParentButton = null;
@@ -103,9 +178,10 @@ namespace Fastkart
         private void ExpandSubMenu(Panel subMenu, Label arrowLabel)
         {
             int expandedHeight = subMenu.Controls.OfType<Button>().Sum(b => b.Height);
+            expandedHeight += subMenu.Padding.Top + subMenu.Padding.Bottom;
 
             subMenu.Height = expandedHeight;
-            arrowLabel.Text = "▼";
+            arrowLabel.Text = "▾";
             currentSubMenuPanel = subMenu;
             currentArrowLabel = arrowLabel;
             currentParentButton = (Button)arrowLabel.Parent;
@@ -122,7 +198,7 @@ namespace Fastkart
             }
         }
 
-        // Sự kiện Click của các button CHA (trỏ vào hàm chung)
+        // Sự kiện Click của các button CHA
         private void btnProduct_Click(object sender, EventArgs e)
         {
             HandleParentMenuClick(pnlProductSub, lblProductArrow);
@@ -157,18 +233,20 @@ namespace Fastkart
         {
             foreach (Button btn in pnlSidebar.Controls.OfType<Button>())
             {
-                btn.BackColor = parentColor;
-                btn.ForeColor = Color.White;
+                btn.BackColor = Color.Transparent;
+                btn.ForeColor = textNormal;
                 foreach (Label lbl in btn.Controls.OfType<Label>())
                 {
                     lbl.BackColor = Color.Transparent;
+                    lbl.ForeColor = textMuted;
                 }
             }
             foreach (Panel pnl in pnlSidebar.Controls.OfType<Panel>())
             {
                 foreach (Button btn in pnl.Controls.OfType<Button>())
                 {
-                    btn.BackColor = childColor;
+                    btn.BackColor = Color.Transparent;
+                    btn.ForeColor = Color.FromArgb(209, 213, 219);
                 }
             }
         }
@@ -180,71 +258,72 @@ namespace Fastkart
 
             ResetButtonColors();
 
-            activeButton.BackColor = activeColor;
+            activeButton.BackColor = activeBg;
             activeButton.ForeColor = Color.White;
             currentActiveButton = activeButton;
 
             Label arrowLabel = activeButton.Controls.OfType<Label>().FirstOrDefault();
             if (arrowLabel != null)
             {
-                arrowLabel.BackColor = activeColor;
+                arrowLabel.BackColor = activeBg;
+                arrowLabel.ForeColor = Color.White;
             }
 
+            // Highlight parent button nếu là submenu item
             Control parentPanel = activeButton.Parent;
             if (parentPanel == pnlProductSub)
             {
-                btnProduct.BackColor = parentHoverColor;
-                lblProductArrow.BackColor = parentHoverColor;
+                btnProduct.BackColor = sidebarHover;
+                lblProductArrow.BackColor = sidebarHover;
             }
             else if (parentPanel == pnlCategorySub)
             {
-                btnCategory.BackColor = parentHoverColor;
-                lblCategoryArrow.BackColor = parentHoverColor;
+                btnCategory.BackColor = sidebarHover;
+                lblCategoryArrow.BackColor = sidebarHover;
             }
             else if (parentPanel == pnlAttributesSub)
             {
-                btnAttributes.BackColor = parentHoverColor;
-                lblAttributesArrow.BackColor = parentHoverColor;
+                btnAttributes.BackColor = sidebarHover;
+                lblAttributesArrow.BackColor = sidebarHover;
             }
             else if (parentPanel == pnlUserSub)
             {
-                btnUser.BackColor = parentHoverColor;
-                lblUserArrow.BackColor = parentHoverColor;
+                btnUser.BackColor = sidebarHover;
+                lblUserArrow.BackColor = sidebarHover;
             }
             else if (parentPanel == pnlRolesSub)
             {
-                btnRoles.BackColor = parentHoverColor;
-                lblRolesArrow.BackColor = parentHoverColor;
+                btnRoles.BackColor = sidebarHover;
+                lblRolesArrow.BackColor = sidebarHover;
             }
         }
 
-
-        // Hàm này gắn tất cả sự kiện hover
+        // Gắn tất cả sự kiện hover
         private void AddHoverEvents()
         {
-            // Button cha (và label mũi tên của chúng)
-            AddHoverToParentButton(btnDashboard, null, parentColor, parentHoverColor);
-            AddHoverToParentButton(btnProduct, lblProductArrow, parentColor, parentHoverColor);
-            AddHoverToParentButton(btnCategory, lblCategoryArrow, parentColor, parentHoverColor);
-            AddHoverToParentButton(btnAttributes, lblAttributesArrow, parentColor, parentHoverColor);
-            AddHoverToParentButton(btnUser, lblUserArrow, parentColor, parentHoverColor);
-            AddHoverToParentButton(btnRoles, lblRolesArrow, parentColor, parentHoverColor);
+            // Button cha
+            AddHoverToParentButton(btnDashboard, null);
+            AddHoverToParentButton(btnProduct, lblProductArrow);
+            AddHoverToParentButton(btnCategory, lblCategoryArrow);
+            AddHoverToParentButton(btnAttributes, lblAttributesArrow);
+            AddHoverToParentButton(btnUser, lblUserArrow);
+            AddHoverToParentButton(btnRoles, lblRolesArrow);
 
-            // Button con (sử dụng childHoverColor đã được cập nhật)
-            AddHoverToChildButton(btnProducts, childColor, childHoverColor);
-            AddHoverToChildButton(btnAddProduct, childColor, childHoverColor);
-            AddHoverToChildButton(btnCategoryList, childColor, childHoverColor);
-            AddHoverToChildButton(btnAddCategory, childColor, childHoverColor);
-            AddHoverToChildButton(btnAttributesList, childColor, childHoverColor);
-            AddHoverToChildButton(btnAddAttribute, childColor, childHoverColor);
-            AddHoverToChildButton(btnAllUser, childColor, childHoverColor);
-            AddHoverToChildButton(btnAddUser, childColor, childHoverColor);
-            AddHoverToChildButton(btnAllRoles, childColor, childHoverColor);
-            AddHoverToChildButton(btnCreateRole, childColor, childHoverColor);
+            // Button con
+            AddHoverToChildButton(btnProducts);
+            AddHoverToChildButton(btnAddProduct);
+            AddHoverToChildButton(btnCategoryList);
+            AddHoverToChildButton(btnAddCategory);
+            AddHoverToChildButton(btnAttributesList);
+            AddHoverToChildButton(btnAddAttribute);
+            AddHoverToChildButton(btnAllUser);
+            AddHoverToChildButton(btnAddUser);
+            AddHoverToChildButton(btnAllRoles);
+            AddHoverToChildButton(btnCreateRole);
         }
 
-        // Hàm gán sự kiện hover cho Button CHA (và label con)
-        private void AddHoverToParentButton(Button btn, Label lbl, Color normalColor, Color hoverColor)
+        // Hover cho Button CHA
+        private void AddHoverToParentButton(Button btn, Label lbl)
         {
             if (btn == null) return;
 
@@ -252,20 +331,20 @@ namespace Fastkart
             {
                 if (btn != currentActiveButton)
                 {
-                    btn.BackColor = hoverColor;
-                    if (lbl != null) lbl.BackColor = hoverColor;
+                    btn.BackColor = sidebarHover;
+                    if (lbl != null) lbl.BackColor = sidebarHover;
                 }
             };
 
-            // === SỬA LỖI CRASH TRONG LOGIC MOUSELEAVE ===
             btn.MouseLeave += (s, e) =>
             {
                 if (btn != currentActiveButton)
                 {
-                    btn.BackColor = normalColor;
+                    btn.BackColor = Color.Transparent;
                     if (lbl != null) lbl.BackColor = Color.Transparent;
                 }
 
+                // Keep parent highlighted nếu child đang active
                 if (currentActiveButton != null && currentActiveButton.Parent != pnlSidebar)
                 {
                     Button parentBtnToKeepHovered = null;
@@ -277,8 +356,8 @@ namespace Fastkart
 
                     if (btn == parentBtnToKeepHovered)
                     {
-                        btn.BackColor = hoverColor;
-                        if (lbl != null) lbl.BackColor = hoverColor;
+                        btn.BackColor = sidebarHover;
+                        if (lbl != null) lbl.BackColor = sidebarHover;
                     }
                 }
             };
@@ -289,17 +368,16 @@ namespace Fastkart
                 {
                     if (btn != currentActiveButton)
                     {
-                        btn.BackColor = hoverColor;
-                        lbl.BackColor = hoverColor;
+                        btn.BackColor = sidebarHover;
+                        lbl.BackColor = sidebarHover;
                     }
                 };
 
-                // === SỬA LỖI CRASH TRONG LOGIC MOUSELEAVE ===
                 lbl.MouseLeave += (s, e) =>
                 {
                     if (btn != currentActiveButton)
                     {
-                        btn.BackColor = normalColor;
+                        btn.BackColor = Color.Transparent;
                         lbl.BackColor = Color.Transparent;
                     }
 
@@ -314,22 +392,31 @@ namespace Fastkart
 
                         if (btn == parentBtnToKeepHovered)
                         {
-                            btn.BackColor = hoverColor;
-                            lbl.BackColor = hoverColor;
+                            btn.BackColor = sidebarHover;
+                            lbl.BackColor = sidebarHover;
                         }
                     }
                 };
             }
         }
 
-        // Hàm gán sự kiện hover cho Button CON
-        private void AddHoverToChildButton(Button btn, Color normalColor, Color hoverColor)
+        // Hover cho Button CON
+        private void AddHoverToChildButton(Button btn)
         {
             if (btn == null) return;
-            btn.MouseEnter += (s, e) => { if (btn != currentActiveButton) btn.BackColor = hoverColor; };
-            btn.MouseLeave += (s, e) => { if (btn != currentActiveButton) btn.BackColor = normalColor; };
-        }
 
+            btn.MouseEnter += (s, e) =>
+            {
+                if (btn != currentActiveButton)
+                    btn.BackColor = sidebarHover;
+            };
+
+            btn.MouseLeave += (s, e) =>
+            {
+                if (btn != currentActiveButton)
+                    btn.BackColor = Color.Transparent;
+            };
+        }
 
         #endregion
 
@@ -337,58 +424,58 @@ namespace Fastkart
 
         private void btnDashboard_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnDashboard);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnDashboard);
             CollapseCurrentSubMenu();
         }
 
         private void btnProducts_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnProducts);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnProducts);
         }
 
         private void btnAddProduct_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnAddProduct);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAddProduct);
         }
 
         private void btnCategoryList_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnCategoryList);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnCategoryList);
         }
 
         private void btnAddCategory_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnAddCategory);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAddCategory);
         }
 
         private void btnAttributesList_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnAttributesList);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAttributesList);
         }
 
         private void btnAddAttribute_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnAddAttribute);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAddAttribute);
         }
 
         private void btnAllUser_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnAllUser);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAllUser);
         }
 
         private void btnAddUser_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnAddUser);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAddUser);
         }
 
         private void btnAllRoles_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnAllRoles);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAllRoles);
         }
 
         private void btnCreateRole_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.White }, btnCreateRole);
+            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnCreateRole);
         }
 
         #endregion

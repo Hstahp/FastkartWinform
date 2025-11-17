@@ -1,7 +1,8 @@
 ﻿using Common.Enum;
+using DAL;
 using DAL.EF;
-using DAL.Repositories;
 using DTO;
+using Helpers;
 using System;
 
 
@@ -29,12 +30,7 @@ namespace BLL
                 result.Status = LoginStatus.UserNotFound;
                 return result;
             }
-
-            // === DEBUG: Kiểm tra giá trị PasswordHash ===
-            System.Diagnostics.Debug.WriteLine($"Email: {email}");
-            System.Diagnostics.Debug.WriteLine($"PasswordHash from DB: {userFromDb.PasswordHash}");
-            System.Diagnostics.Debug.WriteLine($"Password input: {password}");
-
+ 
             // 2. Xác thực mật khẩu
             bool isPasswordValid = false;
             try
@@ -75,8 +71,50 @@ namespace BLL
 
             return result;
         }
+        public bool HandleForgotPassword(string email)
+        {
+            // 1. Kiểm tra xem email có tồn tại không
+            var user = _userRepo.GetUserByEmail(email);
+            if (user == null)
+            {
+              
+                return false;
+            }
 
+            // 2. Tạo OTP và thời gian hết hạn (5 phút)
+            string otp = OtpHelper.GenerateOtp();
+            DateTime expiry = DateTime.Now.AddMinutes(5);
 
+            // 3. Lưu OTP vào CSDL (qua DAL)
+            bool saved = _userRepo.SaveOtp(email, otp, expiry);
+
+            if (saved)
+            {
+                // 4. Nếu lưu thành công, gửi email (dùng EmailHelper)
+                return EmailHelper.SendOtpEmail(email, otp);
+            }
+
+            return false;
+        }
+        public bool VerifyOtp(string email, string otp)
+        {
+            return _userRepo.VerifyOtp(email, otp);
+        }
+
+        public bool ResetPassword(string email, string newPassword)
+        {
+            // BLL chịu trách nhiệm HASH mật khẩu
+            try
+            {
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                return _userRepo.ResetPassword(email, hashedPassword);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
         public bool Register(string fullName, string email, string rawPassword)
         {
             // Mã hóa mật khẩu trước khi lưu
@@ -95,5 +133,6 @@ namespace BLL
 
             return true; // trả về true nếu tạo thành công
         }
+
     }
 }
