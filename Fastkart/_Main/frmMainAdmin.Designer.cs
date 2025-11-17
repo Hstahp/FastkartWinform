@@ -560,7 +560,7 @@
             this.pnlHeader.Location = new System.Drawing.Point(250, 0);
             this.pnlHeader.Margin = new System.Windows.Forms.Padding(0);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Size = new System.Drawing.Size(1161, 110);
+            this.pnlHeader.Size = new System.Drawing.Size(1180, 110);
             this.pnlHeader.TabIndex = 1;
             // 
             // pnlUserInfo
@@ -570,7 +570,7 @@
             this.pnlUserInfo.Controls.Add(this.lblName);
             this.pnlUserInfo.Controls.Add(this.picUser);
             this.pnlUserInfo.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pnlUserInfo.Location = new System.Drawing.Point(922, 0);
+            this.pnlUserInfo.Location = new System.Drawing.Point(941, 0);
             this.pnlUserInfo.Name = "pnlUserInfo";
             this.pnlUserInfo.Size = new System.Drawing.Size(239, 110);
             this.pnlUserInfo.TabIndex = 1;
@@ -627,7 +627,7 @@
             this.txtSearch.Location = new System.Drawing.Point(26, 46);
             this.txtSearch.MinimumSize = new System.Drawing.Size(200, 4);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(677, 50);
+            this.txtSearch.Size = new System.Drawing.Size(696, 50);
             this.txtSearch.TabIndex = 0;
             this.txtSearch.Text = "Tìm kiếm...";
             // 
@@ -638,14 +638,14 @@
             this.pnlMainContent.Location = new System.Drawing.Point(250, 110);
             this.pnlMainContent.Margin = new System.Windows.Forms.Padding(0);
             this.pnlMainContent.Name = "pnlMainContent";
-            this.pnlMainContent.Size = new System.Drawing.Size(1161, 724);
+            this.pnlMainContent.Size = new System.Drawing.Size(1180, 724);
             this.pnlMainContent.TabIndex = 2;
             // 
             // frmMainAdmin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 36F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1411, 834);
+            this.ClientSize = new System.Drawing.Size(1430, 834);
             this.Controls.Add(this.pnlMainContent);
             this.Controls.Add(this.pnlHeader);
             this.Controls.Add(this.pnlSidebar);
