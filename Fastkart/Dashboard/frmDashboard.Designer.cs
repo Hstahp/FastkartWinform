@@ -1,4 +1,4 @@
-﻿namespace Fastkart.Dashboard
+﻿namespace GUI.Dashboard
 {
     partial class frmDashboard
     {

@@ -10,5 +10,6 @@ namespace Common
     {
         public const string DBConnectDocker = "Server= localhost,1434; Database= FastKart; Integrated Security=True;User ID= fastkart; Password=12345Abc@";
         public const string DBConnectSQLEXPRESS ="";
+        public const string DEFAULT_IMG_USER =  "[\"https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png\"]";
     }
 }

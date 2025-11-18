@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Fastkart.Dashboard
+namespace GUI.Dashboard
 {
     public partial class frmDashboard : Form
     {

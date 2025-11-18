@@ -1,16 +1,9 @@
-﻿namespace Fastkart
+﻿namespace GUI
 {
     partial class frmMainAdmin
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,13 +15,13 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             this.pnlSidebar = new System.Windows.Forms.Panel();
+            this.pnlSettingsSub = new System.Windows.Forms.Panel();
+            this.btnProfileSetting = new System.Windows.Forms.Button();
+            this.btnSettings = new System.Windows.Forms.Button();
+            this.lblSettingsArrow = new System.Windows.Forms.Label();
             this.pnlRolesSub = new System.Windows.Forms.Panel();
             this.btnCreateRole = new System.Windows.Forms.Button();
             this.btnAllRoles = new System.Windows.Forms.Button();
@@ -67,6 +60,8 @@
             this.picUser = new System.Windows.Forms.PictureBox();
             this.pnlMainContent = new System.Windows.Forms.Panel();
             this.pnlSidebar.SuspendLayout();
+            this.pnlSettingsSub.SuspendLayout();
+            this.btnSettings.SuspendLayout();
             this.pnlRolesSub.SuspendLayout();
             this.btnRoles.SuspendLayout();
             this.pnlUserSub.SuspendLayout();
@@ -87,6 +82,8 @@
             // 
             this.pnlSidebar.AutoScroll = true;
             this.pnlSidebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(41)))), ((int)(((byte)(55)))));
+            this.pnlSidebar.Controls.Add(this.pnlSettingsSub);
+            this.pnlSidebar.Controls.Add(this.btnSettings);
             this.pnlSidebar.Controls.Add(this.pnlRolesSub);
             this.pnlSidebar.Controls.Add(this.btnRoles);
             this.pnlSidebar.Controls.Add(this.pnlUserSub);
@@ -105,6 +102,71 @@
             this.pnlSidebar.Name = "pnlSidebar";
             this.pnlSidebar.Size = new System.Drawing.Size(260, 834);
             this.pnlSidebar.TabIndex = 0;
+            // 
+            // pnlSettingsSub
+            // 
+            this.pnlSettingsSub.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(24)))), ((int)(((byte)(39)))));
+            this.pnlSettingsSub.Controls.Add(this.btnProfileSetting);
+            this.pnlSettingsSub.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlSettingsSub.Location = new System.Drawing.Point(0, 472);
+            this.pnlSettingsSub.Margin = new System.Windows.Forms.Padding(0);
+            this.pnlSettingsSub.Name = "pnlSettingsSub";
+            this.pnlSettingsSub.Padding = new System.Windows.Forms.Padding(0, 4, 0, 4);
+            this.pnlSettingsSub.Size = new System.Drawing.Size(260, 0);
+            this.pnlSettingsSub.TabIndex = 13;
+            // 
+            // btnProfileSetting
+            // 
+            this.btnProfileSetting.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnProfileSetting.FlatAppearance.BorderSize = 0;
+            this.btnProfileSetting.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnProfileSetting.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnProfileSetting.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnProfileSetting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(213)))), ((int)(((byte)(219)))));
+            this.btnProfileSetting.Location = new System.Drawing.Point(0, 4);
+            this.btnProfileSetting.Margin = new System.Windows.Forms.Padding(0);
+            this.btnProfileSetting.Name = "btnProfileSetting";
+            this.btnProfileSetting.Padding = new System.Windows.Forms.Padding(48, 0, 0, 0);
+            this.btnProfileSetting.Size = new System.Drawing.Size(260, 38);
+            this.btnProfileSetting.TabIndex = 3;
+            this.btnProfileSetting.Text = "   Profile Setting";
+            this.btnProfileSetting.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnProfileSetting.UseVisualStyleBackColor = true;
+            this.btnProfileSetting.Click += new System.EventHandler(this.btnProfileSetting_Click);
+            // 
+            // btnSettings
+            // 
+            this.btnSettings.Controls.Add(this.lblSettingsArrow);
+            this.btnSettings.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnSettings.FlatAppearance.BorderSize = 0;
+            this.btnSettings.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSettings.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSettings.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(229)))), ((int)(((byte)(231)))), ((int)(((byte)(235)))));
+            this.btnSettings.Location = new System.Drawing.Point(0, 420);
+            this.btnSettings.Margin = new System.Windows.Forms.Padding(0);
+            this.btnSettings.Name = "btnSettings";
+            this.btnSettings.Padding = new System.Windows.Forms.Padding(20, 0, 0, 0);
+            this.btnSettings.Size = new System.Drawing.Size(260, 52);
+            this.btnSettings.TabIndex = 12;
+            this.btnSettings.Text = "⚙️  Settings";
+            this.btnSettings.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnSettings.UseVisualStyleBackColor = true;
+            this.btnSettings.Click += new System.EventHandler(this.btnSettings_Click);
+            // 
+            // lblSettingsArrow
+            // 
+            this.lblSettingsArrow.BackColor = System.Drawing.Color.Transparent;
+            this.lblSettingsArrow.Dock = System.Windows.Forms.DockStyle.Right;
+            this.lblSettingsArrow.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular);
+            this.lblSettingsArrow.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(156)))), ((int)(((byte)(163)))), ((int)(((byte)(175)))));
+            this.lblSettingsArrow.Location = new System.Drawing.Point(220, 0);
+            this.lblSettingsArrow.Name = "lblSettingsArrow";
+            this.lblSettingsArrow.Size = new System.Drawing.Size(40, 52);
+            this.lblSettingsArrow.TabIndex = 0;
+            this.lblSettingsArrow.Text = "›";
+            this.lblSettingsArrow.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblSettingsArrow.Click += new System.EventHandler(this.btnSettings_Click);
             // 
             // pnlRolesSub
             // 
@@ -699,6 +761,8 @@
             this.Text = "Fastkart - Admin Dashboard";
             this.Load += new System.EventHandler(this.frmMainAdmin_Load);
             this.pnlSidebar.ResumeLayout(false);
+            this.pnlSettingsSub.ResumeLayout(false);
+            this.btnSettings.ResumeLayout(false);
             this.pnlRolesSub.ResumeLayout(false);
             this.btnRoles.ResumeLayout(false);
             this.pnlUserSub.ResumeLayout(false);
@@ -710,6 +774,7 @@
             this.pnlProductSub.ResumeLayout(false);
             this.btnProduct.ResumeLayout(false);
             this.pnlLogo.ResumeLayout(false);
+            this.pnlLogo.PerformLayout();
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
             this.pnlUserInfo.ResumeLayout(false);
@@ -759,5 +824,9 @@
         private System.Windows.Forms.Label lblRolesArrow;
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.Button btnNotifications;
+        private System.Windows.Forms.Panel pnlSettingsSub;
+        private System.Windows.Forms.Button btnProfileSetting;
+        private System.Windows.Forms.Button btnSettings;
+        private System.Windows.Forms.Label lblSettingsArrow;
     }
-}
+}   

@@ -1,7 +1,8 @@
 ﻿using DAL.EF;
 using System;
+using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
-
 namespace DAL
 {
     public class UserDAL
@@ -19,6 +20,12 @@ namespace DAL
                 .FirstOrDefault(u => u.Email == email && u.Deleted == false);
         }
 
+        public Users GetUserByEmailWithRole(string email)
+        {
+            return _context.Users
+                .Include(u => u.Roles) 
+                .FirstOrDefault(u => u.Email == email && u.Deleted == false);
+        }
         public bool SaveOtp(string email, string otpCode, DateTime otpExpiry)
         {
             try
@@ -84,6 +91,52 @@ namespace DAL
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+        public List<Roles> GetAllRoles()
+        {
+            return _context.Roles.Where(r => !r.Deleted).ToList();
+        }
+
+
+        public bool UpdateUserProfile(Users userUpdateInfo)
+        {
+            try
+            {
+                // Tìm user trong DB theo ID
+                var userInDb = _context.Users.FirstOrDefault(u => u.Uid == userUpdateInfo.Uid);
+
+                if (userInDb == null) return false;
+
+                // Cập nhật thông tin chung
+                userInDb.FullName = userUpdateInfo.FullName;
+                userInDb.Email = userUpdateInfo.Email;
+                userInDb.PhoneNumber = userUpdateInfo.PhoneNumber;
+                userInDb.Address = userUpdateInfo.Address;
+                userInDb.RoleUid = userUpdateInfo.RoleUid;
+
+                userInDb.UpdatedAt = DateTime.Now;
+                // userInDb.UpdatedBy = ... (Có thể thêm tên người sửa nếu muốn)
+
+                // Cập nhật Mật khẩu (CHỈ KHI có mật khẩu mới được truyền vào)
+                if (!string.IsNullOrEmpty(userUpdateInfo.PasswordHash))
+                {
+                    userInDb.PasswordHash = userUpdateInfo.PasswordHash;
+                }
+
+                // Cập nhật Ảnh (CHỈ KHI có đường dẫn ảnh mới được truyền vào)
+                if (!string.IsNullOrEmpty(userUpdateInfo.ImgUser))
+                {
+                    userInDb.ImgUser = userUpdateInfo.ImgUser;
+                }
+
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Update Error: " + ex.Message);
                 return false;
             }
         }

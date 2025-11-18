@@ -1,32 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using Common;
+using DTO;
+using GUI;
+using Helpers;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Http;
 using System.Windows.Forms;
-using GUI;
 
-namespace Fastkart
+namespace GUI
 {
     public partial class frmMainAdmin : Form
     {
-        // Trạng thái menu
         private Panel currentSubMenuPanel = null;
         private Button currentParentButton = null;
         private Label currentArrowLabel = null;
         private Button currentActiveButton = null;
+        private Panel pnlUserDropdown;
+        private bool isUserDropdownVisible = false;
 
-        private Color sidebarBg = Color.FromArgb(31, 41, 55);     
-        private Color sidebarHover = Color.FromArgb(55, 65, 81);      
-        private Color submenuBg = Color.FromArgb(17, 24, 39);        
-        private Color activeColor = Color.FromArgb(59, 130, 246);     
-        private Color activeBg = Color.FromArgb(37, 99, 235);        
-        private Color textNormal = Color.FromArgb(229, 231, 235);     
-        private Color textMuted = Color.FromArgb(156, 163, 175);       
+        private Color sidebarBg = Color.FromArgb(31, 41, 55);
+        private Color sidebarHover = Color.FromArgb(55, 65, 81);
+        private Color activeBg = Color.FromArgb(37, 99, 235);
+        private Color textNormal = Color.FromArgb(229, 231, 235);
+        private Color textMuted = Color.FromArgb(156, 163, 175);
 
         public frmMainAdmin()
         {
@@ -35,52 +35,214 @@ namespace Fastkart
             CollapseAllSubMenus();
             AddHoverEvents();
             InitializeSearchBox();
- 
+            InitializeUserInfo();
+            InitializeUserDropdown();
+
             this.FormClosing += frmMainAdmin_FormClosing;
+            this.FormClosed += frmMainAdmin_FormClosed;
         }
 
         private void frmMainAdmin_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Hiển thị xác nhận đăng xuất
-            DialogResult result = MessageBox.Show(
-                "Bạn có chắc chắn muốn đăng xuất?",
-                "Xác nhận đăng xuất",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question
-            );
-
-            if (result == DialogResult.Yes)
+            if (e.CloseReason == CloseReason.UserClosing)
             {
-                // Tìm hoặc tạo mới form Login
-                Form loginForm = Application.OpenForms["frmLogin"];
-                if (loginForm != null)
+                DialogResult result = MessageBox.Show(
+                    "Bạn có chắc chắn muốn đăng xuất?",
+                    "Xác nhận đăng xuất",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (result == DialogResult.Yes)
                 {
-                    loginForm.Show();
+                    UserSession.Clear();
                 }
                 else
                 {
-                    frmLogin newLoginForm = new frmLogin();
-                    newLoginForm.Show();
+                    e.Cancel = true;
                 }
+            }
+        }
+
+        private void frmMainAdmin_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            frmLogin loginForm = Application.OpenForms.OfType<frmLogin>().FirstOrDefault();
+            if (loginForm != null)
+            {
+                loginForm.ResetForm(); // Xóa text cũ
+                loginForm.Show();
             }
             else
             {
-                // Hủy việc đóng form
-                e.Cancel = true;
+                new frmLogin().Show();
             }
         }
 
-        /*
-        private void ClearUserSession()
+        // Load User Info (và cập nhật lại khi Profile Setting thay đổi)
+        private async void InitializeUserInfo()
         {
-            // Ví dụ: Xóa thông tin user đã lưu
-            Properties.Settings.Default.LoggedInUserId = 0;
-            Properties.Settings.Default.LoggedInUserEmail = string.Empty;
-            Properties.Settings.Default.Save();
-        }
-        */
+            if (UserSession.CurrentUser != null)
+            {
+                lblName.Text = UserSession.CurrentUser.FullName;
+                lblRole.Text = UserSession.CurrentUser.RoleName;
 
-        // Sự kiện Form Load
+                string jsonString = UserSession.CurrentUser.ImgUser;
+                if (!string.IsNullOrEmpty(jsonString))
+                {
+                    try
+                    {
+                        string imageUrl = "";
+                        var jsonArray = JArray.Parse(jsonString);
+                        if (jsonArray.Count > 0) imageUrl = jsonArray[0].ToString();
+
+                        if (!string.IsNullOrEmpty(imageUrl))
+                        {
+                            using (HttpClient client = new HttpClient())
+                            {
+                                byte[] imageData = await client.GetByteArrayAsync(imageUrl);
+                                using (MemoryStream ms = new MemoryStream(imageData))
+                                {
+                                    Image originalImage = Image.FromStream(ms);
+                                    picUser.Image = CropToSquare(originalImage);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Error loading user image: " + ex.Message);
+                    }
+                }
+            }
+        }
+
+        private Image CropToSquare(Image img)
+        {
+            int originalWidth = img.Width;
+            int originalHeight = img.Height;
+            int cropSize = Math.Min(originalWidth, originalHeight);
+            int cropX = (originalWidth - cropSize) / 2;
+            int cropY = (originalHeight - cropSize) / 2;
+
+            Bitmap croppedBmp = new Bitmap(cropSize, cropSize);
+            using (Graphics g = Graphics.FromImage(croppedBmp))
+            {
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.DrawImage(img, new Rectangle(0, 0, cropSize, cropSize),
+                            new Rectangle(cropX, cropY, cropSize, cropSize),
+                            GraphicsUnit.Pixel);
+            }
+            return croppedBmp;
+        }
+
+        // ... (InitializeUserDropdown và các hàm khác giữ nguyên như cũ) ...
+        private void InitializeUserDropdown()
+        {
+            // ... (Code cũ của bạn) ...
+            pnlUserDropdown = new Panel
+            {
+                Width = 200,
+                Height = 0,
+                BackColor = Color.White,
+                Visible = false,
+                Location = new Point(
+                    pnlHeader.Right - 200 - pnlHeader.Padding.Right,
+                    pnlHeader.Bottom
+                )
+            };
+
+            Button btnMyInfo = CreateDropdownButton("👤  My Info", 0);
+            Button btnSettings = CreateDropdownButton("⚙️  Settings", 1);
+            Button btnLogout = CreateDropdownButton("🚪  Logout", 2);
+
+            btnMyInfo.Click += (s, e) =>
+            {
+                frmMyInfo profileForm = new frmMyInfo();
+                profileForm.ShowDialog(this);
+                HideUserDropdown();
+            };
+
+            // Logic mở Setting từ Dropdown -> Kích hoạt Sidebar
+            btnSettings.Click += (s, e) => {
+                HideUserDropdown();
+                if (currentSubMenuPanel != pnlSettingsSub)
+                {
+                    HandleParentMenuClick(pnlSettingsSub, lblSettingsArrow);
+                }
+                btnProfileSetting.PerformClick();
+            };
+
+            btnLogout.Click += BtnLogout_Click;
+
+            pnlUserDropdown.Controls.Add(btnMyInfo);
+            pnlUserDropdown.Controls.Add(btnSettings);
+            pnlUserDropdown.Controls.Add(btnLogout);
+
+            pnlUserDropdown.Paint += (s, e) =>
+            {
+                e.Graphics.DrawRectangle(new Pen(Color.FromArgb(229, 231, 235), 1), 0, 0, pnlUserDropdown.Width - 1, pnlUserDropdown.Height - 1);
+            };
+
+            this.Controls.Add(pnlUserDropdown);
+            pnlUserDropdown.BringToFront();
+
+            pnlUserInfo.Click += (s, e) => ToggleUserDropdown();
+            btnUserDropdown.Click += (s, e) => ToggleUserDropdown();
+            picUser.Click += (s, e) => ToggleUserDropdown();
+            lblName.Click += (s, e) => ToggleUserDropdown();
+            lblRole.Click += (s, e) => ToggleUserDropdown();
+        }
+
+        private Button CreateDropdownButton(string text, int index)
+        {
+            Button btn = new Button
+            {
+                Text = text,
+                Width = 200,
+                Height = 45,
+                Top = index * 45,
+                FlatStyle = FlatStyle.Flat,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(15, 0, 0, 0),
+                Font = new Font("Segoe UI", 9.75F),
+                ForeColor = Color.FromArgb(31, 41, 55),
+                BackColor = Color.White,
+                Cursor = Cursors.Hand
+            };
+            btn.FlatAppearance.BorderSize = 0;
+            btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(249, 250, 251);
+            return btn;
+        }
+
+        private void ToggleUserDropdown()
+        {
+            isUserDropdownVisible = !isUserDropdownVisible;
+            if (isUserDropdownVisible)
+            {
+                pnlUserDropdown.Height = 135;
+                pnlUserDropdown.Visible = true;
+                pnlUserDropdown.BringToFront();
+            }
+            else
+            {
+                pnlUserDropdown.Height = 0;
+                pnlUserDropdown.Visible = false;
+            }
+        }
+
+        private void HideUserDropdown()
+        {
+            pnlUserDropdown.Height = 0;
+            pnlUserDropdown.Visible = false;
+            isUserDropdownVisible = false;
+        }
+
+        private void BtnLogout_Click(object sender, EventArgs e)
+        {
+            HideUserDropdown();
+            this.Close();
+        }
+
         private void frmMainAdmin_Load(object sender, EventArgs e)
         {
             picUser.Paint += new PaintEventHandler(picUser_Paint);
@@ -90,14 +252,12 @@ namespace Fastkart
             }
         }
 
-        // Làm tròn ảnh user
         private void picUser_Paint(object sender, PaintEventArgs e)
         {
             GraphicsPath gp = new GraphicsPath();
             gp.AddEllipse(0, 0, picUser.Width - 1, picUser.Height - 1);
             picUser.Region = new Region(gp);
 
-            // Thêm border cho ảnh
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             using (Pen pen = new Pen(Color.FromArgb(209, 213, 219), 2))
             {
@@ -105,7 +265,6 @@ namespace Fastkart
             }
         }
 
-        // Khởi tạo search box
         private void InitializeSearchBox()
         {
             txtSearch.GotFocus += (s, e) =>
@@ -126,17 +285,28 @@ namespace Fastkart
                 }
             };
 
-            // Thêm padding cho TextBox
             txtSearch.Padding = new Padding(12, 8, 12, 8);
             txtSearch.Height = 40;
         }
 
-        // Mở 1 form con vào pnlMainContent
         private void OpenChildForm(Form childForm, Button clickedButton)
         {
+            HideUserDropdown();
+
+            // BẮT BUỘC PHẢI CÓ DÒNG NÀY:
             childForm.TopLevel = false;
+
             childForm.FormBorderStyle = FormBorderStyle.None;
             childForm.Dock = DockStyle.Fill;
+
+            // (Phần còn lại giữ nguyên)
+            if (childForm is frmProfileSetting profileForm)
+            {
+                profileForm.ProfileUpdated += (s, e) =>
+                {
+                    InitializeUserInfo();
+                };
+            }
 
             pnlMainContent.Controls.Clear();
             pnlMainContent.Controls.Add(childForm);
@@ -148,7 +318,6 @@ namespace Fastkart
 
         #region Xử lý Submenu
 
-        // Đóng tất cả menu con khi khởi động
         private void CollapseAllSubMenus()
         {
             pnlProductSub.Height = 0;
@@ -156,9 +325,9 @@ namespace Fastkart
             pnlAttributesSub.Height = 0;
             pnlUserSub.Height = 0;
             pnlRolesSub.Height = 0;
+            pnlSettingsSub.Height = 0;
         }
 
-        // Đóng menu con HIỆN TẠI đang mở
         private void CollapseCurrentSubMenu()
         {
             if (currentSubMenuPanel != null)
@@ -174,7 +343,6 @@ namespace Fastkart
             currentArrowLabel = null;
         }
 
-        // Mở một menu con MỚI
         private void ExpandSubMenu(Panel subMenu, Label arrowLabel)
         {
             int expandedHeight = subMenu.Controls.OfType<Button>().Sum(b => b.Height);
@@ -187,7 +355,6 @@ namespace Fastkart
             currentParentButton = (Button)arrowLabel.Parent;
         }
 
-        // Hàm Click chung cho các button CHA
         private void HandleParentMenuClick(Panel subMenu, Label arrowLabel)
         {
             bool isAlreadyOpen = (currentSubMenuPanel == subMenu);
@@ -198,7 +365,6 @@ namespace Fastkart
             }
         }
 
-        // Sự kiện Click của các button CHA
         private void btnProduct_Click(object sender, EventArgs e)
         {
             HandleParentMenuClick(pnlProductSub, lblProductArrow);
@@ -224,11 +390,15 @@ namespace Fastkart
             HandleParentMenuClick(pnlRolesSub, lblRolesArrow);
         }
 
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+            HandleParentMenuClick(pnlSettingsSub, lblSettingsArrow);
+        }
+
         #endregion
 
         #region Xử lý Hover & Highlight
 
-        // Reset màu tất cả các button
         private void ResetButtonColors()
         {
             foreach (Button btn in pnlSidebar.Controls.OfType<Button>())
@@ -251,7 +421,6 @@ namespace Fastkart
             }
         }
 
-        // Highlight button được chọn
         private void HighlightActiveButton(Button activeButton)
         {
             if (activeButton == null) return;
@@ -269,7 +438,6 @@ namespace Fastkart
                 arrowLabel.ForeColor = Color.White;
             }
 
-            // Highlight parent button nếu là submenu item
             Control parentPanel = activeButton.Parent;
             if (parentPanel == pnlProductSub)
             {
@@ -296,20 +464,23 @@ namespace Fastkart
                 btnRoles.BackColor = sidebarHover;
                 lblRolesArrow.BackColor = sidebarHover;
             }
+            else if (parentPanel == pnlSettingsSub)
+            {
+                btnSettings.BackColor = sidebarHover;
+                lblSettingsArrow.BackColor = sidebarHover;
+            }
         }
 
-        // Gắn tất cả sự kiện hover
         private void AddHoverEvents()
         {
-            // Button cha
             AddHoverToParentButton(btnDashboard, null);
             AddHoverToParentButton(btnProduct, lblProductArrow);
             AddHoverToParentButton(btnCategory, lblCategoryArrow);
             AddHoverToParentButton(btnAttributes, lblAttributesArrow);
             AddHoverToParentButton(btnUser, lblUserArrow);
             AddHoverToParentButton(btnRoles, lblRolesArrow);
+            AddHoverToParentButton(btnSettings, lblSettingsArrow);
 
-            // Button con
             AddHoverToChildButton(btnProducts);
             AddHoverToChildButton(btnAddProduct);
             AddHoverToChildButton(btnCategoryList);
@@ -320,9 +491,9 @@ namespace Fastkart
             AddHoverToChildButton(btnAddUser);
             AddHoverToChildButton(btnAllRoles);
             AddHoverToChildButton(btnCreateRole);
+            AddHoverToChildButton(btnProfileSetting);
         }
 
-        // Hover cho Button CHA
         private void AddHoverToParentButton(Button btn, Label lbl)
         {
             if (btn == null) return;
@@ -344,7 +515,6 @@ namespace Fastkart
                     if (lbl != null) lbl.BackColor = Color.Transparent;
                 }
 
-                // Keep parent highlighted nếu child đang active
                 if (currentActiveButton != null && currentActiveButton.Parent != pnlSidebar)
                 {
                     Button parentBtnToKeepHovered = null;
@@ -353,6 +523,7 @@ namespace Fastkart
                     else if (currentActiveButton.Parent == pnlAttributesSub) parentBtnToKeepHovered = btnAttributes;
                     else if (currentActiveButton.Parent == pnlUserSub) parentBtnToKeepHovered = btnUser;
                     else if (currentActiveButton.Parent == pnlRolesSub) parentBtnToKeepHovered = btnRoles;
+                    else if (currentActiveButton.Parent == pnlSettingsSub) parentBtnToKeepHovered = btnSettings;
 
                     if (btn == parentBtnToKeepHovered)
                     {
@@ -389,6 +560,7 @@ namespace Fastkart
                         else if (currentActiveButton.Parent == pnlAttributesSub) parentBtnToKeepHovered = btnAttributes;
                         else if (currentActiveButton.Parent == pnlUserSub) parentBtnToKeepHovered = btnUser;
                         else if (currentActiveButton.Parent == pnlRolesSub) parentBtnToKeepHovered = btnRoles;
+                        else if (currentActiveButton.Parent == pnlSettingsSub) parentBtnToKeepHovered = btnSettings;
 
                         if (btn == parentBtnToKeepHovered)
                         {
@@ -400,7 +572,6 @@ namespace Fastkart
             }
         }
 
-        // Hover cho Button CON
         private void AddHoverToChildButton(Button btn)
         {
             if (btn == null) return;
@@ -476,6 +647,11 @@ namespace Fastkart
         private void btnCreateRole_Click(object sender, EventArgs e)
         {
             OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnCreateRole);
+        }
+
+        private void btnProfileSetting_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new frmProfileSetting(), btnProfileSetting);
         }
 
         #endregion

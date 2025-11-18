@@ -1,8 +1,9 @@
 ﻿using BLL;
+using Common;
 using Common.Enum;
 using DTO;
-using Fastkart; // Namespace chứa frmMainAdmin
 using Guna.UI2.WinForms;
+using Helpers;
 using System;
 using System.Windows.Forms;
 
@@ -15,9 +16,28 @@ namespace GUI
         public frmLogin()
         {
             InitializeComponent();
-            // Cấu hình kéo thả form bằng panel đăng nhập (bên phải)
-            _dragControl = new Guna2DragControl(this);
+            _dragControl = new Guna2DragControl(this);
             _dragControl.TargetControl = this.panelLogin;
+        }
+
+        /// <summary>
+        /// Xóa thông tin đăng nhập cũ và reset form
+        /// </summary>
+        public void ResetForm()
+        {
+            txtEmail.Text = "";
+            txtPassword.Text = "";
+
+            // Reset lại icon con mắt về trạng thái "ẩn"
+            if (!txtPassword.UseSystemPasswordChar)
+            {
+                txtPassword.UseSystemPasswordChar = true;
+                txtPassword.PasswordChar = '●';
+                txtPassword.IconRight = global::GUI.Properties.Resources.eye_open;
+            }
+
+            // Đưa con trỏ về ô email
+            txtEmail.Focus();
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
@@ -25,12 +45,23 @@ namespace GUI
             string email = txtEmail.Text.Trim();
             string password = txtPassword.Text;
 
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            // Use ValidationHelper for input validation
+            if (!ValidationHelper.IsNotEmpty(email) || !ValidationHelper.IsNotEmpty(password))
             {
                 MessageBox.Show("Vui lòng nhập email và mật khẩu.",
                         "Lỗi",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
+                return;
+            }
+
+            if (!ValidationHelper.IsValidEmail(email))
+            {
+                MessageBox.Show("Vui lòng nhập địa chỉ email hợp lệ.",
+                        "Lỗi",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                txtEmail.Focus();
                 return;
             }
 
@@ -42,31 +73,39 @@ namespace GUI
                 case LoginStatus.Success:
                     UserDTO loggedInUser = loginResult.User;
 
-                    MessageBox.Show($"Chào mừng {loggedInUser.FullName}!",
-                            "Thành công",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information);
+                    // Lưu session
+                    UserSession.CurrentUser = loggedInUser;
 
-                    // Mở form Admin và ẩn form này
-                    frmMainAdmin mainAdminForm = new frmMainAdmin();
+                    MessageBox.Show($"Welcome {loggedInUser.FullName}!",
+                        "Login successful",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    // Mở form Admin và ẩn form này
+                    frmMainAdmin mainAdminForm = new frmMainAdmin();
                     mainAdminForm.Show();
                     this.Hide();
 
                     break;
 
                 case LoginStatus.UserNotFound:
+                    MessageBox.Show("Account has been deleted or does not exist.",
+                        "Login failed",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                    break;
                 case LoginStatus.WrongPassword:
                     MessageBox.Show("Email hoặc mật khẩu không chính xác.",
-                            "Đăng nhập thất bại",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning);
+                        "Login failed",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
                     break;
 
                 case LoginStatus.AccessDenied:
-                    MessageBox.Show("Tài khoản của bạn không có quyền truy cập.",
-                            "Lỗi phân quyền",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Stop);
+                    MessageBox.Show("Your account does not have access.",
+                        "Authorization error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Stop);
                     break;
             }
         }
@@ -80,32 +119,26 @@ namespace GUI
             }
         }
 
-        // === ĐÃ CẬP NHẬT THEO YÊU CẦU CỦA BẠN ===
-        private void linkForgotPassword_Click(object sender, EventArgs e)
+        private void linkForgotPassword_Click(object sender, EventArgs e)
         {
             frmForgotPassword frm = new frmForgotPassword();
             frm.Show();
-            this.Hide(); // Ẩn form Login
-        }
+            this.Hide();
+        }
 
-        // === GIỮ NGUYÊN CODE CỦA BẠN ===
-        private void txtPassword_IconRightClick(object sender, EventArgs e)
+        private void txtPassword_IconRightClick(object sender, EventArgs e)
         {
             if (txtPassword.UseSystemPasswordChar)
             {
-                // Hiện mật khẩu
-                txtPassword.UseSystemPasswordChar = false;
+                txtPassword.UseSystemPasswordChar = false;
                 txtPassword.PasswordChar = '\0';
-                // Giả sử bạn có ảnh "eye_closed" trong Resources
-                txtPassword.IconRight = global::GUI.Properties.Resources.eye_closed;
+                txtPassword.IconRight = global::GUI.Properties.Resources.eye_closed;
             }
             else
             {
-                // Ẩn mật khẩu
-                txtPassword.UseSystemPasswordChar = true;
+                txtPassword.UseSystemPasswordChar = true;
                 txtPassword.PasswordChar = '●';
-                // Giả sử bạn có ảnh "eye_open" trong Resources
-                txtPassword.IconRight = global::GUI.Properties.Resources.eye_open;
+                txtPassword.IconRight = global::GUI.Properties.Resources.eye_open;
             }
         }
     }

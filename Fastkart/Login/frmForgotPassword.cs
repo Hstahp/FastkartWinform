@@ -1,5 +1,6 @@
 ﻿using BLL;
-using Guna.UI2.WinForms; // Để sử dụng Guna2DragControl nếu cần
+using Guna.UI2.WinForms;
+using Helpers;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -8,18 +9,15 @@ namespace GUI
 {
     public partial class frmForgotPassword : Form
     {
-        // Khai báo một Guna2DragControl cục bộ để kéo form
         private Guna2DragControl _dragControl;
 
         public frmForgotPassword()
         {
             InitializeComponent();
 
-            // Cấu hình kéo thả form bằng panelForgotPassword
             _dragControl = new Guna2DragControl(this);
             _dragControl.TargetControl = this.panelForgotPassword;
 
-            // Xử lý nút đóng (controlBoxClose)
             this.controlBoxClose.Click += new System.EventHandler(this.controlBoxClose_Click);
         }
 
@@ -27,25 +25,37 @@ namespace GUI
         {
             string email = txtEmail.Text.Trim();
 
-            if (string.IsNullOrEmpty(email))
+            // Use ValidationHelper
+            if (!ValidationHelper.IsNotEmpty(email))
             {
                 MessageBox.Show("Vui lòng nhập địa chỉ email của bạn.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEmail.Focus();
+                return;
+            }
+
+            if (!ValidationHelper.IsValidEmail(email))
+            {
+                MessageBox.Show("Vui lòng nhập địa chỉ email hợp lệ.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEmail.Focus();
                 return;
             }
 
             this.Cursor = Cursors.WaitCursor;
+            btnForgotPassword.Enabled = false;
+
             UserBLL userBLL = new UserBLL();
             bool success = await Task.Run(() => userBLL.HandleForgotPassword(email));
+
             this.Cursor = Cursors.Default;
+            btnForgotPassword.Enabled = true;
 
             if (success)
             {
                 MessageBox.Show("Đã gửi mã OTP thành công. Vui lòng kiểm tra email!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // === THAY ĐỔI: MỞ FRMOTP ===
-                frmOtp frm = new frmOtp(email); // Truyền email sang form OTP
+                frmOtp frm = new frmOtp(email);
                 frm.Show();
-                this.Close(); // Đóng form này lại
+                this.Close();
             }
             else
             {
@@ -53,7 +63,6 @@ namespace GUI
             }
         }
 
-        // Sửa nút X để mở lại form Login
         private void controlBoxClose_Click(object sender, EventArgs e)
         {
             Form loginForm = Application.OpenForms["frmLogin"];
@@ -73,7 +82,7 @@ namespace GUI
             if (e.KeyCode == Keys.Enter)
             {
                 btnForgotPassword.PerformClick();
-                e.SuppressKeyPress = true; // Ngăn không cho tiếng 'ding' khi nhấn Enter
+                e.SuppressKeyPress = true;
             }
         }
     }

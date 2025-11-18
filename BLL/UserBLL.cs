@@ -1,37 +1,43 @@
-﻿using Common.Enum;
+﻿using Common;
+using Common.Enum;
 using DAL;
 using DAL.EF;
 using DTO;
 using Helpers;
 using System;
-
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.WebSockets;
 
 namespace BLL
 {
     public class UserBLL
     {
         private UserDAL _userRepo;
-
+        private CloudinaryHelper _cloudinaryHelper;
+       
         public UserBLL()
         {
             _userRepo = new UserDAL();
+            _cloudinaryHelper = new CloudinaryHelper(
+                "dfeaar87r",                 // Cloud Name
+                "138196473955614",           // API Key
+                "ld489J1wALMzac-AdrqOiteHdTA" // API Secret
+            );
         }
-
 
         public LoginResultDTO Login(string email, string password)
         {
             var result = new LoginResultDTO();
 
-            // 1. Lấy user từ CSDL qua DAL
-            Users userFromDb = _userRepo.GetUserByEmail(email);
+            Users userFromDb = _userRepo.GetUserByEmailWithRole(email);
 
             if (userFromDb == null)
             {
                 result.Status = LoginStatus.UserNotFound;
                 return result;
             }
- 
-            // 2. Xác thực mật khẩu
+
             bool isPasswordValid = false;
             try
             {
@@ -40,7 +46,6 @@ namespace BLL
             }
             catch (Exception ex)
             {
-                // Log chi tiết lỗi để debug
                 System.Diagnostics.Debug.WriteLine($"BCrypt Error: {ex.Message}");
                 isPasswordValid = false;
             }
@@ -51,14 +56,13 @@ namespace BLL
                 return result;
             }
 
-            // 3. KIỂM TRA QUYỀN TRUY CẬP
             if (userFromDb.RoleUid == (int)UserRole.Customer)
             {
                 result.Status = LoginStatus.AccessDenied;
                 return result;
             }
 
-            // 4. Đăng nhập thành công!
+           
             result.Status = LoginStatus.Success;
             result.User = new UserDTO
             {
@@ -66,36 +70,42 @@ namespace BLL
                 FullName = userFromDb.FullName,
                 Email = userFromDb.Email,
                 ImgUser = userFromDb.ImgUser,
-                RoleUid = userFromDb.RoleUid
+                RoleUid = userFromDb.RoleUid,
+                RoleName = userFromDb.Roles?.RoleName ?? "Unknown",
+
+                // Thêm các trường mới
+                PhoneNumber = userFromDb.PhoneNumber,
+                Address = userFromDb.Address,
+                CreatedAt = userFromDb.CreatedAt,
+                UpdatedAt = userFromDb.UpdatedAt,
+                CreatedBy = userFromDb.CreatedBy,
+                UpdatedBy = userFromDb.UpdatedBy
             };
 
             return result;
         }
+
         public bool HandleForgotPassword(string email)
         {
-            // 1. Kiểm tra xem email có tồn tại không
             var user = _userRepo.GetUserByEmail(email);
             if (user == null)
             {
-              
                 return false;
             }
 
-            // 2. Tạo OTP và thời gian hết hạn (5 phút)
             string otp = OtpHelper.GenerateOtp();
             DateTime expiry = DateTime.Now.AddMinutes(5);
 
-            // 3. Lưu OTP vào CSDL (qua DAL)
             bool saved = _userRepo.SaveOtp(email, otp, expiry);
 
             if (saved)
             {
-                // 4. Nếu lưu thành công, gửi email (dùng EmailHelper)
                 return EmailHelper.SendOtpEmail(email, otp);
             }
 
             return false;
         }
+
         public bool VerifyOtp(string email, string otp)
         {
             return _userRepo.VerifyOtp(email, otp);
@@ -103,7 +113,6 @@ namespace BLL
 
         public bool ResetPassword(string email, string newPassword)
         {
-            // BLL chịu trách nhiệm HASH mật khẩu
             try
             {
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
@@ -115,24 +124,65 @@ namespace BLL
                 return false;
             }
         }
+
         public bool Register(string fullName, string email, string rawPassword)
         {
-            // Mã hóa mật khẩu trước khi lưu
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(rawPassword);
+            return true;
+        }
+        public List<RoleDTO> GetAllRoles()
+        {
+            
+            List<Roles> rolesEntities = _userRepo.GetAllRoles();
 
-            // ... 
-            // Tạo đối tượng 'Users' mới
-            // Users newUser = new Users();
-            // newUser.FullName = fullName;
-            // newUser.Email = email;
-            // newUser.PasswordHash = hashedPassword; // LƯU MẬT KHẨU ĐÃ HASH
-            // newUser.RoleUid = (int)Common.Enum.UserRole.Customer;
-            // ...
-            // Gọi repository để lưu (ví dụ: _userRepo.CreateUser(newUser))
-            // ...
+            List<RoleDTO> rolesDtos = rolesEntities.Select(r => new RoleDTO
+            {
+                Uid = r.Uid,
+                RoleName = r.RoleName
+            }).ToList();
 
-            return true; // trả về true nếu tạo thành công
+            return rolesDtos;
         }
 
+        public bool UpdateUserProfile(UserDTO userDto, string newPassword, string newImagePath)
+        {
+            Users userEntity = new Users
+            {
+                Uid = userDto.Uid,
+                FullName = userDto.FullName,
+                Email = userDto.Email,
+                PhoneNumber = userDto.PhoneNumber,
+                Address = userDto.Address,
+                RoleUid = userDto.RoleUid
+            };
+
+            if (!string.IsNullOrEmpty(newPassword))
+            {
+                userEntity.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            }
+
+            
+            if (!string.IsNullOrEmpty(newImagePath))
+            {
+                if (newImagePath == "REMOVE") 
+                {
+                    userEntity.ImgUser = AppConstants.DEFAULT_IMG_USER;
+                    userDto.ImgUser = userEntity.ImgUser;
+                }
+                else
+                {
+                    // Upload ảnh mới
+                    string url = _cloudinaryHelper.UploadImage(newImagePath, "fastkart/users");
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        userEntity.ImgUser = $"[\"{url}\"]";
+                        userDto.ImgUser = userEntity.ImgUser;
+                    }
+                }
+            }
+                
+
+            return _userRepo.UpdateUserProfile(userEntity);
+        }
     }
 }
