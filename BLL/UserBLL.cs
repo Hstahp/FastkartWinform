@@ -25,7 +25,11 @@ namespace BLL
                 "ld489J1wALMzac-AdrqOiteHdTA" // API Secret
             );
         }
-
+        private string SetNullIfEmpty(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return null;
+            return value.Trim();
+        }
         public LoginResultDTO Login(string email, string password)
         {
             var result = new LoginResultDTO();
@@ -71,7 +75,7 @@ namespace BLL
                 Email = userFromDb.Email,
                 ImgUser = userFromDb.ImgUser,
                 RoleUid = userFromDb.RoleUid,
-                RoleName = userFromDb.Roles?.RoleName ?? "Unknown",
+                RoleName = userFromDb.Roles?.RoleName ?? "N/A",
 
                 // Thêm các trường mới
                 PhoneNumber = userFromDb.PhoneNumber,
@@ -124,7 +128,22 @@ namespace BLL
                 return false;
             }
         }
+       
+        public List<UserDTO> GetAllUsers()
+        {
+            var users = _userRepo.GetAllUsers();
 
+            return users.Select(u => new UserDTO
+            {
+                Uid = u.Uid,
+                FullName = u.FullName,
+                Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
+                ImgUser = u.ImgUser, // Chuỗi JSON
+                RoleName = u.Roles?.RoleName ?? "N/A",
+                RoleUid = u.RoleUid
+            }).ToList();
+        }
         public bool Register(string fullName, string email, string rawPassword)
         {
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(rawPassword);
@@ -149,11 +168,12 @@ namespace BLL
             Users userEntity = new Users
             {
                 Uid = userDto.Uid,
-                FullName = userDto.FullName,
-                Email = userDto.Email,
-                PhoneNumber = userDto.PhoneNumber,
-                Address = userDto.Address,
-                RoleUid = userDto.RoleUid
+                FullName = userDto.FullName.Trim(),
+                Email = userDto.Email.Trim(),
+                RoleUid = userDto.RoleUid,
+                UpdatedBy = UserSession.CurrentUser != null ? UserSession.CurrentUser.RoleName : "Unknown",
+                PhoneNumber = SetNullIfEmpty(userDto.PhoneNumber),
+                Address = SetNullIfEmpty(userDto.Address)
             };
 
             if (!string.IsNullOrEmpty(newPassword))
@@ -161,28 +181,83 @@ namespace BLL
                 userEntity.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
             }
 
-            
             if (!string.IsNullOrEmpty(newImagePath))
             {
-                if (newImagePath == "REMOVE") 
+                if (newImagePath == "REMOVE")
                 {
-                    userEntity.ImgUser = AppConstants.DEFAULT_IMG_USER;
+                    userEntity.ImgUser =  AppConstants.DEFAULT_IMG_USER;
                     userDto.ImgUser = userEntity.ImgUser;
                 }
                 else
                 {
-                    // Upload ảnh mới
                     string url = _cloudinaryHelper.UploadImage(newImagePath, "fastkart/users");
                     if (!string.IsNullOrEmpty(url))
                     {
-                        userEntity.ImgUser = $"[\"{url}\"]";
-                        userDto.ImgUser = userEntity.ImgUser;
+                        string jsonImg = $"[\"{url}\"]";
+                        userEntity.ImgUser = jsonImg;
+                        userDto.ImgUser = jsonImg;
                     }
                 }
             }
-                
 
             return _userRepo.UpdateUserProfile(userEntity);
+        }
+
+
+        public bool AddUser(UserDTO userDto, string password, string imagePath)
+        {
+            if (_userRepo.IsEmailExists(userDto.Email)) return false;
+
+            Users newUser = new Users
+            {
+                FullName = userDto.FullName.Trim(),
+                Email = userDto.Email.Trim(),
+                RoleUid = userDto.RoleUid,
+                CreatedBy = UserSession.CurrentUser != null ? UserSession.CurrentUser.RoleName : "Unknown",
+                UpdatedBy = UserSession.CurrentUser != null ? UserSession.CurrentUser.RoleName : "Unknown",
+
+                PhoneNumber = SetNullIfEmpty(userDto.PhoneNumber),
+                Address = SetNullIfEmpty(userDto.Address)
+            };
+
+            newUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+            if (!string.IsNullOrEmpty(imagePath))
+            {
+                string url = _cloudinaryHelper.UploadImage(imagePath, "fastkart/users");
+                if (!string.IsNullOrEmpty(url))
+                {
+                    newUser.ImgUser = $"[\"{url}\"]";
+                }
+                else
+                {
+                    newUser.ImgUser = AppConstants.DEFAULT_IMG_USER;
+                }
+            }
+            else
+            {
+                newUser.ImgUser = AppConstants.DEFAULT_IMG_USER;
+            }
+
+            return _userRepo.AddUser(newUser);
+        }
+
+        public bool IsEmailExists(string email)
+        {
+            return _userRepo.IsEmailExists(email);
+        }
+
+        public bool SoftDeleteUser(int userId)
+        {
+            try
+            {
+                return _userRepo.SoftDeleteUser(userId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in SoftDeleteUser BLL: {ex.Message}");
+                return false;
+            }
         }
     }
 }

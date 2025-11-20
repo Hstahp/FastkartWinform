@@ -1,4 +1,5 @@
 ﻿using DAL.EF;
+using Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -47,7 +48,15 @@ namespace DAL
             }
         }
 
-        // --- HÀM MỚI 1: XÁC THỰC OTP ---
+        public List<Users> GetAllUsers()
+        {
+            // Lấy tất cả user chưa bị xóa, kèm thông tin Role
+            return _context.Users
+                .Include(u => u.Roles)
+                .Where(u => !u.Deleted)
+                .OrderByDescending(u => u.CreatedAt) // Mới nhất lên đầu
+                .ToList();
+        }
         public bool VerifyOtp(string email, string otp)
         {
             try
@@ -98,34 +107,30 @@ namespace DAL
         {
             return _context.Roles.Where(r => !r.Deleted).ToList();
         }
-
+        public bool IsEmailExists(string email) 
+        {
+            return _context.Users.Any(u => u.Email == email && !u.Deleted); 
+        }
 
         public bool UpdateUserProfile(Users userUpdateInfo)
         {
             try
             {
-                // Tìm user trong DB theo ID
                 var userInDb = _context.Users.FirstOrDefault(u => u.Uid == userUpdateInfo.Uid);
-
                 if (userInDb == null) return false;
 
-                // Cập nhật thông tin chung
                 userInDb.FullName = userUpdateInfo.FullName;
                 userInDb.Email = userUpdateInfo.Email;
                 userInDb.PhoneNumber = userUpdateInfo.PhoneNumber;
                 userInDb.Address = userUpdateInfo.Address;
                 userInDb.RoleUid = userUpdateInfo.RoleUid;
-
                 userInDb.UpdatedAt = DateTime.Now;
-                // userInDb.UpdatedBy = ... (Có thể thêm tên người sửa nếu muốn)
-
-                // Cập nhật Mật khẩu (CHỈ KHI có mật khẩu mới được truyền vào)
+                userInDb.UpdatedBy = userUpdateInfo.UpdatedBy;
                 if (!string.IsNullOrEmpty(userUpdateInfo.PasswordHash))
                 {
                     userInDb.PasswordHash = userUpdateInfo.PasswordHash;
                 }
 
-                // Cập nhật Ảnh (CHỈ KHI có đường dẫn ảnh mới được truyền vào)
                 if (!string.IsNullOrEmpty(userUpdateInfo.ImgUser))
                 {
                     userInDb.ImgUser = userUpdateInfo.ImgUser;
@@ -137,6 +142,51 @@ namespace DAL
             catch (Exception ex)
             {
                 Console.WriteLine("Update Error: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool AddUser(Users newUser)
+        {
+            try
+            {
+                newUser.CreatedAt = DateTime.Now;
+                newUser.UpdatedAt = DateTime.Now;
+                newUser.Deleted = false;
+
+                _context.Users.Add(newUser);
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Add User Error: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool SoftDeleteUser(int userId)
+        {
+            try
+            {
+                // SỬA: Dùng _context có sẵn thay vì tạo mới FastKartEntities
+                var user = _context.Users.FirstOrDefault(u => u.Uid == userId);
+                if (user != null)
+                {
+                    user.Deleted = true;
+                    user.UpdatedAt = DateTime.Now;
+                    user.UpdatedBy = UserSession.CurrentUser != null 
+                        ? UserSession.CurrentUser.FullName 
+                        : "System";
+                    
+                    _context.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in SoftDeleteUser DAL: {ex.Message}");
                 return false;
             }
         }

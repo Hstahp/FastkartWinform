@@ -14,6 +14,7 @@ namespace DAL.EF
         {
             CartItem = new HashSet<CartItem>();
             OrderItem = new HashSet<OrderItem>();
+            Wishlist = new HashSet<Wishlist>();
         }
 
         [Key]
@@ -87,5 +88,8 @@ namespace DAL.EF
         public virtual StockStatus StockStatus { get; set; }
 
         public virtual Unit Unit { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Wishlist> Wishlist { get; set; }
     }
 }

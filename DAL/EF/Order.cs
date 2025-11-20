@@ -32,6 +32,8 @@ namespace DAL.EF
 
         public string PaymentMethod { get; set; }
 
+        public bool Deleted { get; set; }
+
         public virtual Users Users { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

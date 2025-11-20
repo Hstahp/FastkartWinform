@@ -1,6 +1,7 @@
 ﻿using BLL;
-using Helpers;
+using Common;
 using DTO;
+using Helpers;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -15,18 +16,34 @@ namespace GUI
     {
         private UserBLL _userBLL;
         private string _selectedImagePath = null;
+        private UserDTO _targetUser; // User đang được edit
+        private bool _canEditRole = false; // CHỈ true khi click Edit button từ frmAllUsers
+
         public event EventHandler ProfileUpdated;
 
+        // Constructor mặc định (edit chính mình) - KHÔNG cho sửa Role
         public frmProfileSetting()
         {
             InitializeComponent();
             _userBLL = new UserBLL();
+            _targetUser = UserSession.CurrentUser;
+            _canEditRole = false; // KHÔNG cho sửa Role
+        }
+
+        // Constructor khi click Edit button - CHO PHÉP sửa Role
+        public frmProfileSetting(UserDTO userToEdit)
+        {
+            InitializeComponent();
+            _userBLL = new UserBLL();
+            _targetUser = userToEdit;
+            _canEditRole = true; // CHO PHÉP sửa Role vì đang edit từ All Users
         }
 
         private void frmProfileSetting_Load(object sender, EventArgs e)
         {
             LoadRoles();
-            LoadCurrentUserInfo();
+            LoadUserInfo();
+            ConfigureRolePermission();
         }
 
         private void LoadRoles()
@@ -40,30 +57,52 @@ namespace GUI
             }
         }
 
-        private async void LoadCurrentUserInfo()
+        private void ConfigureRolePermission()
         {
-            var user = UserSession.CurrentUser;
-            if (user == null) return;
+            // === LOGIC RÕ RÀNG ===
+            // _canEditRole = true  → Được sửa Role (từ Edit button)
+            // _canEditRole = false → KHÔNG được sửa Role (edit profile cá nhân)
 
-            txtName.Text = user.FullName;
-            txtEmail.Text = user.Email;
-            txtPhone.Text = user.PhoneNumber;
-            txtAddress.Text = user.Address;
+            if (_canEditRole)
+            {
+                // CHO PHÉP chỉnh Role
+                cboRole.Enabled = true;
+                cboRole.FillColor = Color.White;
+                cboRole.ForeColor = Color.Black;
+                lblRole.Text = "Role *";
+            }
+            else
+            {
+                // KHÓA Role, không cho chỉnh
+                cboRole.Enabled = false;
+                cboRole.FillColor = Color.FromArgb(240, 240, 240);
+                cboRole.ForeColor = Color.Gray;
+                lblRole.Text = "Role (Read-only)";
+            }
+        }
 
+        private async void LoadUserInfo()
+        {
+            if (_targetUser == null) return;
+
+            txtName.Text = _targetUser.FullName;
+            txtEmail.Text = _targetUser.Email;
+            txtPhone.Text = _targetUser.PhoneNumber;
+            txtAddress.Text = _targetUser.Address;
+
+            // Set Role
             if (cboRole.Items.Count > 0)
             {
-                cboRole.SelectedValue = user.RoleUid;
-                cboRole.Enabled = false;
-                cboRole.FillColor = Color.WhiteSmoke;
-                cboRole.ForeColor = Color.Black;
+                cboRole.SelectedValue = _targetUser.RoleUid;
             }
 
-            if (!string.IsNullOrEmpty(user.ImgUser))
+            // Load ảnh
+            if (!string.IsNullOrEmpty(_targetUser.ImgUser))
             {
                 try
                 {
                     string imageUrl = "";
-                    var jsonArray = JArray.Parse(user.ImgUser);
+                    var jsonArray = JArray.Parse(_targetUser.ImgUser);
                     if (jsonArray.Count > 0) imageUrl = jsonArray[0].ToString();
 
                     if (!string.IsNullOrEmpty(imageUrl))
@@ -101,7 +140,7 @@ namespace GUI
 
         private async void btnUpdate_Click(object sender, EventArgs e)
         {
-            // Validate Name and Email
+            // Validate
             if (!ValidationHelper.IsNotEmpty(txtName.Text))
             {
                 MessageBox.Show("Name is required.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -123,7 +162,6 @@ namespace GUI
                 return;
             }
 
-            // Validate Phone (optional but if provided, must be valid)
             if (ValidationHelper.IsNotEmpty(txtPhone.Text) && !ValidationHelper.IsValidPhoneNumber(txtPhone.Text))
             {
                 MessageBox.Show("Please enter a valid phone number.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -133,7 +171,6 @@ namespace GUI
 
             string newPassword = null;
 
-            // Kiểm tra nếu có nhập password
             if (ValidationHelper.IsNotEmpty(txtPassword.Text))
             {
                 if (txtPassword.Text != txtConfirmPass.Text)
@@ -143,7 +180,6 @@ namespace GUI
                     return;
                 }
 
-                // Kiểm tra độ mạnh mật khẩu
                 if (!ValidationHelper.IsPasswordStrong(txtPassword.Text))
                 {
                     MessageBox.Show(ValidationHelper.GetPasswordRequirementsMessage(),
@@ -157,12 +193,12 @@ namespace GUI
 
             UserDTO updateDto = new UserDTO
             {
-                Uid = UserSession.CurrentUser.Uid,
+                Uid = _targetUser.Uid,
                 FullName = txtName.Text.Trim(),
                 Email = txtEmail.Text.Trim(),
                 PhoneNumber = txtPhone.Text.Trim(),
                 Address = txtAddress.Text.Trim(),
-                RoleUid = (int)cboRole.SelectedValue
+                RoleUid = (int)cboRole.SelectedValue 
             };
 
             this.Cursor = Cursors.WaitCursor;
@@ -177,19 +213,30 @@ namespace GUI
 
             if (result)
             {
-                MessageBox.Show("Profile updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Profile updated successfull    y!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                UserSession.CurrentUser.FullName = updateDto.FullName;
-                UserSession.CurrentUser.Email = updateDto.Email;
-                UserSession.CurrentUser.PhoneNumber = updateDto.PhoneNumber;
-                UserSession.CurrentUser.Address = updateDto.Address;
-
-                if (!string.IsNullOrEmpty(updateDto.ImgUser))
+                // Cập nhật session nếu đang edit chính mình
+                if (_targetUser.Uid == UserSession.CurrentUser.Uid)
                 {
-                    UserSession.CurrentUser.ImgUser = updateDto.ImgUser;
+                    UserSession.CurrentUser.FullName = updateDto.FullName;
+                    UserSession.CurrentUser.Email = updateDto.Email;
+                    UserSession.CurrentUser.PhoneNumber = updateDto.PhoneNumber;
+                    UserSession.CurrentUser.Address = updateDto.Address;
+                    
+                    // CHỈ cập nhật Role nếu được phép
+                    if (_canEditRole)
+                    {
+                        UserSession.CurrentUser.RoleUid = updateDto.RoleUid;
+                    }
+
+                    if (!string.IsNullOrEmpty(updateDto.ImgUser))
+                    {
+                        UserSession.CurrentUser.ImgUser = updateDto.ImgUser;
+                    }
                 }
 
                 ProfileUpdated?.Invoke(this, EventArgs.Empty);
+                this.Close();
             }
             else
             {

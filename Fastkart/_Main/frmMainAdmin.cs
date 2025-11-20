@@ -78,13 +78,56 @@ namespace GUI
             }
         }
 
-        // Load User Info (và cập nhật lại khi Profile Setting thay đổi)
+        private void AdjustUserInfoWidth()
+        {
+            // 1. Cài đặt giới hạn chiều rộng tối đa cho Tên (pixel)
+           
+
+            // 2. Đo chiều rộng thực tế của text
+            Size textSize = TextRenderer.MeasureText(lblName.Text, lblName.Font);
+
+            if (textSize.Width > AppConstants.MAX_NAME_WIDTH)
+            {
+                // TRƯỜNG HỢP TÊN DÀI: Cắt bớt và thêm ...
+                lblName.AutoSize = false;
+                lblName.Width = AppConstants.MAX_NAME_WIDTH;
+                lblName.AutoEllipsis = true; // Tự động thêm dấu "..." ở cuối
+            }
+            else
+            {
+                // TRƯỜNG HỢP TÊN NGẮN: Hiển thị đầy đủ
+                lblName.AutoSize = true;
+                lblName.AutoEllipsis = false;
+            }
+
+            // 3. Căn chỉnh vị trí Role (luôn nằm thẳng hàng với Name)
+            // picUser.Right ~ 60 + 12 padding = 72
+            int textStartX = picUser.Right + 12;
+
+            lblName.Left = textStartX;
+            lblRole.Left = textStartX;
+
+            // 4. Tính toán vị trí nút Mũi tên (Dropdown)
+            // Nó sẽ nằm sau thành phần dài nhất (Name hoặc Role)
+            int maxContentRight = Math.Max(lblName.Right, lblRole.Right);
+
+            btnUserDropdown.Left = maxContentRight + 5; // Cách ra 5px
+
+            // 5. Cập nhật độ rộng của cả Panel
+            pnlUserInfo.Width = btnUserDropdown.Right + 20;
+        }
+
+ 
         private async void InitializeUserInfo()
         {
             if (UserSession.CurrentUser != null)
             {
                 lblName.Text = UserSession.CurrentUser.FullName;
                 lblRole.Text = UserSession.CurrentUser.RoleName;
+
+               
+                AdjustUserInfoWidth();
+             
 
                 string jsonString = UserSession.CurrentUser.ImgUser;
                 if (!string.IsNullOrEmpty(jsonString))
@@ -110,7 +153,7 @@ namespace GUI
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine("Error loading user image: " + ex.Message);
+                        System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
                     }
                 }
             }
@@ -135,10 +178,10 @@ namespace GUI
             return croppedBmp;
         }
 
-        // ... (InitializeUserDropdown và các hàm khác giữ nguyên như cũ) ...
+  
         private void InitializeUserDropdown()
         {
-            // ... (Code cũ của bạn) ...
+ 
             pnlUserDropdown = new Panel
             {
                 Width = 200,
@@ -213,7 +256,17 @@ namespace GUI
             btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(249, 250, 251);
             return btn;
         }
-
+        private void OpenAddNewUserForm()
+        {
+            // Mở submenu Users (nếu chưa mở)
+            if (currentSubMenuPanel != pnlUserSub)
+            {
+                HandleParentMenuClick(pnlUserSub, lblUserArrow);
+            }
+            
+            // Gọi hàm mở form con. Ta dùng nút btnAddUser trên Sidebar để làm nút active (highlight)
+            OpenChildForm(new frmAddNewUser(), btnAddUser);
+        }
         private void ToggleUserDropdown()
         {
             isUserDropdownVisible = !isUserDropdownVisible;
@@ -631,12 +684,40 @@ namespace GUI
 
         private void btnAllUser_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAllUser);
+            frmAllUsers frm = new frmAllUsers();
+
+            // Xử lý Add User
+            frm.RequestAddUser += (s, args) =>
+            {
+                OpenAddNewUserForm();   
+            };
+
+            frm.RequestEditUser += (s, user) =>
+            {
+                // Mở ProfileSetting giống như từ sidebar
+                frmProfileSetting editForm = new frmProfileSetting(user);
+                editForm.ProfileUpdated += (sender2, e2) =>
+                {
+                    InitializeUserInfo(); // Cập nhật header nếu edit chính mình
+                    frm.LoadData(); // Reload data trong frmAllUsers
+                };
+
+                // Mở Settings submenu
+                if (currentSubMenuPanel != pnlSettingsSub)
+                {
+                    HandleParentMenuClick(pnlSettingsSub, lblSettingsArrow);
+                }
+
+                // Mở form trong panel chính
+                OpenChildForm(editForm, btnProfileSetting);
+            };
+
+            OpenChildForm(frm, btnAllUser);
         }
 
         private void btnAddUser_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAddUser);
+            OpenAddNewUserForm();
         }
 
         private void btnAllRoles_Click(object sender, EventArgs e)

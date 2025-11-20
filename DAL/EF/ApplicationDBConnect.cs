@@ -12,6 +12,7 @@ namespace DAL.EF
         {
         }
 
+        public virtual DbSet<C__EFMigrationsHistory> C__EFMigrationsHistory { get; set; }
         public virtual DbSet<BlogCategories> BlogCategories { get; set; }
         public virtual DbSet<BlogPosts> BlogPosts { get; set; }
         public virtual DbSet<Brand> Brand { get; set; }
@@ -30,6 +31,7 @@ namespace DAL.EF
         public virtual DbSet<StockStatus> StockStatus { get; set; }
         public virtual DbSet<Unit> Unit { get; set; }
         public virtual DbSet<Users> Users { get; set; }
+        public virtual DbSet<Wishlist> Wishlist { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -122,6 +124,11 @@ namespace DAL.EF
 
             modelBuilder.Entity<Users>()
                 .HasMany(e => e.Order)
+                .WithRequired(e => e.Users)
+                .HasForeignKey(e => e.UserUid);
+
+            modelBuilder.Entity<Users>()
+                .HasMany(e => e.Wishlist)
                 .WithRequired(e => e.Users)
                 .HasForeignKey(e => e.UserUid);
         }

@@ -1,4 +1,5 @@
-﻿using Helpers;
+﻿using DTO;
+using Helpers;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Drawing;
@@ -11,11 +12,17 @@ namespace GUI
 {
     public partial class frmMyInfo : Form
     {
+        private UserDTO _user;
+
         public frmMyInfo()
         {
             InitializeComponent();
         }
-
+        public frmMyInfo(UserDTO user)
+        {
+            InitializeComponent();
+            _user = user; // Dùng user được truyền vào
+        }
         private void frmMyInfo_Load(object sender, EventArgs e)
         {
             // Gọi hàm load thông tin bất đồng bộ

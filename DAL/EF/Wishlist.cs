@@ -6,28 +6,20 @@ namespace DAL.EF
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class BlogPosts
+    [Table("Wishlist")]
+    public partial class Wishlist
     {
         [Key]
         public int Uid { get; set; }
 
-        [Required]
-        [StringLength(500)]
-        public string Title { get; set; }
+        public int UserUid { get; set; }
 
-        [Required]
-        public string Content { get; set; }
-
-        public int AuthorUid { get; set; }
-
-        public int CategoryUid { get; set; }
-
-        public string ImageUrl { get; set; }
+        public int ProductUid { get; set; }
 
         [Column(TypeName = "datetime2")]
         public DateTime CreatedAt { get; set; }
 
-        public virtual BlogCategories BlogCategories { get; set; }
+        public virtual Product Product { get; set; }
 
         public virtual Users Users { get; set; }
     }
