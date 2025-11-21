@@ -80,7 +80,7 @@ namespace BLL
                 // Thêm các trường mới
                 PhoneNumber = userFromDb.PhoneNumber,
                 Address = userFromDb.Address,
-                CreatedAt = userFromDb.CreatedAt,
+                CreatedAt = userFromDb.CreatedAt ,
                 UpdatedAt = userFromDb.UpdatedAt,
                 CreatedBy = userFromDb.CreatedBy,
                 UpdatedBy = userFromDb.UpdatedBy
@@ -157,9 +157,14 @@ namespace BLL
                 FullName = u.FullName,
                 Email = u.Email,
                 PhoneNumber = u.PhoneNumber,
-                ImgUser = u.ImgUser, // Chuỗi JSON
+                ImgUser = u.ImgUser,
                 RoleName = u.Roles?.RoleName ?? "N/A",
-                RoleUid = u.RoleUid
+                RoleUid = u.RoleUid,
+                CreatedAt = u.CreatedAt, 
+                UpdatedAt = u.UpdatedAt,
+
+                CreatedBy = u.CreatedBy,
+                UpdatedBy = u.UpdatedBy
             }).ToList();
         }
         public bool Register(string fullName, string email, string rawPassword)

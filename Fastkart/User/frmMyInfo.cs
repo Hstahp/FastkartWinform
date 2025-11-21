@@ -1,11 +1,12 @@
 ﻿using DTO;
 using Helpers;
+using Common; // Thêm cái này để dùng UserSessionDTO
 using Newtonsoft.Json.Linq;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
-using System.Net.Http; 
+using System.Net.Http;
 using System.Windows.Forms;
 
 namespace GUI
@@ -14,66 +15,78 @@ namespace GUI
     {
         private UserDTO _user;
 
+        // Constructor 1: Dùng cho nút "My Info" (Xem chính mình)
         public frmMyInfo()
         {
             InitializeComponent();
+            // --- [SỬA LỖI TẠI ĐÂY] ---
+            // Nếu không truyền ai vào, thì mặc định lấy người đang đăng nhập
+            _user = UserSessionDTO.CurrentUser;
         }
+
+        // Constructor 2: Dùng cho nút "Mắt" (Xem người khác)
         public frmMyInfo(UserDTO user)
         {
             InitializeComponent();
             _user = user; // Dùng user được truyền vào
         }
+
         private void frmMyInfo_Load(object sender, EventArgs e)
         {
-            // Gọi hàm load thông tin bất đồng bộ
             LoadUserProfile();
         }
 
-        // Dùng async void để tải ảnh mà không làm đơ UI
         private async void LoadUserProfile()
         {
-            var currentUser = UserSession.CurrentUser;
-            if (currentUser == null)
+            // Kiểm tra null (Phòng trường hợp lỗi session)
+            if (_user == null)
             {
-                MessageBox.Show("Không tìm thấy thông tin người dùng.");
+                MessageBox.Show("Không tìm thấy thông tin người dùng (Session Null).");
                 this.Close();
                 return;
             }
 
             // 1. Điền thông tin Text
-            lblName.Text = currentUser.FullName;
-            lblRole.Text = currentUser.RoleName;
+            lblName.Text = _user.FullName;
+            lblRole.Text = _user.RoleName;
 
-            lblEmail.Text = currentUser.Email;
-            lblPhone.Text = string.IsNullOrEmpty(currentUser.PhoneNumber) ? "N/A" : currentUser.PhoneNumber;
-            lblAddress.Text = string.IsNullOrEmpty(currentUser.Address) ? "N/A" : currentUser.Address;
+            lblEmail.Text = _user.Email;
+            lblPhone.Text = string.IsNullOrEmpty(_user.PhoneNumber) ? "N/A" : _user.PhoneNumber;
+            lblAddress.Text = string.IsNullOrEmpty(_user.Address) ? "N/A" : _user.Address;
 
-            lblCreatedAt.Text = currentUser.CreatedAt.ToString("dd/MM/yyyy HH:mm");
-            lblCreatedBy.Text = string.IsNullOrEmpty(currentUser.CreatedBy) ? "N/A" : currentUser.CreatedBy;
-            lblUpdatedAt.Text = currentUser.UpdatedAt.ToString("dd/MM/yyyy HH:mm");
-            lblUpdatedBy.Text = string.IsNullOrEmpty(currentUser.UpdatedBy) ? "N/A" : currentUser.UpdatedBy;
+            lblCreatedAt.Text = _user.CreatedAt.ToString("dd/MM/yyyy HH:mm");
+            lblCreatedBy.Text = string.IsNullOrEmpty(_user.CreatedBy) ? "N/A" : _user.CreatedBy;
+            lblUpdatedAt.Text = _user.UpdatedAt.ToString("dd/MM/yyyy HH:mm");
+            lblUpdatedBy.Text = string.IsNullOrEmpty(_user.UpdatedBy) ? "N/A" : _user.UpdatedBy;
 
-            string jsonString = currentUser.ImgUser;
+            // 2. Load Ảnh
+            string jsonString = _user.ImgUser;
+
             if (!string.IsNullOrEmpty(jsonString))
             {
                 try
                 {
                     string imageUrl = "";
-                    var jsonArray = JArray.Parse(jsonString);
-                    if (jsonArray.Count > 0)
+                    // Parse JSON cẩn thận
+                    if (jsonString.Trim().StartsWith("["))
                     {
-                        imageUrl = jsonArray[0].ToString();
+                        var jsonArray = JArray.Parse(jsonString);
+                        if (jsonArray.Count > 0) imageUrl = jsonArray[0].ToString();
+                    }
+                    else
+                    {
+                        imageUrl = jsonString;
                     }
 
                     if (!string.IsNullOrEmpty(imageUrl))
                     {
                         using (HttpClient client = new HttpClient())
                         {
+                            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0");
                             byte[] imageData = await client.GetByteArrayAsync(imageUrl);
                             using (MemoryStream ms = new MemoryStream(imageData))
                             {
                                 Image originalImage = Image.FromStream(ms);
-                                // GỌI HÀM CẮT VÀ BO TRÒN TẠI ĐÂY
                                 picUser.Image = CropAndRoundImage(originalImage, picUser.Width, picUser.Height);
                             }
                         }
@@ -82,26 +95,16 @@ namespace GUI
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine("Lỗi tải ảnh MyInfo: " + ex.Message);
-                    // (Tùy chọn: Gán ảnh mặc định nếu lỗi)
                 }
             }
         }
 
-        /// <summary>
-        /// Cắt ảnh thành hình vuông từ giữa và bo tròn các góc.
-        /// </summary>
-        /// <param name="img">Ảnh gốc</param>
-        /// <param name="targetWidth">Chiều rộng mong muốn của ảnh cuối cùng</param>
-        /// <param name="targetHeight">Chiều cao mong muốn của ảnh cuối cùng</param>
-        /// <returns>Ảnh đã cắt và bo tròn</returns>
         private Image CropAndRoundImage(Image img, int targetWidth, int targetHeight)
         {
-            // Bước 1: Cắt ảnh thành hình vuông từ giữa
             int originalWidth = img.Width;
             int originalHeight = img.Height;
-            int cropSize = Math.Min(originalWidth, originalHeight); // Kích thước của hình vuông nhỏ nhất
+            int cropSize = Math.Min(originalWidth, originalHeight);
 
-            // Tính toán vị trí bắt đầu cắt để lấy phần giữa
             int cropX = (originalWidth - cropSize) / 2;
             int cropY = (originalHeight - cropSize) / 2;
 
@@ -118,7 +121,6 @@ namespace GUI
                             GraphicsUnit.Pixel);
             }
 
-            // Bước 2: Thay đổi kích thước và bo tròn ảnh
             Bitmap roundedBmp = new Bitmap(targetWidth, targetHeight);
             using (Graphics g = Graphics.FromImage(roundedBmp))
             {
@@ -127,17 +129,14 @@ namespace GUI
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 g.CompositingQuality = CompositingQuality.HighQuality;
 
-                // Tạo một đường dẫn hình tròn
                 using (GraphicsPath gp = new GraphicsPath())
                 {
                     gp.AddEllipse(0, 0, targetWidth - 1, targetHeight - 1);
-                    g.SetClip(gp); // Cắt ảnh theo hình tròn này
-
-                    // Vẽ ảnh đã cắt vuông vào trong hình tròn
+                    g.SetClip(gp);
                     g.DrawImage(croppedBmp, 0, 0, targetWidth, targetHeight);
                 }
             }
-            // Dispose ảnh gốc và ảnh đã cắt vuông để giải phóng bộ nhớ
+
             img.Dispose();
             croppedBmp.Dispose();
             return roundedBmp;
