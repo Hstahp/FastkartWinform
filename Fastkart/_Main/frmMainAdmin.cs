@@ -258,15 +258,34 @@ namespace GUI
         }
         private void OpenAddNewUserForm()
         {
-            // Mở submenu Users (nếu chưa mở)
             if (currentSubMenuPanel != pnlUserSub)
             {
                 HandleParentMenuClick(pnlUserSub, lblUserArrow);
             }
-            
-            // Gọi hàm mở form con. Ta dùng nút btnAddUser trên Sidebar để làm nút active (highlight)
+           
             OpenChildForm(new frmAddNewUser(), btnAddUser);
         }
+
+        private void OpenAddNewRoleForm()
+        {
+            if (currentSubMenuPanel != pnlRolesSub)
+            {
+                HandleParentMenuClick(pnlRolesSub, lblUserArrow);
+            }
+
+            OpenChildForm(new frmAddRole(), btnCreateRole);
+        }
+
+        private void OpenAllRoleForm()
+        {
+            if (currentSubMenuPanel != pnlRolesSub)
+            {
+                HandleParentMenuClick(pnlRolesSub, lblUserArrow);
+            }
+
+            OpenChildForm(new frmAllRole(), btnAllRoles);
+        }
+
         private void ToggleUserDropdown()
         {
             isUserDropdownVisible = !isUserDropdownVisible;
@@ -303,6 +322,30 @@ namespace GUI
             {
                 btnDashboard.PerformClick();
             }
+            ApplySidebarPermissions();
+        }
+
+        private void ApplySidebarPermissions()
+        {
+            if (!UserSessionDTO.HasPermission("PRODUCT", "VIEW"))
+            {
+                btnProduct.Visible = false;  
+                pnlProductSub.Visible = false;   
+            }
+
+            if (!UserSessionDTO.HasPermission("USER", "VIEW"))
+            {
+                btnUser.Visible = false;
+                pnlUserSub.Visible = false;
+            }
+
+            if (!UserSessionDTO.HasPermission("ROLE", "VIEW"))
+            {
+                btnRoles.Visible = false;
+                pnlRolesSub.Visible = false;
+            }
+
+            // ... Làm tương tự cho Category, Attributes ...
         }
 
         private void picUser_Paint(object sender, PaintEventArgs e)
@@ -533,7 +576,7 @@ namespace GUI
             AddHoverToParentButton(btnUser, lblUserArrow);
             AddHoverToParentButton(btnRoles, lblRolesArrow);
             AddHoverToParentButton(btnSettings, lblSettingsArrow);
-
+            AddHoverToChildButton(btnPermission);
             AddHoverToChildButton(btnProducts);
             AddHoverToChildButton(btnAddProduct);
             AddHoverToChildButton(btnCategoryList);
@@ -722,12 +765,12 @@ namespace GUI
 
         private void btnAllRoles_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAllRoles);
+            OpenAllRoleForm();
         }
 
         private void btnCreateRole_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnCreateRole);
+            OpenAddNewRoleForm();
         }
 
         private void btnProfileSetting_Click(object sender, EventArgs e)
@@ -735,6 +778,22 @@ namespace GUI
             OpenChildForm(new frmProfileSetting(), btnProfileSetting);
         }
 
+        private void OpenPermissionForm()
+        {
+            // Mở menu cha nếu chưa mở
+            if (currentSubMenuPanel != pnlRolesSub)
+            {
+                HandleParentMenuClick(pnlRolesSub, lblRolesArrow);
+            }
+
+            // Mở form Permission vào panel chính
+            OpenChildForm(new frmPermission(), btnPermission);
+        }
+
+        private void btnPermission_Click(object sender, EventArgs e)
+        {
+            OpenPermissionForm();
+        }
         #endregion
     }
 }

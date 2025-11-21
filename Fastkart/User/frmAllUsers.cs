@@ -1,8 +1,6 @@
 ﻿using BLL;
 using Common;
 using DTO;
-using Helpers;
-using Microsoft.ReportingServices.ReportProcessing.ReportObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -19,23 +17,21 @@ namespace GUI
     {
         private UserBLL _userBLL;
         private List<UserDTO> _originalList;
-        private List<UserDTO> _filteredList; // List sau khi search
-        private Dictionary<int, Image> _imageCache = new Dictionary<int, Image>();
+        private List<UserDTO> _filteredList;
+        private Dictionary<int, Image> _imageCache = new Dictionary<int, Image>();
         private HashSet<int> _pendingDownloads = new HashSet<int>();
         private Image _defaultAvatar = CreatePlaceholderImage();
+
         public event EventHandler RequestAddUser;
         public event EventHandler<UserDTO> RequestEditUser;
-
 
         private Image _iconDetail;
         private Image _iconEdit;
         private Image _iconDelete;
 
-        // === CONSTANTS ===
-        private const int ICON_SIZE = 24;
+        private const int ICON_SIZE = 24;
         private const int ICON_SPACING = 10;
 
-        // === PHÂN TRANG ===
         private const int ITEMS_PER_PAGE = 5;
         private int _currentPage = 1;
         private int _totalPages = 1;
@@ -51,6 +47,24 @@ namespace GUI
             InitializePagination();
         }
 
+        private void frmAllUsers_Load(object sender, EventArgs e)
+        {
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_VIEW))
+            {
+                MessageBox.Show("Bạn không có quyền truy cập trang Quản lý Người dùng!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.Close();
+                return;
+            }
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_CREATE))
+            {
+                if (btnAdd != null) btnAdd.Visible = false;
+            }
+
+
+            LoadData();
+        }
+
+        // ... (Phần LoadActionIcons, ResizeIcon, CreateFallbackIcon giữ nguyên) ...
         private void LoadActionIcons()
         {
             try
@@ -159,7 +173,7 @@ namespace GUI
             return bmp;
         }
 
-
+        // ... (Phần Pagination giữ nguyên) ...
         private void InitializePagination()
         {
             btnPrevPage.Click += (s, e) =>
@@ -203,7 +217,6 @@ namespace GUI
 
             _totalPages = (int)Math.Ceiling(sourceList.Count / (double)ITEMS_PER_PAGE);
 
-            // Đảm bảo current page hợp lệ
             if (_currentPage > _totalPages) _currentPage = _totalPages;
             if (_currentPage < 1) _currentPage = 1;
 
@@ -215,21 +228,18 @@ namespace GUI
             dgvUsers.DataSource = pagedData;
             UpdatePaginationControls();
 
-
             RefreshCachedImages();
         }
 
-
+        // ... (Phần xử lý ảnh giữ nguyên) ...
         private void RefreshCachedImages()
         {
-            // Duyệt qua tất cả các row hiện tại
-            for (int i = 0; i < dgvUsers.Rows.Count; i++)
+            for (int i = 0; i < dgvUsers.Rows.Count; i++)
             {
                 var user = dgvUsers.Rows[i].DataBoundItem as UserDTO;
                 if (user == null) continue;
 
-                // Tìm cột Avatar
-                int avatarColIndex = -1;
+                int avatarColIndex = -1;
                 for (int j = 0; j < dgvUsers.Columns.Count; j++)
                 {
                     if (dgvUsers.Columns[j].Name == "colAvatar")
@@ -241,13 +251,11 @@ namespace GUI
 
                 if (avatarColIndex < 0) continue;
 
-                // Nếu ảnh đã có trong cache, set trực tiếp
-                if (_imageCache.ContainsKey(user.Uid))
+                if (_imageCache.ContainsKey(user.Uid))
                 {
                     dgvUsers.Rows[i].Cells[avatarColIndex].Value = _imageCache[user.Uid];
                 }
-                // Nếu chưa có và có URL, tải ảnh
-                else if (!_pendingDownloads.Contains(user.Uid) && !string.IsNullOrEmpty(user.AvatarUrl))
+                else if (!_pendingDownloads.Contains(user.Uid) && !string.IsNullOrEmpty(user.AvatarUrl))
                 {
                     dgvUsers.Rows[i].Cells[avatarColIndex].Value = _defaultAvatar;
                     LoadUserImageAsync(user.Uid, user.AvatarUrl);
@@ -257,14 +265,7 @@ namespace GUI
                     dgvUsers.Rows[i].Cells[avatarColIndex].Value = _defaultAvatar;
                 }
             }
-
-            // Refresh grid để trigger CellPainting
-            dgvUsers.Refresh();
-        }
-
-        private void frmAllUsers_Load(object sender, EventArgs e)
-        {
-            LoadData();
+            dgvUsers.Refresh();
         }
 
         public void LoadData()
@@ -342,7 +343,6 @@ namespace GUI
                                 _imageCache.Add(uid, img);
                             }
                         }
-
                         UpdateGridImage(uid);
                     }
                 }
@@ -397,22 +397,17 @@ namespace GUI
 
         private void dgvUsers_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            // Vẽ Avatar
-            if (e.RowIndex >= 0 && dgvUsers.Columns[e.ColumnIndex].Name == "colAvatar")
+            // Vẽ Avatar
+            if (e.RowIndex >= 0 && dgvUsers.Columns[e.ColumnIndex].Name == "colAvatar")
             {
                 e.PaintBackground(e.ClipBounds, true);
-
                 Image img = e.Value as Image ?? _defaultAvatar;
-
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
                 int size = 45;
                 int x = e.CellBounds.X + (e.CellBounds.Width - size) / 2;
                 int y = e.CellBounds.Y + (e.CellBounds.Height - size) / 2;
-
                 Image croppedImg = CropToSquare(img, size);
-
                 using (GraphicsPath gp = new GraphicsPath())
                 {
                     gp.AddEllipse(x, y, size, size);
@@ -420,42 +415,50 @@ namespace GUI
                     e.Graphics.DrawImage(croppedImg, x, y, size, size);
                     e.Graphics.ResetClip();
                 }
-
-                if (croppedImg != img && croppedImg != _defaultAvatar)
-                {
-                    croppedImg.Dispose();
-                }
-
+                if (croppedImg != img && croppedImg != _defaultAvatar) croppedImg.Dispose();
                 e.Handled = true;
             }
 
-            // Vẽ Action Buttons
-            if (e.RowIndex >= 0 && dgvUsers.Columns[e.ColumnIndex].Name == "colAction")
+            // --- [SỬA] VẼ ACTION BUTTONS THEO QUYỀN ---
+            if (e.RowIndex >= 0 && dgvUsers.Columns[e.ColumnIndex].Name == "colAction")
             {
                 e.PaintBackground(e.ClipBounds, true);
-
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
-                int totalWidth = (ICON_SIZE * 3) + (ICON_SPACING * 2);
+                // Check quyền SỬA và XÓA
+                bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_EDIT);
+                bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_DELETE);
+
+                // Tính toán vị trí vẽ
+                int totalWidth = ICON_SIZE; // Mặc định chỉ có Detail
+                if (canEdit) totalWidth += ICON_SIZE + ICON_SPACING;
+                if (canDelete) totalWidth += ICON_SIZE + ICON_SPACING;
+
                 int startX = e.CellBounds.X + (e.CellBounds.Width - totalWidth) / 2;
                 int y = e.CellBounds.Y + (e.CellBounds.Height - ICON_SIZE) / 2;
+                int currentX = startX;
 
+                // 1. Vẽ Detail (Luôn hiện nếu đã vào được đây)
                 if (_iconDetail != null)
                 {
-                    Rectangle detailRect = new Rectangle(startX, y, ICON_SIZE, ICON_SIZE);
+                    Rectangle detailRect = new Rectangle(currentX, y, ICON_SIZE, ICON_SIZE);
                     e.Graphics.DrawImage(_iconDetail, detailRect);
+                    currentX += ICON_SIZE + ICON_SPACING;
                 }
 
-                if (_iconEdit != null)
+                // 2. Vẽ Edit (Nếu có quyền)
+                if (canEdit && _iconEdit != null)
                 {
-                    Rectangle editRect = new Rectangle(startX + ICON_SIZE + ICON_SPACING, y, ICON_SIZE, ICON_SIZE);
+                    Rectangle editRect = new Rectangle(currentX, y, ICON_SIZE, ICON_SIZE);
                     e.Graphics.DrawImage(_iconEdit, editRect);
+                    currentX += ICON_SIZE + ICON_SPACING;
                 }
 
-                if (_iconDelete != null)
+                // 3. Vẽ Delete (Nếu có quyền)
+                if (canDelete && _iconDelete != null)
                 {
-                    Rectangle deleteRect = new Rectangle(startX + (ICON_SIZE + ICON_SPACING) * 2, y, ICON_SIZE, ICON_SIZE);
+                    Rectangle deleteRect = new Rectangle(currentX, y, ICON_SIZE, ICON_SIZE);
                     e.Graphics.DrawImage(_iconDelete, deleteRect);
                 }
 
@@ -466,30 +469,20 @@ namespace GUI
         private Image CropToSquare(Image img, int targetSize)
         {
             if (img == null) return _defaultAvatar;
-
             int originalWidth = img.Width;
             int originalHeight = img.Height;
             int cropSize = Math.Min(originalWidth, originalHeight);
-
-            if (originalWidth == originalHeight && originalWidth == targetSize)
-                return img;
-
+            if (originalWidth == originalHeight && originalWidth == targetSize) return img;
             int cropX = (originalWidth - cropSize) / 2;
             int cropY = (originalHeight - cropSize) / 2;
-
             Bitmap croppedBmp = new Bitmap(targetSize, targetSize);
             using (Graphics g = Graphics.FromImage(croppedBmp))
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                g.DrawImage(img,
-                  new Rectangle(0, 0, targetSize, targetSize),
-                  new Rectangle(cropX, cropY, cropSize, cropSize),
-                  GraphicsUnit.Pixel);
+                g.DrawImage(img, new Rectangle(0, 0, targetSize, targetSize), new Rectangle(cropX, cropY, cropSize, cropSize), GraphicsUnit.Pixel);
             }
-
             return croppedBmp;
         }
 
@@ -536,30 +529,49 @@ namespace GUI
             var user = dgvUsers.Rows[e.RowIndex].DataBoundItem as UserDTO;
             if (user == null) return;
 
-            var cellRect = dgvUsers.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+            // --- [SỬA] LOGIC CLICK CHUỘT THÔNG MINH DỰA TRÊN VỊ TRÍ VẼ ---
+            bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_EDIT);
+            bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_DELETE);
 
-            int totalWidth = (ICON_SIZE * 3) + (ICON_SPACING * 2);
+            // Tính toán lại vị trí các icon giống hệt lúc vẽ (CellPainting)
+            int totalWidth = ICON_SIZE;
+            if (canEdit) totalWidth += ICON_SIZE + ICON_SPACING;
+            if (canDelete) totalWidth += ICON_SIZE + ICON_SPACING;
+
+            var cellRect = dgvUsers.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
             int startX = (cellRect.Width - totalWidth) / 2;
 
             Point mousePos = dgvUsers.PointToClient(Cursor.Position);
             int relativeX = mousePos.X - cellRect.X;
 
-            // Detail
-            if (relativeX >= startX && relativeX < startX + ICON_SIZE)
+            int currentX = startX;
+
+            // 1. Check Detail Click
+            if (relativeX >= currentX && relativeX < currentX + ICON_SIZE)
             {
                 ShowUserDetail(user);
+                return;
             }
-            // Edit - 🆕 MỞ GIỐNG PROFILE SETTING
-            else if (relativeX >= startX + ICON_SIZE + ICON_SPACING &&
-          relativeX < startX + 2 * ICON_SIZE + ICON_SPACING)
+            currentX += ICON_SIZE + ICON_SPACING;
+
+            // 2. Check Edit Click (Nếu có quyền)
+            if (canEdit)
             {
-                EditUser(user);
+                if (relativeX >= currentX && relativeX < currentX + ICON_SIZE)
+                {
+                    EditUser(user);
+                    return;
+                }
+                currentX += ICON_SIZE + ICON_SPACING;
             }
-            // Delete
-            else if (relativeX >= startX + 2 * (ICON_SIZE + ICON_SPACING) &&
-          relativeX < startX + totalWidth)
+
+            // 3. Check Delete Click (Nếu có quyền)
+            if (canDelete)
             {
-                DeleteUser(user);
+                if (relativeX >= currentX && relativeX < currentX + ICON_SIZE)
+                {
+                    DeleteUser(user);
+                }
             }
         }
 
@@ -569,24 +581,21 @@ namespace GUI
             detailForm.ShowDialog();
         }
 
-        // 🆕 EDIT - MỞ BẰNG EVENT ĐỂ frmMainAdmin XỬ LÝ
-        private void EditUser(UserDTO user)
+        private void EditUser(UserDTO user)
         {
             RequestEditUser?.Invoke(this, user);
         }
 
         private void DeleteUser(UserDTO user)
         {
-            if (user.Uid == UserSession.CurrentUser.Uid)
+            if (user.Uid == UserSessionDTO.CurrentUser.Uid) // Sửa UserSession thành UserSessionDTO
             {
-                MessageBox.Show("You cannot delete your own account!", "Warning",
-                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("You cannot delete your own account!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             var result = MessageBox.Show(
-              $"Are you sure you want to delete {user.FullName}?\n\n" +
-              $"This will mark the user as deleted (soft delete).",
+              $"Are you sure you want to delete {user.FullName}?\n\n",
               "Confirm Delete",
               MessageBoxButtons.YesNo,
               MessageBoxIcon.Warning);
@@ -597,17 +606,14 @@ namespace GUI
 
                 if (success)
                 {
-                    MessageBox.Show($"User '{user.FullName}' has been deleted successfully!",
-                      "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"User '{user.FullName}' has been deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LoadData();
                 }
                 else
                 {
-                    MessageBox.Show("Failed to delete user. Please try again.",
-                      "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Failed to delete user. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
     }
 }
-

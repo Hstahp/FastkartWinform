@@ -59,6 +59,7 @@
             this.lblName = new System.Windows.Forms.Label();
             this.picUser = new System.Windows.Forms.PictureBox();
             this.pnlMainContent = new System.Windows.Forms.Panel();
+            this.btnPermission = new System.Windows.Forms.Button();
             this.pnlSidebar.SuspendLayout();
             this.pnlSettingsSub.SuspendLayout();
             this.btnSettings.SuspendLayout();
@@ -171,6 +172,7 @@
             // pnlRolesSub
             // 
             this.pnlRolesSub.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(24)))), ((int)(((byte)(39)))));
+            this.pnlRolesSub.Controls.Add(this.btnPermission); // Nút mới
             this.pnlRolesSub.Controls.Add(this.btnCreateRole);
             this.pnlRolesSub.Controls.Add(this.btnAllRoles);
             this.pnlRolesSub.Dock = System.Windows.Forms.DockStyle.Top;
@@ -180,6 +182,22 @@
             this.pnlRolesSub.Padding = new System.Windows.Forms.Padding(0, 4, 0, 4);
             this.pnlRolesSub.Size = new System.Drawing.Size(260, 0);
             this.pnlRolesSub.TabIndex = 11;
+            this.btnPermission.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnPermission.FlatAppearance.BorderSize = 0;
+            this.btnPermission.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnPermission.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPermission.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnPermission.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(213)))), ((int)(((byte)(219)))));
+            this.btnPermission.Location = new System.Drawing.Point(0, 80); // Vị trí dưới cùng (4+38+38 = 80)
+            this.btnPermission.Margin = new System.Windows.Forms.Padding(0);
+            this.btnPermission.Name = "btnPermission";
+            this.btnPermission.Padding = new System.Windows.Forms.Padding(48, 0, 0, 0);
+            this.btnPermission.Size = new System.Drawing.Size(260, 38);
+            this.btnPermission.TabIndex = 5;
+            this.btnPermission.Text = "   Permission";
+            this.btnPermission.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnPermission.UseVisualStyleBackColor = true;
+            this.btnPermission.Click += new System.EventHandler(this.btnPermission_Click);
             // 
             // btnCreateRole
             // 
@@ -828,5 +846,6 @@
         private System.Windows.Forms.Button btnProfileSetting;
         private System.Windows.Forms.Button btnSettings;
         private System.Windows.Forms.Label lblSettingsArrow;
+        private System.Windows.Forms.Button btnPermission;
     }
 }   

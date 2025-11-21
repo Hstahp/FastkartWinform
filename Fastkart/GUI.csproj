@@ -119,7 +119,24 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlServerTypes\Loader.cs" />
+    <Compile Include="Role\frmAddRole.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Role\frmAddRole.Designer.cs">
+      <DependentUpon>frmAddRole.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Role\frmAllRole.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Role\frmAllRole.Designer.cs">
+      <DependentUpon>frmAllRole.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Role\frmPermission.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Role\frmPermission.Designer.cs">
+      <DependentUpon>frmPermission.cs</DependentUpon>
+    </Compile>
     <Compile Include="User\frmAddNewUser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -200,21 +217,6 @@
       <Project>{730658ee-881b-430f-8d3a-469c4b5505ae}</Project>
       <Name>Helpers</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="SqlServerTypes\readme.htm" />
-    <Content Include="SqlServerTypes\x64\msvcr120.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServerTypes\x64\SqlServerSpatial140.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServerTypes\x86\msvcr120.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

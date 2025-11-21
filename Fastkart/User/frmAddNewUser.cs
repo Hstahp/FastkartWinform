@@ -1,5 +1,5 @@
 ﻿using BLL;
-using Common;
+using Common; // Để dùng PermCode và UserSessionDTO
 using DTO;
 using System;
 using System.Collections.Generic;
@@ -23,10 +23,28 @@ namespace GUI
 
         private void frmAddNewUser_Load(object sender, EventArgs e)
         {
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_CREATE))
+            {
+                this.BeginInvoke(new MethodInvoker(delegate
+                {
+                    MessageBox.Show("Bạn không có quyền thêm người dùng mới!",
+                                    "Truy cập bị từ chối",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Warning);
+                    this.Close();
+                }));
+                return; 
+            }
+
             LoadRoles();
+
+            Label spacer = new Label();
+            spacer.Size = new Size(10, 100);
+            spacer.BackColor = Color.Transparent;
+            spacer.Location = new Point(0, btnAdd.Bottom + 20);
+            pnlContainer.Controls.Add(spacer);
         }
 
-        // 1. Load Role (ĐỂ ENABLED)
         private void LoadRoles()
         {
             List<RoleDTO> roles = _userBLL.GetAllRoles();
@@ -36,7 +54,6 @@ namespace GUI
                 cboRole.DisplayMember = "RoleName";
                 cboRole.ValueMember = "Uid";
 
-                // Mặc định chọn Role đầu tiên
                 cboRole.SelectedIndex = 0;
             }
         }

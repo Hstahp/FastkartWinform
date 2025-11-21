@@ -15,7 +15,7 @@ namespace BLL
     {
         private UserDAL _userRepo;
         private CloudinaryHelper _cloudinaryHelper;
-       
+
         public UserBLL()
         {
             _userRepo = new UserDAL();
@@ -66,7 +66,7 @@ namespace BLL
                 return result;
             }
 
-           
+
             result.Status = LoginStatus.Success;
             result.User = new UserDTO
             {
@@ -85,6 +85,24 @@ namespace BLL
                 CreatedBy = userFromDb.CreatedBy,
                 UpdatedBy = userFromDb.UpdatedBy
             };
+
+            // --- LƯU SESSION VÀ NẠP QUYỀN (BỔ SUNG) ---
+
+            // 1. Lưu thông tin User vào Session
+            UserSessionDTO.CurrentUser = result.User;
+
+            // 2. Gọi DAL để lấy danh sách quyền
+            RoleDAL roleDal = new RoleDAL();
+            List<string> permissions = roleDal.GetPermissionCodesByRole(userFromDb.RoleUid);
+
+            // 3. Nạp vào Session
+            UserSessionDTO.Permissions.Clear();
+            foreach (var p in permissions)
+            {
+                UserSessionDTO.Permissions.Add(p.ToUpper());
+            }
+
+            // --- HẾT PHẦN BỔ SUNG ---
 
             return result;
         }
@@ -128,7 +146,7 @@ namespace BLL
                 return false;
             }
         }
-       
+
         public List<UserDTO> GetAllUsers()
         {
             var users = _userRepo.GetAllUsers();
@@ -151,7 +169,7 @@ namespace BLL
         }
         public List<RoleDTO> GetAllRoles()
         {
-            
+
             List<Roles> rolesEntities = _userRepo.GetAllRoles();
 
             List<RoleDTO> rolesDtos = rolesEntities.Select(r => new RoleDTO
@@ -185,7 +203,7 @@ namespace BLL
             {
                 if (newImagePath == "REMOVE")
                 {
-                    userEntity.ImgUser =  AppConstants.DEFAULT_IMG_USER;
+                    userEntity.ImgUser = AppConstants.DEFAULT_IMG_USER;
                     userDto.ImgUser = userEntity.ImgUser;
                 }
                 else

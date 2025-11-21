@@ -44,6 +44,7 @@
     <Compile Include="AppConstants.cs" />
     <Compile Include="Enum\LoginStatus.cs" />
     <Compile Include="Enum\UserRole.cs" />
+    <Compile Include="PermCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
