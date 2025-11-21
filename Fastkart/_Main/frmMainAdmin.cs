@@ -691,7 +691,7 @@ namespace GUI
 
         private void btnDashboard_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnDashboard);
+            OpenChildForm(new frmDashboard(), btnDashboard);
             CollapseCurrentSubMenu();
         }
 

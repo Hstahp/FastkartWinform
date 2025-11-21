@@ -92,7 +92,7 @@
             this.guna2VScrollBar1.LargeChange = 10;
             this.guna2VScrollBar1.Location = new System.Drawing.Point(880, 70);
             this.guna2VScrollBar1.Name = "guna2VScrollBar1";
-            this.guna2VScrollBar1.ScrollbarSize = 18;
+            this.guna2VScrollBar1.ScrollbarSize = 10;
             this.guna2VScrollBar1.Size = new System.Drawing.Size(18, 620);
             this.guna2VScrollBar1.TabIndex = 3;
             this.guna2VScrollBar1.ThumbColor = System.Drawing.Color.Silver;
