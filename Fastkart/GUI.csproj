@@ -133,6 +133,24 @@
     <Compile Include="Login\frmResetPassword.Designer.cs">
       <DependentUpon>frmResetPassword.cs</DependentUpon>
     </Compile>
+    <Compile Include="Product\frmCreate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Product\frmCreate.Designer.cs">
+      <DependentUpon>frmCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Product\frmEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Product\frmEdit.Designer.cs">
+      <DependentUpon>frmEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Product\frmIndex.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Product\frmIndex.Designer.cs">
+      <DependentUpon>frmIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Role\frmAddRole.cs">
@@ -189,6 +207,15 @@
     <EmbeddedResource Include="Login\frmLogin.resx">
       <DependentUpon>frmLogin.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Product\frmCreate.resx">
+      <DependentUpon>frmCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Product\frmEdit.resx">
+      <DependentUpon>frmEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Product\frmIndex.resx">
+      <DependentUpon>frmIndex.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -220,6 +247,26 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\compose.png" />
+    <None Include="Resources\bin.png" />
+    <None Include="Resources\bin %281%29.png" />
+    <None Include="Resources\compose %281%29.png" />
+    <None Include="Resources\view %281%29.png" />
+    <Content Include="SqlServerTypes\readme.htm" />
+    <Content Include="SqlServerTypes\x64\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x64\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\msvcr120.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\BLL\BLL.csproj">
       <Project>{4eb39e7f-d455-43e7-a032-84d1253b6d01}</Project>
       <Name>BLL</Name>
@@ -227,6 +274,10 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{7dca5e2d-8cf6-4f9f-81f1-705a054bc67e}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DAL\DAL.csproj">
+      <Project>{A9446B3E-B154-4E8C-A362-13A99AB90CA4}</Project>
+      <Name>DAL</Name>
     </ProjectReference>
     <ProjectReference Include="..\DTO\DTO.csproj">
       <Project>{f125060d-5ff6-4d65-b960-b8c92dc6085a}</Project>

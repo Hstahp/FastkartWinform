@@ -50,6 +50,9 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Linq.Dynamic.Core, Version=1.7.0.0, Culture=neutral, PublicKeyToken=0f07ec44de6ac832, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Dynamic.Core.1.7.0\lib\net46\System.Linq.Dynamic.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
@@ -70,6 +73,7 @@
     <Compile Include="EF\Cart.cs" />
     <Compile Include="EF\CartItem.cs" />
     <Compile Include="EF\C__EFMigrationsHistory.cs" />
+    <Compile Include="EF\CloudinarySettings.cs" />
     <Compile Include="EF\Functions.cs" />
     <Compile Include="EF\Order.cs" />
     <Compile Include="EF\OrderItem.cs" />
@@ -85,9 +89,14 @@
     <Compile Include="EF\Users.cs" />
     <Compile Include="EF\Wishlist.cs" />
     <Compile Include="LoginDAL.cs" />
+    <Compile Include="ProductDAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoleDAL.cs" />
     <Compile Include="UserDAL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
@@ -103,11 +112,6 @@
       <Name>Helpers</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
