@@ -41,9 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrandDTO.cs" />
     <Compile Include="DashboardDTO.cs" />
     <Compile Include="LoginResultDTO.cs" />
+    <Compile Include="ProductCategory.cs" />
+    <Compile Include="ProductDTO.cs" />
+    <Compile Include="ProductSubCategoryDTO.cs" />
     <Compile Include="RoleDTO.cs" />
+    <Compile Include="StockStatusDTO.cs" />
+    <Compile Include="UnitDTO.cs" />
     <Compile Include="UserDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

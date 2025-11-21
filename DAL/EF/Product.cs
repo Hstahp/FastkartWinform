@@ -36,7 +36,7 @@ namespace DAL.EF
         [StringLength(50)]
         public string Sku { get; set; }
 
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
 
         public int Discount { get; set; }
 

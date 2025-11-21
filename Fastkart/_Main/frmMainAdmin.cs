@@ -1,6 +1,7 @@
 ﻿using Common;
 using DTO;
 using GUI;
+using GUI.ProductDTO;
 using Helpers;
 using Newtonsoft.Json.Linq;
 using System;
@@ -601,12 +602,12 @@ namespace GUI
 
         private void btnProducts_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnProducts);
+            OpenChildForm(new frmIndex() { BackColor = Color.FromArgb(249, 250, 251) }, btnProducts);
         }
 
         private void btnAddProduct_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAddProduct);
+            OpenChildForm(new frmCreate() { BackColor = Color.FromArgb(249, 250, 251) }, btnAddProduct);
         }
 
         private void btnCategoryList_Click(object sender, EventArgs e)
