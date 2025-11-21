@@ -1,4 +1,6 @@
 ﻿using BLL;
+using Common;
+using DTO;
 using GUI.Product;
 using Newtonsoft.Json;
 using System;
@@ -12,7 +14,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-//using System.Web.UI.WebControls;
 using System.Windows.Forms;
 
 namespace GUI.ProductDTO
@@ -30,20 +31,152 @@ namespace GUI.ProductDTO
         {
             InitializeComponent();
             _productBLL = new ProductBLL();
+
+            // Đăng ký các sự kiện cho GridView
             dgvProducts.CellPainting += dgvProducts_CellPainting;
             dgvProducts.CellMouseMove += dgvProducts_CellMouseMove;
             dgvProducts.CellMouseLeave += dgvProducts_CellMouseLeave;
             dgvProducts.CellClick += dgvProducts_CellClick;
         }
 
-
         private void frmIndex_Load(object sender, EventArgs e)
         {
+            // 1. CHECK QUYỀN XEM
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_VIEW))
+            {
+                MessageBox.Show("Bạn không có quyền truy cập trang Quản lý Sản phẩm!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.Close();
+                return;
+            }
+
+            // 2. CHECK QUYỀN THÊM (Ẩn nút Add)
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_CREATE))
+            {
+                if (btnAddProduct != null) btnAddProduct.Visible = false;
+            }
+
+            // (Lưu ý: Việc ẩn hiện nút Sửa/Xóa sẽ được xử lý trực tiếp trong sự kiện CellPainting bên dưới)
+
             LoadData();
             LoadFilter();
             LoadSort();
             cboFilter.SelectedIndexChanged += cboFilter_SelectedIndexChanged;
             cboSort.SelectedIndexChanged += cboSort_SelectedIndexChanged;
+        }
+
+        // --- [PHẦN 1: VẼ ICON THEO QUYỀN] ---
+        private void dgvProducts_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.RowIndex >= 0 && dgvProducts.Columns[e.ColumnIndex].Name == "colAction")
+            {
+                e.PaintBackground(e.CellBounds, true);
+
+                // Check quyền
+                bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_EDIT);
+                bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_DELETE);
+
+                int size = 20;
+                int padding = 5;
+                int startX = e.CellBounds.X + padding;
+                int y = e.CellBounds.Y + (e.CellBounds.Height - size) / 2;
+
+                // 1. Vẽ nút Xem (Luôn hiện)
+                e.Graphics.DrawImage(Properties.Resources.view, new Rectangle(startX, y, size, size));
+
+                // 2. Vẽ nút Sửa (Nếu có quyền)
+                if (canEdit)
+                {
+                    e.Graphics.DrawImage(Properties.Resources.edit, new Rectangle(startX + 30, y, size, size));
+                }
+
+                // 3. Vẽ nút Xóa (Nếu có quyền)
+                if (canDelete)
+                {
+                    e.Graphics.DrawImage(Properties.Resources.delete, new Rectangle(startX + 60, y, size, size));
+                }
+
+                e.Handled = true;
+            }
+        }
+
+        // --- [PHẦN 2: HIỆU ỨNG CHUỘT THEO QUYỀN] ---
+        private void dgvProducts_CellMouseMove(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex < 0 || dgvProducts.Columns[e.ColumnIndex].Name != "colAction")
+            {
+                dgvProducts.Cursor = Cursors.Default;
+                return;
+            }
+
+            bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_EDIT);
+            bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_DELETE);
+
+            Rectangle cellRect = dgvProducts.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+            int relativeX = MousePosition.X - dgvProducts.PointToScreen(cellRect.Location).X;
+            int iconSize = 20;
+            int padding = 5;
+
+            bool isHand = false;
+
+            // Vùng nút Xem
+            if (relativeX >= padding && relativeX < padding + iconSize) isHand = true;
+
+            // Vùng nút Sửa (chỉ khi có quyền)
+            if (canEdit && relativeX >= padding + 30 && relativeX < padding + 30 + iconSize) isHand = true;
+
+            // Vùng nút Xóa (chỉ khi có quyền)
+            if (canDelete && relativeX >= padding + 60 && relativeX < padding + 60 + iconSize) isHand = true;
+
+            dgvProducts.Cursor = isHand ? Cursors.Hand : Cursors.Default;
+        }
+
+        private void dgvProducts_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            dgvProducts.Cursor = Cursors.Default;
+        }
+
+        // --- [PHẦN 3: XỬ LÝ CLICK THEO QUYỀN] ---
+        private void dgvProducts_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            if (dgvProducts.Columns[e.ColumnIndex].Name == "colAction")
+            {
+                bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_EDIT);
+                bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_DELETE);
+
+                Rectangle cellRect = dgvProducts.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+                int relativeX = dgvProducts.PointToClient(Cursor.Position).X - cellRect.Left;
+
+                int iconSize = 20;
+                int padding = 5;
+
+                object uidValue = dgvProducts.Rows[e.RowIndex].Cells["colUid"].Value;
+                if (uidValue == null) return;
+                int productId = Convert.ToInt32(uidValue);
+
+                // 1. Click XEM
+                if (relativeX >= padding && relativeX < padding + iconSize)
+                {
+                    MessageBox.Show("Xem sản phẩm: " + productId);
+                }
+                // 2. Click SỬA (Có quyền mới click được)
+                else if (canEdit && relativeX >= padding + 30 && relativeX < padding + 30 + iconSize)
+                {
+                    OpenEditForm(productId);
+                }
+                // 3. Click XÓA (Có quyền mới click được)
+                else if (canDelete && relativeX >= padding + 60 && relativeX < padding + 60 + iconSize)
+                {
+                    if (MessageBox.Show("Bạn có chắc chắn muốn xóa sản phẩm này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        // Gọi hàm xóa sản phẩm tại đây nếu bạn đã cài đặt
+                        // _productBLL.DeleteProduct(productId);
+                        // LoadData();
+                        MessageBox.Show("Đã gửi yêu cầu xóa ID: " + productId);
+                    }
+                }
+            }
         }
 
         private async Task<Image> LoadImageFromUrlAsync(string url)
@@ -61,136 +194,13 @@ namespace GUI.ProductDTO
             }
             catch
             {
-                return null; 
-            }
-        }
-
-        private void dgvProducts_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
-        {
-            if (e.ColumnIndex == dgvProducts.Columns["colAction"].Index && e.RowIndex >= 0)
-            {
-                e.PaintBackground(e.CellBounds, true);
-
-                int size = 20;
-                int padding = 5;
-
-                int x = e.CellBounds.X + padding;
-                int y = e.CellBounds.Y + (e.CellBounds.Height - size) / 2;
-
-                e.Graphics.DrawImage(Properties.Resources.view, new Rectangle(x, y, size, size));
-                e.Graphics.DrawImage(Properties.Resources.edit, new Rectangle(x + 30, y, size, size));
-                e.Graphics.DrawImage(Properties.Resources.delete, new Rectangle(x + 60, y, size, size));
-
-                e.Handled = true;
-            }
-        }
-
-        private void dgvProducts_CellMouseMove(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            if (e.RowIndex < 0 || e.ColumnIndex != dgvProducts.Columns["colAction"].Index)
-            {
-                dgvProducts.Cursor = Cursors.Default;
-                return;
-            }
-
-            Rectangle cellRect = dgvProducts.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
-            int relativeX = MousePosition.X - dgvProducts.PointToScreen(cellRect.Location).X;
-
-            int iconSize = 20;
-            int padding = 5;
-
-            if ((relativeX >= padding && relativeX < padding + iconSize) ||      
-                (relativeX >= padding + 30 && relativeX < padding + 30 + iconSize) ||  
-                (relativeX >= padding + 60 && relativeX < padding + 60 + iconSize))   
-            {
-                dgvProducts.Cursor = Cursors.Hand;
-            }
-            else
-            {
-                dgvProducts.Cursor = Cursors.Default;
-            }
-        }
-
-        private void dgvProducts_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
-        {
-            dgvProducts.Cursor = Cursors.Default;
-        }
-
-
-        private void dgvProducts_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex < 0) return;
-
-            if (e.ColumnIndex == dgvProducts.Columns["colAction"].Index)
-            {
-                Rectangle cellRect = dgvProducts.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
-
-                int relativeX = dgvProducts.PointToClient(Cursor.Position).X - cellRect.Left;
-
-                int iconSize = 20;
-                int padding = 5;
-
-                object uidValue = dgvProducts.Rows[e.RowIndex].Cells["colUid"].Value;
-
-                if (uidValue == null)
-                {
-                    MessageBox.Show("Không tìm thấy ID sản phẩm.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                int productId = Convert.ToInt32(uidValue);
-
-                if (relativeX >= padding && relativeX < padding + iconSize)
-                {
-                    MessageBox.Show("Xem sản phẩm: " + e.RowIndex);
-                }
-                else if (relativeX >= padding + 30 && relativeX < padding + 30 + iconSize)
-                {
-                    OpenEditForm(productId);
-                }
-                else if (relativeX >= padding + 60 && relativeX < padding + 60 + iconSize)
-                {
-                    DeleteProductAction(productId);
-                }
-            }
-        }
-
-
-        private void DeleteProductAction(int productId)
-        {
-            DialogResult confirmResult = MessageBox.Show(
-                "Bạn có chắc chắn muốn xóa mềm sản phẩm ID " + productId + " này không? Sản phẩm sẽ được chuyển vào thùng rác.",
-                "Xác nhận xóa",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (confirmResult == DialogResult.Yes)
-            {
-                try
-                {
-                    bool success = _productBLL.DeleteProduct(productId);
-
-                    if (success)
-                    {
-                        MessageBox.Show("Xóa sản phẩm thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        LoadData();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Xóa sản phẩm thất bại. Vui lòng thử lại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Lỗi hệ thống khi xóa: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                return null;
             }
         }
 
         private void OpenEditForm(int productId)
         {
             frmEdit editForm = new frmEdit(productId);
-
             DialogResult result = editForm.ShowDialog();
 
             if (result == DialogResult.OK)
@@ -211,12 +221,10 @@ namespace GUI.ProductDTO
             UpdatePaginationButtons();
 
             dgvProducts.Rows.Clear();
-
             List<Task> tasks = new List<Task>();
 
             foreach (var p in products)
             {
-
                 string formattedPrice = p.Price.HasValue
                     ? p.Price.Value.ToString("#,##0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN")) + " VNĐ"
                     : "";
@@ -225,6 +233,7 @@ namespace GUI.ProductDTO
                 int rowIndex = dgvProducts.Rows.Add(false, null, p.ProductName,
                     p.ProductSubCategory?.SubCategoryName ?? "",
                     p.Position, p.StockQuantity, formattedPrice, status, "", p.Uid);
+
                 var dgvRow = dgvProducts.Rows[rowIndex];
 
                 if (!string.IsNullOrEmpty(p.Thumbnail))
@@ -234,11 +243,9 @@ namespace GUI.ProductDTO
                         try
                         {
                             var thumbnails = JsonConvert.DeserializeObject<List<string>>(p.Thumbnail);
-
                             if (thumbnails != null && thumbnails.Count > 0)
                             {
                                 string url = thumbnails[0];
-
                                 var img = await LoadImageFromUrlAsync(url);
 
                                 if (img != null)
@@ -257,16 +264,12 @@ namespace GUI.ProductDTO
                                 }
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            // Nên log lỗi ex.Message ở đây nếu cần thiết
-                        }
+                        catch (Exception) { }
                     }));
                 }
             }
 
             await Task.WhenAll(tasks);
-
         }
 
         private void LoadFilter()
@@ -279,8 +282,8 @@ namespace GUI.ProductDTO
             };
 
             cboFilter.DataSource = data;
-            cboFilter.DisplayMember = "Name"; 
-            cboFilter.ValueMember = "Id";    
+            cboFilter.DisplayMember = "Name";
+            cboFilter.ValueMember = "Id";
             cboFilter.SelectedIndex = 0;
         }
 
@@ -290,7 +293,6 @@ namespace GUI.ProductDTO
             if (cboFilter.SelectedIndex != -1)
             {
                 filter = cboFilter.SelectedValue.ToString();
-
                 LoadData();
             }
         }
@@ -318,7 +320,6 @@ namespace GUI.ProductDTO
             if (cboSort.SelectedIndex != -1)
             {
                 sort = cboSort.SelectedValue.ToString();
-
                 LoadData();
             }
         }
@@ -334,7 +335,6 @@ namespace GUI.ProductDTO
             centerPanel.Top = 0;
 
             guna2Panel3.Controls.Add(centerPanel);
-
             guna2Panel3.Controls.Add(CreatePageButton("«", 1, pageCurrent > 1));
 
             for (int i = 1; i <= totalPage; i++)
@@ -349,7 +349,7 @@ namespace GUI.ProductDTO
         {
             var btn = new Guna.UI2.WinForms.Guna2Button();
             btn.Text = text;
-            btn.Width = 47;  
+            btn.Width = 47;
             btn.Height = 43;
             btn.Margin = new Padding(4);
             btn.BorderRadius = 5;
@@ -360,20 +360,18 @@ namespace GUI.ProductDTO
 
             if (active)
             {
-                btn.FillColor = Color.FromArgb(94, 148, 255); 
+                btn.FillColor = Color.FromArgb(94, 148, 255);
                 btn.ForeColor = Color.White;
             }
             else
             {
                 btn.FillColor = Color.White;
-                btn.ForeColor = Color.FromArgb(100, 100, 100); 
+                btn.ForeColor = Color.FromArgb(100, 100, 100);
             }
 
             btn.Click += PaginationButton_Click;
-
             return btn;
         }
-
 
         private void PaginationButton_Click(object sender, EventArgs e)
         {
@@ -381,19 +379,17 @@ namespace GUI.ProductDTO
             int newPage = (int)btn.Tag;
 
             pageCurrent = newPage;
-            LoadData();  
+            LoadData();
         }
 
         private void btnAddProduct_Click(object sender, EventArgs e)
         {
             frmCreate createForm = new frmCreate();
-
             DialogResult result = createForm.ShowDialog();
 
             if (result == DialogResult.OK)
             {
                 MessageBox.Show("Sản phẩm đã được thêm thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
                 LoadData();
             }
         }

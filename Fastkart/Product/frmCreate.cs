@@ -1,5 +1,6 @@
 ﻿using BLL;
 using DTO;
+using Common; // Dùng cho PermCode và UserSessionDTO
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,21 +18,24 @@ namespace GUI.ProductDTO
     {
         private ProductBLL _productBLL;
         private string _selectedImagePath;
+
         public frmCreate()
         {
             InitializeComponent();
             _productBLL = new ProductBLL();
+
+            // Cấu hình Form
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Width = 730;
 
-            loadCategory();
-            loadBrand();
-            loadUnit();
-            loadStockStatus();
+            // Đăng ký sự kiện Shown để check quyền an toàn
+            this.Shown += FrmCreate_Shown;
+            this.Load += FrmCreate_Load;
 
+            // Cấu hình upload ảnh
             this.guna2PanelImageUpload.AllowDrop = true;
             this.btnRemoveImage.BringToFront();
             this.guna2PanelImageUpload.DragEnter += guna2PanelImageUpload_DragEnter;
@@ -39,7 +43,31 @@ namespace GUI.ProductDTO
             this.labelImagePlaceholder.Click += new System.EventHandler(this.guna2PanelImageUpload_Click);
             this.btnSaveProduct.Click += new System.EventHandler(this.btnSaveProduct_Click);
             this.btnRemoveImage.Click += new System.EventHandler(this.btnRemoveImage_Click);
+        }
 
+        // --- 1. CHECK QUYỀN TẠI SỰ KIỆN SHOWN (AN TOÀN NHẤT) ---
+        private void FrmCreate_Shown(object sender, EventArgs e)
+        {
+            // Kiểm tra quyền THÊM SẢN PHẨM (PRODUCT.CREATE)
+            // Lúc này Form đã hiện lên (Handle created), nên gọi Close() an toàn 100%
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_CREATE))
+            {
+                MessageBox.Show("Bạn không có quyền thêm sản phẩm mới!",
+                                "Truy cập bị từ chối",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                this.Close(); // Đóng form
+            }
+        }
+
+        // --- 2. LOAD DỮ LIỆU TẠI SỰ KIỆN LOAD ---
+        private void FrmCreate_Load(object sender, EventArgs e)
+        {
+            // Chỉ load dữ liệu, KHÔNG check quyền ở đây để tránh lỗi Invoke
+            loadCategory();
+            loadBrand();
+            loadUnit();
+            loadStockStatus();
         }
 
         private void loadCategory()
@@ -48,7 +76,8 @@ namespace GUI.ProductDTO
             cboCategory.DataSource = categories;
             cboCategory.DisplayMember = "CategoryName";
             cboCategory.ValueMember = "Uid";
-            cboCategory.SelectedIndex = 0;
+            if (categories.Count > 0) cboCategory.SelectedIndex = 0;
+
             loadSubcategory();
             cboCategory.SelectedIndexChanged += cboCategory_SelectedIndexChanged;
         }
@@ -58,16 +87,16 @@ namespace GUI.ProductDTO
             loadSubcategory();
         }
 
-
         private void loadSubcategory()
         {
+            if (cboCategory.SelectedValue == null) return;
             int id = (int)cboCategory.SelectedValue;
 
             var subCategory = _productBLL.GetSubCategory(id);
             cboSubcategory.DataSource = subCategory;
             cboSubcategory.DisplayMember = "SubCategoryName";
             cboSubcategory.ValueMember = "Uid";
-            cboSubcategory.SelectedIndex = 0;
+            if (subCategory.Count > 0) cboSubcategory.SelectedIndex = 0;
         }
 
         private void loadBrand()
@@ -76,23 +105,25 @@ namespace GUI.ProductDTO
             cboBrand.DataSource = brands;
             cboBrand.DisplayMember = "BrandName";
             cboBrand.ValueMember = "Uid";
-            cboBrand.SelectedIndex = 0;
+            if (brands.Count > 0) cboBrand.SelectedIndex = 0;
         }
+
         private void loadUnit()
         {
             var Units = _productBLL.GetAllUnit();
             cboUnit.DataSource = Units;
             cboUnit.DisplayMember = "UnitName";
             cboUnit.ValueMember = "Uid";
-            cboUnit.SelectedIndex = 0;
+            if (Units.Count > 0) cboUnit.SelectedIndex = 0;
         }
+
         private void loadStockStatus()
         {
             var brands = _productBLL.GetAllStockStatus();
             cboStockStatus.DataSource = brands;
             cboStockStatus.DisplayMember = "StockName";
             cboStockStatus.ValueMember = "Uid";
-            cboStockStatus.SelectedIndex = 0;
+            if (brands.Count > 0) cboStockStatus.SelectedIndex = 0;
         }
 
         private void guna2PanelImageUpload_DragEnter(object sender, DragEventArgs e)
@@ -106,11 +137,11 @@ namespace GUI.ProductDTO
                      files[0].ToLower().EndsWith(".png") ||
                      files[0].ToLower().EndsWith(".jpeg")))
                 {
-                    e.Effect = DragDropEffects.Copy; 
+                    e.Effect = DragDropEffects.Copy;
                     return;
                 }
             }
-            e.Effect = DragDropEffects.None; 
+            e.Effect = DragDropEffects.None;
         }
 
         private void guna2PanelImageUpload_DragDrop(object sender, DragEventArgs e)
@@ -135,7 +166,6 @@ namespace GUI.ProductDTO
             }
         }
 
-
         private void btnSaveProduct_Click(object sender, EventArgs e)
         {
             if (!ValidateProductInput())
@@ -156,14 +186,14 @@ namespace GUI.ProductDTO
 
                 Description = rtbDescription.Text,
 
-                Weight = double.TryParse(txtWeight.Text, out double weight) ? weight : (double?)null, 
+                Weight = double.TryParse(txtWeight.Text, out double weight) ? weight : (double?)null,
 
                 Price = decimal.TryParse(txtPrice.Text, out decimal price) ? price : (decimal?)null,
                 Discount = int.TryParse(txtDiscount.Text, out int discount) ? discount : (int?)null,
 
                 Sku = txtSKU.Text,
                 StockQuantity = int.TryParse(txtStockQuantity.Text, out int qty) ? qty : (int?)null,
-                StockStatusUid = Convert.ToInt32(cboStockStatus.SelectedValue), 
+                StockStatusUid = Convert.ToInt32(cboStockStatus.SelectedValue),
 
                 IsFeatured = toggleIsFeatured.Checked,
                 Exchangeable = toggleExchangeable.Checked,
@@ -172,7 +202,7 @@ namespace GUI.ProductDTO
                 Thumbnail = this._selectedImagePath,
 
                 CreatedAt = DateTime.Now,
-                CreatedBy = Environment.UserName, 
+                CreatedBy = Environment.UserName,
                 Deleted = false,
             };
 
@@ -198,7 +228,6 @@ namespace GUI.ProductDTO
                 MessageBox.Show($"Lỗi lưu dữ liệu: {ex.Message}", "Lỗi hệ thống", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private bool ValidateProductInput()
         {
@@ -267,7 +296,7 @@ namespace GUI.ProductDTO
                 MessageBox.Show("Chiết khấu (Discount) phải là số nguyên.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
-            if (discountValue < 0 || discountValue > 100) 
+            if (discountValue < 0 || discountValue > 100)
             {
                 MessageBox.Show("Chiết khấu (Discount) phải là số nguyên từ 0 đến 100.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
@@ -308,7 +337,7 @@ namespace GUI.ProductDTO
                 guna2PictureBoxPreview.Image = image;
                 guna2PictureBoxPreview.Visible = true;
                 labelImagePlaceholder.Visible = false;
-                btnRemoveImage.Visible = true; 
+                btnRemoveImage.Visible = true;
 
                 this.labelImagePlaceholder.Text = $"Đã chọn: {System.IO.Path.GetFileName(filePath)}";
                 this.labelImagePlaceholder.ForeColor = System.Drawing.Color.Green;
@@ -347,10 +376,10 @@ namespace GUI.ProductDTO
             rtbDescription.Clear();
             this._selectedImagePath = null;
 
-            cboSubcategory.SelectedIndex = 0;
-            cboBrand.SelectedIndex = 0;
-            cboUnit.SelectedIndex = 0;
-            cboStockStatus.SelectedIndex = 0;
+            if (cboSubcategory.Items.Count > 0) cboSubcategory.SelectedIndex = 0;
+            if (cboBrand.Items.Count > 0) cboBrand.SelectedIndex = 0;
+            if (cboUnit.Items.Count > 0) cboUnit.SelectedIndex = 0;
+            if (cboStockStatus.Items.Count > 0) cboStockStatus.SelectedIndex = 0;
 
             radioActive.Checked = true;
             toggleIsFeatured.Checked = false;
