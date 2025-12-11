@@ -37,12 +37,6 @@ namespace GUI
             }
 
             LoadRoles();
-
-            Label spacer = new Label();
-            spacer.Size = new Size(10, 100);
-            spacer.BackColor = Color.Transparent;
-            spacer.Location = new Point(0, btnAdd.Bottom + 20);
-            pnlContainer.Controls.Add(spacer);
         }
 
         private void LoadRoles()

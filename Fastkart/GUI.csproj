@@ -226,8 +226,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="User\frmAddNewUser.resx">
+      <DependentUpon>frmAddNewUser.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="User\frmAllUsers.resx">
       <DependentUpon>frmAllUsers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="User\frmProfileSetting.resx">
+      <DependentUpon>frmProfileSetting.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="_Main\frmMainAdmin.resx">
       <DependentUpon>frmMainAdmin.cs</DependentUpon>

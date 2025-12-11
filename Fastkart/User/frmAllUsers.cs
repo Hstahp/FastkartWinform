@@ -36,6 +36,8 @@ namespace GUI
         private int _currentPage = 1;
         private int _totalPages = 1;
 
+        
+
         public frmAllUsers()
         {
             InitializeComponent();
@@ -45,6 +47,31 @@ namespace GUI
             LoadActionIcons();
             ConfigureGrid();
             InitializePagination();
+            InitializeSearchBox();
+        }
+
+        private void InitializeSearchBox()
+        {
+            txtSearch.Text = AppConstants.SEARCH_PLACEHOLDER;
+            txtSearch.ForeColor = Color.FromArgb(156, 163, 175);
+        }
+
+        private void txtSearch_Enter(object sender, EventArgs e)
+        {
+            if (txtSearch.Text == AppConstants.SEARCH_PLACEHOLDER)
+            {
+                txtSearch.Text = "";
+                txtSearch.ForeColor = Color.FromArgb(75, 85, 99);
+            }
+        }
+
+        private void txtSearch_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtSearch.Text))
+            {
+                txtSearch.Text = AppConstants.SEARCH_PLACEHOLDER;
+                txtSearch.ForeColor = Color.FromArgb(156, 163, 175);
+            }
         }
 
         private void frmAllUsers_Load(object sender, EventArgs e)
@@ -60,11 +87,9 @@ namespace GUI
                 if (btnAdd != null) btnAdd.Visible = false;
             }
 
-
             LoadData();
         }
 
-        // ... (Phần LoadActionIcons, ResizeIcon, CreateFallbackIcon giữ nguyên) ...
         private void LoadActionIcons()
         {
             try
@@ -123,11 +148,11 @@ namespace GUI
             dgvUsers.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(37, 99, 235);
             dgvUsers.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
             dgvUsers.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dgvUsers.ColumnHeadersHeight = 40;
+            dgvUsers.ColumnHeadersHeight = 45;
 
             dgvUsers.RowHeadersVisible = false;
             dgvUsers.BackgroundColor = Color.White;
-            dgvUsers.GridColor = Color.White;
+            dgvUsers.GridColor = Color.FromArgb(229, 231, 235);
 
             dgvUsers.DefaultCellStyle.SelectionBackColor = Color.FromArgb(219, 234, 254);
             dgvUsers.DefaultCellStyle.SelectionForeColor = Color.FromArgb(31, 41, 55);
@@ -173,7 +198,6 @@ namespace GUI
             return bmp;
         }
 
-        // ... (Phần Pagination giữ nguyên) ...
         private void InitializePagination()
         {
             btnPrevPage.Click += (s, e) =>
@@ -231,7 +255,6 @@ namespace GUI
             RefreshCachedImages();
         }
 
-        // ... (Phần xử lý ảnh giữ nguyên) ...
         private void RefreshCachedImages()
         {
             for (int i = 0; i < dgvUsers.Rows.Count; i++)
@@ -397,7 +420,6 @@ namespace GUI
 
         private void dgvUsers_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            // Vẽ Avatar
             if (e.RowIndex >= 0 && dgvUsers.Columns[e.ColumnIndex].Name == "colAvatar")
             {
                 e.PaintBackground(e.ClipBounds, true);
@@ -419,19 +441,16 @@ namespace GUI
                 e.Handled = true;
             }
 
-            // --- [SỬA] VẼ ACTION BUTTONS THEO QUYỀN ---
             if (e.RowIndex >= 0 && dgvUsers.Columns[e.ColumnIndex].Name == "colAction")
             {
                 e.PaintBackground(e.ClipBounds, true);
                 e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
                 e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
 
-                // Check quyền SỬA và XÓA
                 bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_EDIT);
                 bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_DELETE);
 
-                // Tính toán vị trí vẽ
-                int totalWidth = ICON_SIZE; // Mặc định chỉ có Detail
+                int totalWidth = ICON_SIZE;
                 if (canEdit) totalWidth += ICON_SIZE + ICON_SPACING;
                 if (canDelete) totalWidth += ICON_SIZE + ICON_SPACING;
 
@@ -439,7 +458,6 @@ namespace GUI
                 int y = e.CellBounds.Y + (e.CellBounds.Height - ICON_SIZE) / 2;
                 int currentX = startX;
 
-                // 1. Vẽ Detail (Luôn hiện nếu đã vào được đây)
                 if (_iconDetail != null)
                 {
                     Rectangle detailRect = new Rectangle(currentX, y, ICON_SIZE, ICON_SIZE);
@@ -447,7 +465,6 @@ namespace GUI
                     currentX += ICON_SIZE + ICON_SPACING;
                 }
 
-                // 2. Vẽ Edit (Nếu có quyền)
                 if (canEdit && _iconEdit != null)
                 {
                     Rectangle editRect = new Rectangle(currentX, y, ICON_SIZE, ICON_SIZE);
@@ -455,7 +472,6 @@ namespace GUI
                     currentX += ICON_SIZE + ICON_SPACING;
                 }
 
-                // 3. Vẽ Delete (Nếu có quyền)
                 if (canDelete && _iconDelete != null)
                 {
                     Rectangle deleteRect = new Rectangle(currentX, y, ICON_SIZE, ICON_SIZE);
@@ -504,7 +520,7 @@ namespace GUI
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
             string k = txtSearch.Text.ToLower().Trim();
-            if (string.IsNullOrEmpty(k))
+            if (string.IsNullOrEmpty(k) || k == AppConstants.SEARCH_PLACEHOLDER.ToLower())
             {
                 _filteredList = null;
             }
@@ -529,11 +545,9 @@ namespace GUI
             var user = dgvUsers.Rows[e.RowIndex].DataBoundItem as UserDTO;
             if (user == null) return;
 
-            // --- [SỬA] LOGIC CLICK CHUỘT THÔNG MINH DỰA TRÊN VỊ TRÍ VẼ ---
             bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_EDIT);
             bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_DELETE);
 
-            // Tính toán lại vị trí các icon giống hệt lúc vẽ (CellPainting)
             int totalWidth = ICON_SIZE;
             if (canEdit) totalWidth += ICON_SIZE + ICON_SPACING;
             if (canDelete) totalWidth += ICON_SIZE + ICON_SPACING;
@@ -546,7 +560,6 @@ namespace GUI
 
             int currentX = startX;
 
-            // 1. Check Detail Click
             if (relativeX >= currentX && relativeX < currentX + ICON_SIZE)
             {
                 ShowUserDetail(user);
@@ -554,7 +567,6 @@ namespace GUI
             }
             currentX += ICON_SIZE + ICON_SPACING;
 
-            // 2. Check Edit Click (Nếu có quyền)
             if (canEdit)
             {
                 if (relativeX >= currentX && relativeX < currentX + ICON_SIZE)
@@ -565,7 +577,6 @@ namespace GUI
                 currentX += ICON_SIZE + ICON_SPACING;
             }
 
-            // 3. Check Delete Click (Nếu có quyền)
             if (canDelete)
             {
                 if (relativeX >= currentX && relativeX < currentX + ICON_SIZE)
@@ -588,7 +599,7 @@ namespace GUI
 
         private void DeleteUser(UserDTO user)
         {
-            if (user.Uid == UserSessionDTO.CurrentUser.Uid) // Sửa UserSession thành UserSessionDTO
+            if (user.Uid == UserSessionDTO.CurrentUser.Uid)
             {
                 MessageBox.Show("You cannot delete your own account!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;

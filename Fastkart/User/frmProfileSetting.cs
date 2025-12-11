@@ -67,7 +67,7 @@ namespace GUI
             {
                 // CHO PHÉP chỉnh Role
                 cboRole.Enabled = true;
-                cboRole.FillColor = Color.White;
+                cboRole.BackColor = Color.White;
                 cboRole.ForeColor = Color.Black;
                 lblRole.Text = "Role *";
             }
@@ -75,7 +75,7 @@ namespace GUI
             {
                 // KHÓA Role, không cho chỉnh
                 cboRole.Enabled = false;
-                cboRole.FillColor = Color.FromArgb(240, 240, 240);
+                cboRole.BackColor = Color.FromArgb(240, 240, 240);
                 cboRole.ForeColor = Color.Gray;
                 lblRole.Text = "Role (Read-only)";
             }
