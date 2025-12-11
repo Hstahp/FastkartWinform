@@ -37,8 +37,17 @@ namespace GUI
             }
 
             LoadRoles();
+            PreventComboBoxScroll();
         }
-
+        private void PreventComboBoxScroll()
+        {
+            // Ngăn ComboBox thay đổi giá trị khi scroll chuột
+            cboRole.MouseWheel += (sender, e) =>
+            {
+                // Chặn sự kiện MouseWheel
+                ((HandledMouseEventArgs)e).Handled = true;
+            };
+        }
         private void LoadRoles()
         {
             List<RoleDTO> roles = _userBLL.GetAllRoles();
