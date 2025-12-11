@@ -60,7 +60,7 @@
             this.pnlHeader.Controls.Add(this.lblTitle);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
-            this.pnlHeader.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pnlHeader.Margin = new System.Windows.Forms.Padding(6);
             this.pnlHeader.Name = "pnlHeader";
             this.pnlHeader.Padding = new System.Windows.Forms.Padding(60, 38, 60, 38);
             this.pnlHeader.Size = new System.Drawing.Size(1800, 135);
@@ -86,7 +86,7 @@
             this.pnlMain.Controls.Add(this.pnlCard);
             this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlMain.Location = new System.Drawing.Point(0, 135);
-            this.pnlMain.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pnlMain.Margin = new System.Windows.Forms.Padding(6);
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.Padding = new System.Windows.Forms.Padding(60, 38, 60, 38);
             this.pnlMain.Size = new System.Drawing.Size(1800, 1211);
@@ -99,7 +99,7 @@
             this.pnlCard.Controls.Add(this.pnlFooter);
             this.pnlCard.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlCard.Location = new System.Drawing.Point(60, 38);
-            this.pnlCard.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pnlCard.Margin = new System.Windows.Forms.Padding(6);
             this.pnlCard.Name = "pnlCard";
             this.pnlCard.Padding = new System.Windows.Forms.Padding(60, 58, 60, 58);
             this.pnlCard.Size = new System.Drawing.Size(1646, 1385);
@@ -128,7 +128,7 @@
             this.tableLayoutPanel1.Controls.Add(this.pnlImageSection, 1, 7);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(60, 58);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(6);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 8;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 115F));
@@ -160,10 +160,10 @@
             this.txtName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtName.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtName.Location = new System.Drawing.Point(366, 33);
-            this.txtName.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.txtName.Location = new System.Drawing.Point(366, 36);
+            this.txtName.Margin = new System.Windows.Forms.Padding(6);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(1154, 50);
+            this.txtName.Size = new System.Drawing.Size(1154, 43);
             this.txtName.TabIndex = 1;
             // 
             // lblEmail
@@ -184,10 +184,10 @@
             this.txtEmail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtEmail.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtEmail.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtEmail.Location = new System.Drawing.Point(366, 148);
-            this.txtEmail.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.txtEmail.Location = new System.Drawing.Point(366, 151);
+            this.txtEmail.Margin = new System.Windows.Forms.Padding(6);
             this.txtEmail.Name = "txtEmail";
-            this.txtEmail.Size = new System.Drawing.Size(1154, 50);
+            this.txtEmail.Size = new System.Drawing.Size(1154, 43);
             this.txtEmail.TabIndex = 3;
             // 
             // lblPhone
@@ -208,10 +208,10 @@
             this.txtPhone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPhone.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPhone.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtPhone.Location = new System.Drawing.Point(366, 263);
-            this.txtPhone.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.txtPhone.Location = new System.Drawing.Point(366, 266);
+            this.txtPhone.Margin = new System.Windows.Forms.Padding(6);
             this.txtPhone.Name = "txtPhone";
-            this.txtPhone.Size = new System.Drawing.Size(1154, 50);
+            this.txtPhone.Size = new System.Drawing.Size(1154, 43);
             this.txtPhone.TabIndex = 5;
             // 
             // lblAddress
@@ -232,10 +232,10 @@
             this.txtAddress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtAddress.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtAddress.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtAddress.Location = new System.Drawing.Point(366, 378);
-            this.txtAddress.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.txtAddress.Location = new System.Drawing.Point(366, 381);
+            this.txtAddress.Margin = new System.Windows.Forms.Padding(6);
             this.txtAddress.Name = "txtAddress";
-            this.txtAddress.Size = new System.Drawing.Size(1154, 50);
+            this.txtAddress.Size = new System.Drawing.Size(1154, 43);
             this.txtAddress.TabIndex = 7;
             // 
             // lblPassword
@@ -256,11 +256,11 @@
             this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtPassword.Location = new System.Drawing.Point(366, 493);
-            this.txtPassword.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.txtPassword.Location = new System.Drawing.Point(366, 496);
+            this.txtPassword.Margin = new System.Windows.Forms.Padding(6);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '●';
-            this.txtPassword.Size = new System.Drawing.Size(1154, 50);
+            this.txtPassword.Size = new System.Drawing.Size(1154, 43);
             this.txtPassword.TabIndex = 9;
             this.txtPassword.UseSystemPasswordChar = true;
             // 
@@ -282,11 +282,11 @@
             this.txtConfirmPass.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtConfirmPass.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtConfirmPass.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtConfirmPass.Location = new System.Drawing.Point(366, 608);
-            this.txtConfirmPass.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.txtConfirmPass.Location = new System.Drawing.Point(366, 611);
+            this.txtConfirmPass.Margin = new System.Windows.Forms.Padding(6);
             this.txtConfirmPass.Name = "txtConfirmPass";
             this.txtConfirmPass.PasswordChar = '●';
-            this.txtConfirmPass.Size = new System.Drawing.Size(1154, 50);
+            this.txtConfirmPass.Size = new System.Drawing.Size(1154, 43);
             this.txtConfirmPass.TabIndex = 11;
             this.txtConfirmPass.UseSystemPasswordChar = true;
             // 
@@ -310,7 +310,7 @@
             this.cboRole.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.cboRole.FormattingEnabled = true;
             this.cboRole.Location = new System.Drawing.Point(366, 725);
-            this.cboRole.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.cboRole.Margin = new System.Windows.Forms.Padding(6);
             this.cboRole.Name = "cboRole";
             this.cboRole.Size = new System.Drawing.Size(1154, 45);
             this.cboRole.TabIndex = 13;
@@ -334,7 +334,7 @@
             this.pnlImageSection.Controls.Add(this.picUser);
             this.pnlImageSection.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlImageSection.Location = new System.Drawing.Point(366, 811);
-            this.pnlImageSection.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pnlImageSection.Margin = new System.Windows.Forms.Padding(6);
             this.pnlImageSection.Name = "pnlImageSection";
             this.pnlImageSection.Padding = new System.Windows.Forms.Padding(0, 29, 0, 0);
             this.pnlImageSection.Size = new System.Drawing.Size(1154, 337);
@@ -345,7 +345,7 @@
             this.pnlImageActions.Controls.Add(this.btnSelectImg);
             this.pnlImageActions.Controls.Add(this.btnRemoveImg);
             this.pnlImageActions.Location = new System.Drawing.Point(260, 29);
-            this.pnlImageActions.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pnlImageActions.Margin = new System.Windows.Forms.Padding(6);
             this.pnlImageActions.Name = "pnlImageActions";
             this.pnlImageActions.Size = new System.Drawing.Size(260, 192);
             this.pnlImageActions.TabIndex = 1;
@@ -359,7 +359,7 @@
             this.btnSelectImg.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold);
             this.btnSelectImg.ForeColor = System.Drawing.Color.White;
             this.btnSelectImg.Location = new System.Drawing.Point(0, 0);
-            this.btnSelectImg.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnSelectImg.Margin = new System.Windows.Forms.Padding(6);
             this.btnSelectImg.Name = "btnSelectImg";
             this.btnSelectImg.Size = new System.Drawing.Size(260, 67);
             this.btnSelectImg.TabIndex = 0;
@@ -376,7 +376,7 @@
             this.btnRemoveImg.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Bold);
             this.btnRemoveImg.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(68)))), ((int)(((byte)(68)))));
             this.btnRemoveImg.Location = new System.Drawing.Point(0, 87);
-            this.btnRemoveImg.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnRemoveImg.Margin = new System.Windows.Forms.Padding(6);
             this.btnRemoveImg.Name = "btnRemoveImg";
             this.btnRemoveImg.Size = new System.Drawing.Size(260, 67);
             this.btnRemoveImg.TabIndex = 1;
@@ -390,7 +390,7 @@
             this.picUser.Cursor = System.Windows.Forms.Cursors.Hand;
             this.picUser.Image = global::GUI.Properties.Resources.default_avatar;
             this.picUser.Location = new System.Drawing.Point(0, 29);
-            this.picUser.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.picUser.Margin = new System.Windows.Forms.Padding(6);
             this.picUser.Name = "picUser";
             this.picUser.Size = new System.Drawing.Size(218, 210);
             this.picUser.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -403,7 +403,7 @@
             this.pnlFooter.Controls.Add(this.btnUpdate);
             this.pnlFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlFooter.Location = new System.Drawing.Point(60, 1212);
-            this.pnlFooter.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pnlFooter.Margin = new System.Windows.Forms.Padding(6);
             this.pnlFooter.Name = "pnlFooter";
             this.pnlFooter.Padding = new System.Windows.Forms.Padding(0, 38, 0, 0);
             this.pnlFooter.Size = new System.Drawing.Size(1526, 115);
@@ -419,7 +419,7 @@
             this.btnUpdate.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnUpdate.ForeColor = System.Drawing.Color.White;
             this.btnUpdate.Location = new System.Drawing.Point(1176, 38);
-            this.btnUpdate.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnUpdate.Margin = new System.Windows.Forms.Padding(6);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(350, 77);
             this.btnUpdate.TabIndex = 0;
@@ -436,7 +436,7 @@
             this.Controls.Add(this.pnlMain);
             this.Controls.Add(this.pnlHeader);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "frmProfileSetting";
             this.Text = "Profile Settings";
             this.Load += new System.EventHandler(this.frmProfileSetting_Load);

@@ -160,10 +160,10 @@
             this.txtName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtName.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtName.Location = new System.Drawing.Point(366, 33);
+            this.txtName.Location = new System.Drawing.Point(366, 36);
             this.txtName.Margin = new System.Windows.Forms.Padding(6);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(1154, 50);
+            this.txtName.Size = new System.Drawing.Size(1154, 43);
             this.txtName.TabIndex = 1;
             // 
             // lblEmail
@@ -184,10 +184,10 @@
             this.txtEmail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtEmail.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtEmail.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtEmail.Location = new System.Drawing.Point(366, 148);
+            this.txtEmail.Location = new System.Drawing.Point(366, 151);
             this.txtEmail.Margin = new System.Windows.Forms.Padding(6);
             this.txtEmail.Name = "txtEmail";
-            this.txtEmail.Size = new System.Drawing.Size(1154, 50);
+            this.txtEmail.Size = new System.Drawing.Size(1154, 43);
             this.txtEmail.TabIndex = 3;
             // 
             // lblPhone
@@ -208,10 +208,10 @@
             this.txtPhone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPhone.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPhone.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtPhone.Location = new System.Drawing.Point(366, 263);
+            this.txtPhone.Location = new System.Drawing.Point(366, 266);
             this.txtPhone.Margin = new System.Windows.Forms.Padding(6);
             this.txtPhone.Name = "txtPhone";
-            this.txtPhone.Size = new System.Drawing.Size(1154, 50);
+            this.txtPhone.Size = new System.Drawing.Size(1154, 43);
             this.txtPhone.TabIndex = 5;
             // 
             // lblAddress
@@ -232,10 +232,10 @@
             this.txtAddress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtAddress.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtAddress.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtAddress.Location = new System.Drawing.Point(366, 378);
+            this.txtAddress.Location = new System.Drawing.Point(366, 381);
             this.txtAddress.Margin = new System.Windows.Forms.Padding(6);
             this.txtAddress.Name = "txtAddress";
-            this.txtAddress.Size = new System.Drawing.Size(1154, 50);
+            this.txtAddress.Size = new System.Drawing.Size(1154, 43);
             this.txtAddress.TabIndex = 7;
             // 
             // lblPassword
@@ -256,11 +256,11 @@
             this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtPassword.Location = new System.Drawing.Point(366, 493);
+            this.txtPassword.Location = new System.Drawing.Point(366, 496);
             this.txtPassword.Margin = new System.Windows.Forms.Padding(6);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '●';
-            this.txtPassword.Size = new System.Drawing.Size(1154, 50);
+            this.txtPassword.Size = new System.Drawing.Size(1154, 43);
             this.txtPassword.TabIndex = 9;
             this.txtPassword.UseSystemPasswordChar = true;
             // 
@@ -282,11 +282,11 @@
             this.txtConfirmPass.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtConfirmPass.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtConfirmPass.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtConfirmPass.Location = new System.Drawing.Point(366, 608);
+            this.txtConfirmPass.Location = new System.Drawing.Point(366, 611);
             this.txtConfirmPass.Margin = new System.Windows.Forms.Padding(6);
             this.txtConfirmPass.Name = "txtConfirmPass";
             this.txtConfirmPass.PasswordChar = '●';
-            this.txtConfirmPass.Size = new System.Drawing.Size(1154, 50);
+            this.txtConfirmPass.Size = new System.Drawing.Size(1154, 43);
             this.txtConfirmPass.TabIndex = 11;
             this.txtConfirmPass.UseSystemPasswordChar = true;
             // 

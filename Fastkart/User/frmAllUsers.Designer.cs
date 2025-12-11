@@ -52,9 +52,10 @@
             this.pnlHeader.Controls.Add(this.lblTitle);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
+            this.pnlHeader.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.pnlHeader.Name = "pnlHeader";
-            this.pnlHeader.Padding = new System.Windows.Forms.Padding(30, 20, 30, 20);
-            this.pnlHeader.Size = new System.Drawing.Size(900, 80);
+            this.pnlHeader.Padding = new System.Windows.Forms.Padding(60, 38, 60, 38);
+            this.pnlHeader.Size = new System.Drawing.Size(1800, 154);
             this.pnlHeader.TabIndex = 0;
             // 
             // btnAdd
@@ -66,9 +67,10 @@
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAdd.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnAdd.ForeColor = System.Drawing.Color.White;
-            this.btnAdd.Location = new System.Drawing.Point(770, 20);
+            this.btnAdd.Location = new System.Drawing.Point(1540, 38);
+            this.btnAdd.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(100, 40);
+            this.btnAdd.Size = new System.Drawing.Size(200, 77);
             this.btnAdd.TabIndex = 1;
             this.btnAdd.Text = "+ Add";
             this.btnAdd.UseVisualStyleBackColor = false;
@@ -80,9 +82,10 @@
             this.lblTitle.Dock = System.Windows.Forms.DockStyle.Left;
             this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold);
             this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(41)))), ((int)(((byte)(55)))));
-            this.lblTitle.Location = new System.Drawing.Point(30, 20);
+            this.lblTitle.Location = new System.Drawing.Point(60, 38);
+            this.lblTitle.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(110, 37);
+            this.lblTitle.Size = new System.Drawing.Size(250, 72);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "All Users";
             // 
@@ -93,22 +96,24 @@
             this.pnlSearchBar.Controls.Add(this.txtSearch);
             this.pnlSearchBar.Controls.Add(this.lblSearchIcon);
             this.pnlSearchBar.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlSearchBar.Location = new System.Drawing.Point(0, 80);
+            this.pnlSearchBar.Location = new System.Drawing.Point(0, 154);
+            this.pnlSearchBar.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.pnlSearchBar.Name = "pnlSearchBar";
-            this.pnlSearchBar.Padding = new System.Windows.Forms.Padding(30, 15, 30, 15);
-            this.pnlSearchBar.Size = new System.Drawing.Size(900, 60);
+            this.pnlSearchBar.Padding = new System.Windows.Forms.Padding(60, 29, 60, 29);
+            this.pnlSearchBar.Size = new System.Drawing.Size(1800, 114);
             this.pnlSearchBar.TabIndex = 1;
             // 
             // txtSearch
             // 
-            this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearch.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtSearch.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.txtSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
-            this.txtSearch.Location = new System.Drawing.Point(75, 18);
+            this.txtSearch.Location = new System.Drawing.Point(150, 35);
+            this.txtSearch.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(790, 18);
+            this.txtSearch.Size = new System.Drawing.Size(1582, 36);
             this.txtSearch.TabIndex = 1;
             this.txtSearch.Text = "Search by name, email or phone...";
             this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
@@ -120,9 +125,10 @@
             this.lblSearchIcon.AutoSize = true;
             this.lblSearchIcon.Font = new System.Drawing.Font("Segoe UI", 12F);
             this.lblSearchIcon.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(156)))), ((int)(((byte)(163)))), ((int)(((byte)(175)))));
-            this.lblSearchIcon.Location = new System.Drawing.Point(35, 14);
+            this.lblSearchIcon.Location = new System.Drawing.Point(70, 27);
+            this.lblSearchIcon.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblSearchIcon.Name = "lblSearchIcon";
-            this.lblSearchIcon.Size = new System.Drawing.Size(20, 21);
+            this.lblSearchIcon.Size = new System.Drawing.Size(64, 45);
             this.lblSearchIcon.TabIndex = 0;
             this.lblSearchIcon.Text = "🔍";
             // 
@@ -132,10 +138,11 @@
             this.pnlGrid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlGrid.Controls.Add(this.dgvUsers);
             this.pnlGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlGrid.Location = new System.Drawing.Point(0, 140);
+            this.pnlGrid.Location = new System.Drawing.Point(0, 268);
+            this.pnlGrid.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.pnlGrid.Name = "pnlGrid";
-            this.pnlGrid.Padding = new System.Windows.Forms.Padding(30, 15, 30, 0);
-            this.pnlGrid.Size = new System.Drawing.Size(900, 500);
+            this.pnlGrid.Padding = new System.Windows.Forms.Padding(60, 29, 60, 0);
+            this.pnlGrid.Size = new System.Drawing.Size(1800, 964);
             this.pnlGrid.TabIndex = 2;
             // 
             // dgvUsers
@@ -177,7 +184,8 @@
             this.dgvUsers.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvUsers.EnableHeadersVisualStyles = false;
             this.dgvUsers.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(229)))), ((int)(((byte)(231)))), ((int)(((byte)(235)))));
-            this.dgvUsers.Location = new System.Drawing.Point(30, 15);
+            this.dgvUsers.Location = new System.Drawing.Point(60, 29);
+            this.dgvUsers.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.dgvUsers.MultiSelect = false;
             this.dgvUsers.Name = "dgvUsers";
             this.dgvUsers.ReadOnly = true;
@@ -191,9 +199,10 @@
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dgvUsers.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dgvUsers.RowHeadersVisible = false;
+            this.dgvUsers.RowHeadersWidth = 82;
             this.dgvUsers.RowTemplate.Height = 60;
             this.dgvUsers.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvUsers.Size = new System.Drawing.Size(838, 483);
+            this.dgvUsers.Size = new System.Drawing.Size(1678, 933);
             this.dgvUsers.TabIndex = 0;
             this.dgvUsers.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvUsers_CellClick);
             this.dgvUsers.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgvUsers_CellFormatting);
@@ -203,6 +212,7 @@
             // 
             this.colAvatar.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.colAvatar.HeaderText = "Avatar";
+            this.colAvatar.MinimumWidth = 10;
             this.colAvatar.Name = "colAvatar";
             this.colAvatar.ReadOnly = true;
             this.colAvatar.Resizable = System.Windows.Forms.DataGridViewTriState.False;
@@ -214,6 +224,7 @@
             this.colName.DataPropertyName = "FullName";
             this.colName.FillWeight = 25F;
             this.colName.HeaderText = "Name";
+            this.colName.MinimumWidth = 10;
             this.colName.Name = "colName";
             this.colName.ReadOnly = true;
             // 
@@ -223,6 +234,7 @@
             this.colEmail.DataPropertyName = "Email";
             this.colEmail.FillWeight = 30F;
             this.colEmail.HeaderText = "Email";
+            this.colEmail.MinimumWidth = 10;
             this.colEmail.Name = "colEmail";
             this.colEmail.ReadOnly = true;
             // 
@@ -232,6 +244,7 @@
             this.colPhone.DataPropertyName = "PhoneNumber";
             this.colPhone.FillWeight = 20F;
             this.colPhone.HeaderText = "Phone";
+            this.colPhone.MinimumWidth = 10;
             this.colPhone.Name = "colPhone";
             this.colPhone.ReadOnly = true;
             // 
@@ -241,6 +254,7 @@
             this.colRole.DataPropertyName = "RoleName";
             this.colRole.FillWeight = 15F;
             this.colRole.HeaderText = "Role";
+            this.colRole.MinimumWidth = 10;
             this.colRole.Name = "colRole";
             this.colRole.ReadOnly = true;
             // 
@@ -248,6 +262,7 @@
             // 
             this.colAction.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.colAction.HeaderText = "Actions";
+            this.colAction.MinimumWidth = 10;
             this.colAction.Name = "colAction";
             this.colAction.ReadOnly = true;
             this.colAction.Width = 120;
@@ -260,10 +275,11 @@
             this.pnlPagination.Controls.Add(this.lblPageInfo);
             this.pnlPagination.Controls.Add(this.btnPrevPage);
             this.pnlPagination.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlPagination.Location = new System.Drawing.Point(0, 640);
+            this.pnlPagination.Location = new System.Drawing.Point(0, 1232);
+            this.pnlPagination.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.pnlPagination.Name = "pnlPagination";
-            this.pnlPagination.Padding = new System.Windows.Forms.Padding(30, 15, 30, 15);
-            this.pnlPagination.Size = new System.Drawing.Size(900, 60);
+            this.pnlPagination.Padding = new System.Windows.Forms.Padding(60, 29, 60, 29);
+            this.pnlPagination.Size = new System.Drawing.Size(1800, 114);
             this.pnlPagination.TabIndex = 3;
             // 
             // btnNextPage
@@ -275,9 +291,10 @@
             this.btnNextPage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnNextPage.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnNextPage.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
-            this.btnNextPage.Location = new System.Drawing.Point(800, 15);
+            this.btnNextPage.Location = new System.Drawing.Point(1602, 29);
+            this.btnNextPage.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnNextPage.Name = "btnNextPage";
-            this.btnNextPage.Size = new System.Drawing.Size(70, 30);
+            this.btnNextPage.Size = new System.Drawing.Size(140, 58);
             this.btnNextPage.TabIndex = 2;
             this.btnNextPage.Text = "Next ›";
             this.btnNextPage.UseVisualStyleBackColor = false;
@@ -287,9 +304,10 @@
             this.lblPageInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblPageInfo.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblPageInfo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
-            this.lblPageInfo.Location = new System.Drawing.Point(670, 15);
+            this.lblPageInfo.Location = new System.Drawing.Point(1342, 29);
+            this.lblPageInfo.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.lblPageInfo.Name = "lblPageInfo";
-            this.lblPageInfo.Size = new System.Drawing.Size(120, 30);
+            this.lblPageInfo.Size = new System.Drawing.Size(240, 58);
             this.lblPageInfo.TabIndex = 1;
             this.lblPageInfo.Text = "Page 1 of 1";
             this.lblPageInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -303,24 +321,26 @@
             this.btnPrevPage.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPrevPage.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnPrevPage.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
-            this.btnPrevPage.Location = new System.Drawing.Point(590, 15);
+            this.btnPrevPage.Location = new System.Drawing.Point(1182, 29);
+            this.btnPrevPage.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnPrevPage.Name = "btnPrevPage";
-            this.btnPrevPage.Size = new System.Drawing.Size(70, 30);
+            this.btnPrevPage.Size = new System.Drawing.Size(140, 58);
             this.btnPrevPage.TabIndex = 0;
             this.btnPrevPage.Text = "‹ Prev";
             this.btnPrevPage.UseVisualStyleBackColor = false;
             // 
             // frmAllUsers
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(249)))), ((int)(((byte)(250)))), ((int)(((byte)(251)))));
-            this.ClientSize = new System.Drawing.Size(900, 700);
+            this.ClientSize = new System.Drawing.Size(1800, 1346);
             this.Controls.Add(this.pnlGrid);
             this.Controls.Add(this.pnlPagination);
             this.Controls.Add(this.pnlSearchBar);
             this.Controls.Add(this.pnlHeader);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Name = "frmAllUsers";
             this.Text = "All Users";
             this.Load += new System.EventHandler(this.frmAllUsers_Load);
