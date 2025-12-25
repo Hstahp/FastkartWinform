@@ -83,10 +83,34 @@ namespace DAL
         {
             try
             {
-                return _context.ProductCategory.Where(p => p.Deleted == false && p.Status == "Active").AsNoTracking().ToList();
+                // Kiểm tra context
+                if (_context == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("ERROR: DbContext is null in GetAllCategoy");
+                    return new List<ProductCategory>();
+                }
+
+                // Kiểm tra DbSet
+                if (_context.ProductCategory == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("ERROR: ProductCategory DbSet is null");
+                    return new List<ProductCategory>();
+                }
+
+                // Lấy dữ liệu
+                var categories = _context.ProductCategory
+                    .Where(c => !c.Deleted) // Lọc bỏ deleted
+                    .OrderBy(c => c.Position)
+                    .ToList();
+
+                System.Diagnostics.Debug.WriteLine($"GetAllCategoy: Found {categories.Count} categories");
+
+                return categories ?? new List<ProductCategory>();
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"ERROR in GetAllCategoy: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
                 return new List<ProductCategory>();
             }
         }

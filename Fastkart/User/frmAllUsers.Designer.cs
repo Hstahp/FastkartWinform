@@ -52,7 +52,7 @@
             this.pnlHeader.Controls.Add(this.lblTitle);
             this.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlHeader.Location = new System.Drawing.Point(0, 0);
-            this.pnlHeader.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pnlHeader.Margin = new System.Windows.Forms.Padding(6);
             this.pnlHeader.Name = "pnlHeader";
             this.pnlHeader.Padding = new System.Windows.Forms.Padding(60, 38, 60, 38);
             this.pnlHeader.Size = new System.Drawing.Size(1800, 154);
@@ -68,7 +68,7 @@
             this.btnAdd.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnAdd.ForeColor = System.Drawing.Color.White;
             this.btnAdd.Location = new System.Drawing.Point(1540, 38);
-            this.btnAdd.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnAdd.Margin = new System.Windows.Forms.Padding(6);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(200, 77);
             this.btnAdd.TabIndex = 1;
@@ -97,7 +97,7 @@
             this.pnlSearchBar.Controls.Add(this.lblSearchIcon);
             this.pnlSearchBar.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlSearchBar.Location = new System.Drawing.Point(0, 154);
-            this.pnlSearchBar.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pnlSearchBar.Margin = new System.Windows.Forms.Padding(6);
             this.pnlSearchBar.Name = "pnlSearchBar";
             this.pnlSearchBar.Padding = new System.Windows.Forms.Padding(60, 29, 60, 29);
             this.pnlSearchBar.Size = new System.Drawing.Size(1800, 114);
@@ -111,7 +111,7 @@
             this.txtSearch.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.txtSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
             this.txtSearch.Location = new System.Drawing.Point(150, 35);
-            this.txtSearch.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.txtSearch.Margin = new System.Windows.Forms.Padding(6);
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(1582, 36);
             this.txtSearch.TabIndex = 1;
@@ -139,7 +139,7 @@
             this.pnlGrid.Controls.Add(this.dgvUsers);
             this.pnlGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlGrid.Location = new System.Drawing.Point(0, 268);
-            this.pnlGrid.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pnlGrid.Margin = new System.Windows.Forms.Padding(6);
             this.pnlGrid.Name = "pnlGrid";
             this.pnlGrid.Padding = new System.Windows.Forms.Padding(60, 29, 60, 0);
             this.pnlGrid.Size = new System.Drawing.Size(1800, 964);
@@ -185,7 +185,7 @@
             this.dgvUsers.EnableHeadersVisualStyles = false;
             this.dgvUsers.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(229)))), ((int)(((byte)(231)))), ((int)(((byte)(235)))));
             this.dgvUsers.Location = new System.Drawing.Point(60, 29);
-            this.dgvUsers.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.dgvUsers.Margin = new System.Windows.Forms.Padding(6);
             this.dgvUsers.MultiSelect = false;
             this.dgvUsers.Name = "dgvUsers";
             this.dgvUsers.ReadOnly = true;
@@ -276,7 +276,7 @@
             this.pnlPagination.Controls.Add(this.btnPrevPage);
             this.pnlPagination.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlPagination.Location = new System.Drawing.Point(0, 1232);
-            this.pnlPagination.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.pnlPagination.Margin = new System.Windows.Forms.Padding(6);
             this.pnlPagination.Name = "pnlPagination";
             this.pnlPagination.Padding = new System.Windows.Forms.Padding(60, 29, 60, 29);
             this.pnlPagination.Size = new System.Drawing.Size(1800, 114);
@@ -292,7 +292,7 @@
             this.btnNextPage.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnNextPage.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
             this.btnNextPage.Location = new System.Drawing.Point(1602, 29);
-            this.btnNextPage.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnNextPage.Margin = new System.Windows.Forms.Padding(6);
             this.btnNextPage.Name = "btnNextPage";
             this.btnNextPage.Size = new System.Drawing.Size(140, 58);
             this.btnNextPage.TabIndex = 2;
@@ -322,7 +322,7 @@
             this.btnPrevPage.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnPrevPage.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(75)))), ((int)(((byte)(85)))), ((int)(((byte)(99)))));
             this.btnPrevPage.Location = new System.Drawing.Point(1182, 29);
-            this.btnPrevPage.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.btnPrevPage.Margin = new System.Windows.Forms.Padding(6);
             this.btnPrevPage.Name = "btnPrevPage";
             this.btnPrevPage.Size = new System.Drawing.Size(140, 58);
             this.btnPrevPage.TabIndex = 0;
@@ -340,7 +340,7 @@
             this.Controls.Add(this.pnlSearchBar);
             this.Controls.Add(this.pnlHeader);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.Margin = new System.Windows.Forms.Padding(6);
             this.Name = "frmAllUsers";
             this.Text = "All Users";
             this.Load += new System.EventHandler(this.frmAllUsers_Load);

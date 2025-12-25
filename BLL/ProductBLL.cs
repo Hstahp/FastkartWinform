@@ -64,11 +64,11 @@ namespace BLL
         public bool AddProduct(DTO.Product productDTO)
         {
             string cleanedProductName = productDTO.ProductName.Trim();
-            string cleanedSku = productDTO.Sku.Trim();
+            string cleanedSku = productDTO.Sku.Trim().ToUpper(); // ✅ UPPERCASE SKU
 
             if (!_productDAL.IsSkuUnique(cleanedSku, 0))
             {
-                MessageBox.Show("Sku đã tồn tại, vui lòng nhập lại", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("SKU đã tồn tại, vui lòng nhập lại", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
@@ -85,16 +85,18 @@ namespace BLL
             }
 
             var cloudinaryService = new CloudinaryBLL();
+            var qrCodeService = new QRCodeBLL(); 
 
             List<string> uploadedUrls = new List<string>();
 
+            // Upload ảnh sản phẩm
             if (!string.IsNullOrEmpty(productDTO.Thumbnail))
             {
                 string imageUrl = cloudinaryService.UploadProductThumbnail(productDTO.Thumbnail);
 
                 if (imageUrl != null)
                 {
-                    uploadedUrls.Add(imageUrl); 
+                    uploadedUrls.Add(imageUrl);
                 }
                 else
                 {
@@ -103,6 +105,29 @@ namespace BLL
             }
 
             string jsonThumbnailArray = Newtonsoft.Json.JsonConvert.SerializeObject(uploadedUrls);
+
+          
+            string qrCodeUrl = null;
+            try
+            {
+                // Generate label với thông tin đầy đủ
+                string labelBase64 = qrCodeService.GenerateLabelBase64(
+                    cleanedSku,
+                    cleanedProductName,
+                    productDTO.Price ?? 0
+                );
+
+                if (!string.IsNullOrEmpty(labelBase64))
+                {
+                    // Upload lên Cloudinary
+                    qrCodeUrl = cloudinaryService.UploadProductThumbnail(labelBase64);
+                }
+            }
+            catch (Exception ex)
+            {
+             
+                System.Diagnostics.Debug.WriteLine($"QR Code generation failed: {ex.Message}");
+            }
 
             int maxPosition = _productDAL.countPosition();
             int newPosition = maxPosition + 1;
@@ -116,6 +141,7 @@ namespace BLL
                 Price = productDTO.Price ?? 0m,
                 Discount = productDTO.Discount ?? 0,
                 Thumbnail = jsonThumbnailArray,
+                QRCodeUrl = qrCodeUrl, 
                 Status = productDTO.Status,
                 Position = newPosition,
                 Description = productDTO.Description,
@@ -124,7 +150,7 @@ namespace BLL
                 IsFeatured = productDTO.IsFeatured,
                 Exchangeable = productDTO.Exchangeable,
                 Refundable = productDTO.Refundable,
-                Sku = productDTO.Sku,
+                Sku = cleanedSku,
                 StockQuantity = productDTO.StockQuantity ?? 0,
                 StockStatusUid = productDTO.StockStatusUid,
 
@@ -137,13 +163,13 @@ namespace BLL
 
         public DTO.Product GetProductById(int productId)
         {
-            
             DAL.EF.Product productEntity = _productDAL.GetProductById(productId);
 
             if (productEntity == null)
             {
                 return null;
             }
+            
             DTO.Product productDTO = new DTO.Product
             {
                 Uid = productEntity.Uid,
@@ -163,7 +189,9 @@ namespace BLL
                 Position = productEntity.Position,
                 StockQuantity = productEntity.StockQuantity,
 
-                // Dữ liệu String/Bool
+                // ✅ THÊM MAPPING CHO QRCODEURL
+                QRCodeUrl = productEntity.QRCodeUrl,
+
                 Description = productEntity.Description,
                 Thumbnail = productEntity.Thumbnail, 
                 Status = productEntity.Status,
@@ -173,7 +201,6 @@ namespace BLL
                 Refundable = productEntity.Refundable,
                 Slug = productEntity.Slug,
 
-                // Metadata
                 CreatedAt = productEntity.CreatedAt,
                 UpdatedAt = productEntity.UpdatedAt,
                 CreatedBy = productEntity.CreatedBy,
@@ -205,13 +232,21 @@ namespace BLL
             };
         }
 
-        // File: BLL/ProductBLL.cs
-
         public bool UpdateProduct(DTO.Product productDTO)
         {
             int currentProductId = productDTO.Uid;
             string cleanedProductName = productDTO.ProductName.Trim();
-            string cleanedSku = productDTO.Sku.Trim();
+            string cleanedSku = productDTO.Sku.Trim().ToUpper();
+
+            
+            var existingProduct = _productDAL.GetProductById(currentProductId);
+            if (existingProduct == null)
+            {
+                throw new Exception("Không tìm thấy sản phẩm");
+            }
+
+            string oldSku = existingProduct.Sku?.ToUpper();
+            bool skuChanged = (oldSku != cleanedSku);
 
             if (!_productDAL.IsSkuUnique(cleanedSku, currentProductId))
             {
@@ -232,6 +267,7 @@ namespace BLL
             var cloudinaryService = new CloudinaryBLL();
             List<string> finalUrls = new List<string>();
 
+            // Upload ảnh mới (nếu có)
             if (!string.IsNullOrEmpty(productDTO.Thumbnail))
             {
                 string thumbnailData = productDTO.Thumbnail;
@@ -264,34 +300,55 @@ namespace BLL
 
             string jsonThumbnailArray = Newtonsoft.Json.JsonConvert.SerializeObject(finalUrls);
 
+            // ✅ TẠO LẠI QR CODE NẾU SKU THAY ĐỔI
+            string qrCodeUrl = existingProduct.QRCodeUrl; // Giữ nguyên URL cũ
+
+            if (skuChanged)
+            {
+                try
+                {
+                    var qrCodeService = new QRCodeBLL();
+                    string labelBase64 = qrCodeService.GenerateLabelBase64(
+                        cleanedSku,
+                        cleanedProductName,
+                        productDTO.Price ?? 0
+                    );
+
+                    if (!string.IsNullOrEmpty(labelBase64))
+                    {
+                        qrCodeUrl = cloudinaryService.UploadProductThumbnail(labelBase64);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"QR Code regeneration failed: {ex.Message}");
+                }
+            }
 
             DAL.EF.Product productEntity = new DAL.EF.Product
             {
                 Uid = currentProductId,
-
                 ProductName = cleanedProductName,
                 SubCategoryUid = productDTO.SubCategoryUid,
                 BrandUid = productDTO.BrandUid,
                 UnitUid = productDTO.UnitUid,
-
                 Price = productDTO.Price ?? 0m,
                 Discount = productDTO.Discount ?? 0,
                 Position = productDTO.Position ?? 0,
                 Weight = productDTO.Weight ?? 0.0,
                 StockQuantity = productDTO.StockQuantity ?? 0,
                 StockStatusUid = productDTO.StockStatusUid,
-
                 Thumbnail = jsonThumbnailArray,
+                QRCodeUrl = qrCodeUrl, 
                 Slug = finalSlug,
                 Status = productDTO.Status,
                 IsFeatured = productDTO.IsFeatured,
                 Exchangeable = productDTO.Exchangeable,
                 Refundable = productDTO.Refundable,
                 Sku = cleanedSku,
-
                 UpdatedAt = DateTime.Now,
-                UpdatedBy = productDTO.UpdatedBy, 
-                Deleted = productDTO.Deleted 
+                UpdatedBy = productDTO.UpdatedBy,
+                Deleted = productDTO.Deleted
             };
 
             return _productDAL.UpdateProduct(productEntity);
@@ -311,6 +368,79 @@ namespace BLL
             {
                 throw new Exception($"Lỗi nghiệp vụ khi xóa sản phẩm ID {productId}. Chi tiết: {ex.Message}");
             }
+        }
+        /// <summary>
+        /// Tự động tạo QR Code cho tất cả products chưa có QRCodeUrl
+        /// </summary>
+        public int GenerateQRCodeForAllProducts()
+        {
+            var qrCodeService = new QRCodeBLL();
+            var cloudinaryService = new CloudinaryBLL();
+
+            // Lấy tất cả products chưa có QR Code
+            var allProducts = _productDAL.GetAllProduct("", "Uid-asc", 0, 10000);
+            var productsWithoutQR = allProducts
+                .Where(p => string.IsNullOrEmpty(p.QRCodeUrl) && !p.Deleted)
+                .ToList();
+
+            int successCount = 0;
+            int failCount = 0;
+
+            foreach (var product in productsWithoutQR)
+            {
+                try
+                {
+                    // Generate QR Label
+                    string labelBase64 = qrCodeService.GenerateLabelBase64(
+                        product.Sku,
+                        product.ProductName,
+                        product.Price ?? 0
+                    );
+
+                    if (!string.IsNullOrEmpty(labelBase64))
+                    {
+                        // Upload to Cloudinary
+                        string qrUrl = cloudinaryService.UploadProductThumbnail(labelBase64);
+
+                        if (!string.IsNullOrEmpty(qrUrl))
+                        {
+                            // Update database
+                            product.QRCodeUrl = qrUrl;
+                            product.UpdatedAt = DateTime.Now;
+
+                            bool updated = _productDAL.UpdateProduct(product);
+                            if (updated)
+                            {
+                                successCount++;
+                                System.Diagnostics.Debug.WriteLine($"✅ Generated QR for: {product.Sku} - {product.ProductName}");
+                            }
+                            else
+                            {
+                                failCount++;
+                                System.Diagnostics.Debug.WriteLine($"❌ Failed to update DB for: {product.Sku}");
+                            }
+                        }
+                        else
+                        {
+                            failCount++;
+                            System.Diagnostics.Debug.WriteLine($"❌ Cloudinary upload failed for: {product.Sku}");
+                        }
+                    }
+                    else
+                    {
+                        failCount++;
+                        System.Diagnostics.Debug.WriteLine($"❌ QR generation failed for: {product.Sku}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    failCount++;
+                    System.Diagnostics.Debug.WriteLine($"❌ Exception for {product.Sku}: {ex.Message}");
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine($"\n📊 SUMMARY: Success={successCount}, Failed={failCount}, Total={productsWithoutQR.Count}");
+            return successCount;
         }
     }
 }

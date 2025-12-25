@@ -423,6 +423,7 @@ namespace GUI
             pnlUserSub.Height = 0;
             pnlRolesSub.Height = 0;
             pnlSettingsSub.Height = 0;
+            pnlPOSSub.Height = 0;
         }
 
         private void CollapseCurrentSubMenu()
@@ -491,7 +492,11 @@ namespace GUI
         {
             HandleParentMenuClick(pnlSettingsSub, lblSettingsArrow);
         }
-
+        private void btnPOSMenu_Click(object sender, EventArgs e)
+        {
+            OpenPOSForm();
+            CollapseCurrentSubMenu();
+        }
         #endregion
 
         #region Xử lý Hover & Highlight
@@ -566,6 +571,11 @@ namespace GUI
                 btnSettings.BackColor = sidebarHover;
                 lblSettingsArrow.BackColor = sidebarHover;
             }
+            else if (parentPanel == pnlPOSSub)
+            {
+                btnPOSMenu.BackColor = sidebarHover;
+                lblPOSArrow.BackColor = sidebarHover;
+            }
         }
 
         private void AddHoverEvents()
@@ -577,6 +587,7 @@ namespace GUI
             AddHoverToParentButton(btnUser, lblUserArrow);
             AddHoverToParentButton(btnRoles, lblRolesArrow);
             AddHoverToParentButton(btnSettings, lblSettingsArrow);
+            AddHoverToParentButton(btnPOSMenu, lblPOSArrow);
             AddHoverToChildButton(btnPermission);
             AddHoverToChildButton(btnProducts);
             AddHoverToChildButton(btnAddProduct);
@@ -589,6 +600,8 @@ namespace GUI
             AddHoverToChildButton(btnAllRoles);
             AddHoverToChildButton(btnCreateRole);
             AddHoverToChildButton(btnProfileSetting);
+            AddHoverToChildButton(btnPOS);
+            AddHoverToChildButton(btnScanQR);
         }
 
         private void AddHoverToParentButton(Button btn, Label lbl)
@@ -621,6 +634,7 @@ namespace GUI
                     else if (currentActiveButton.Parent == pnlUserSub) parentBtnToKeepHovered = btnUser;
                     else if (currentActiveButton.Parent == pnlRolesSub) parentBtnToKeepHovered = btnRoles;
                     else if (currentActiveButton.Parent == pnlSettingsSub) parentBtnToKeepHovered = btnSettings;
+                    else if (currentActiveButton.Parent == pnlPOSSub) parentBtnToKeepHovered = btnPOSMenu; // THÊM DÒNG NÀY
 
                     if (btn == parentBtnToKeepHovered)
                     {
@@ -658,6 +672,7 @@ namespace GUI
                         else if (currentActiveButton.Parent == pnlUserSub) parentBtnToKeepHovered = btnUser;
                         else if (currentActiveButton.Parent == pnlRolesSub) parentBtnToKeepHovered = btnRoles;
                         else if (currentActiveButton.Parent == pnlSettingsSub) parentBtnToKeepHovered = btnSettings;
+                        else if (currentActiveButton.Parent == pnlPOSSub) parentBtnToKeepHovered = btnPOSMenu; // THÊM DÒNG NÀY
 
                         if (btn == parentBtnToKeepHovered)
                         {
@@ -795,6 +810,26 @@ namespace GUI
         {
             OpenPermissionForm();
         }
+        private void btnPOS_Click(object sender, EventArgs e)
+        {
+            OpenPOSForm();
+        }
+
+        private void btnScanQR_Click(object sender, EventArgs e)
+        {
+            OpenScanQRForm();
+
+        }
+        private void OpenPOSForm()
+        {
+            OpenChildForm(new frmPOS(), btnPOS);
+        }
+
+        private void OpenScanQRForm()
+        {
+            OpenChildForm(new frmScanQR(), btnScanQR);
+        }
+
         #endregion
     }
 }

@@ -2,6 +2,7 @@
 using Common;
 using DTO;
 using GUI.Product;
+using GUI.ScanQR;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -62,6 +63,102 @@ namespace GUI.ProductDTO
             LoadSort();
             cboFilter.SelectedIndexChanged += cboFilter_SelectedIndexChanged;
             cboSort.SelectedIndexChanged += cboSort_SelectedIndexChanged;
+
+            // ✅ THÊM NÚT GENERATE QR CODE
+            AddQRGeneratorButton();
+        }
+
+        private void AddQRGeneratorButton()
+        {
+            var btnQRGenerator = new Guna.UI2.WinForms.Guna2Button
+            {
+                Text = "🔄 Generate QR Codes",
+                Width = 200,
+                Height = 45,
+                Location = new System.Drawing.Point(250, 20), // ✅ Hard-code tọa độ
+                FillColor = System.Drawing.Color.FromArgb(16, 185, 129),
+                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold),
+                BorderRadius = 8,
+                Cursor = Cursors.Hand
+            };
+
+            // ✅ Add trực tiếp vào form
+            this.Controls.Add(btnQRGenerator);
+            btnQRGenerator.BringToFront();
+            
+            btnQRGenerator.Click += BtnQRGenerator_Click;
+        }
+
+        private async void BtnQRGenerator_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show(
+                "Tạo QR Code cho tất cả sản phẩm chưa có?\n\n" +
+                "⏱️ Thời gian ước tính: ~1-2 phút cho 100 sản phẩm\n" +
+                "📶 Cần kết nối Internet để upload Cloudinary",
+                "Xác nhận",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (result != DialogResult.Yes) return;
+
+            try
+            {
+                this.Cursor = Cursors.WaitCursor;
+
+                // Show progress form (optional)
+                var progressForm = new Form
+                {
+                    Text = "Đang tạo QR Code...",
+                    Width = 400,
+                    Height = 150,
+                    StartPosition = FormStartPosition.CenterScreen,
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    ControlBox = false
+                };
+
+                var lblProgress = new Label
+                {
+                    Text = "Vui lòng đợi...\n\nĐang tạo và upload QR Code lên Cloudinary...",
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill,
+                    Font = new Font("Segoe UI", 10F)
+                };
+
+                progressForm.Controls.Add(lblProgress);
+                progressForm.Show();
+                Application.DoEvents();
+
+                // Chạy task generate QR
+                int count = await Task.Run(() => _productBLL.GenerateQRCodeForAllProducts());
+
+                progressForm.Close();
+
+                MessageBox.Show(
+                    $"✅ Hoàn thành!\n\n" +
+                    $"Đã tạo QR Code cho {count} sản phẩm.\n\n" +
+                    $"Xem chi tiết trong Output window (View > Output).",
+                    "Thành công",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+
+                // Reload data
+                LoadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"❌ Lỗi: {ex.Message}",
+                    "Lỗi",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+            }
+            finally
+            {
+                this.Cursor = Cursors.Default;
+            }
         }
 
         // --- [PHẦN 1: VẼ ICON THEO QUYỀN] ---
@@ -155,10 +252,10 @@ namespace GUI.ProductDTO
                 if (uidValue == null) return;
                 int productId = Convert.ToInt32(uidValue);
 
-                // 1. Click XEM
+                // 1. Click XEM QR CODE
                 if (relativeX >= padding && relativeX < padding + iconSize)
                 {
-                    MessageBox.Show("Xem sản phẩm: " + productId);
+                    ShowProductQRCode(productId);
                 }
                 // 2. Click SỬA (Có quyền mới click được)
                 else if (canEdit && relativeX >= padding + 30 && relativeX < padding + 30 + iconSize)
@@ -170,10 +267,12 @@ namespace GUI.ProductDTO
                 {
                     if (MessageBox.Show("Bạn có chắc chắn muốn xóa sản phẩm này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
-                        // Gọi hàm xóa sản phẩm tại đây nếu bạn đã cài đặt
-                        // _productBLL.DeleteProduct(productId);
-                        // LoadData();
-                        MessageBox.Show("Đã gửi yêu cầu xóa ID: " + productId);
+                        bool success = _productBLL.DeleteProduct(productId);
+                        if (success)
+                        {
+                            MessageBox.Show("Xóa sản phẩm thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LoadData();
+                        }
                     }
                 }
             }
@@ -391,6 +490,39 @@ namespace GUI.ProductDTO
             {
                 MessageBox.Show("Sản phẩm đã được thêm thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 LoadData();
+            }
+        }
+
+        private void ShowProductQRCode(int productId)
+        {
+            try
+            {
+                var product = _productBLL.GetProductById(productId);
+                if (product == null)
+                {
+                    MessageBox.Show("Không tìm thấy sản phẩm!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(product.QRCodeUrl))
+                {
+                    MessageBox.Show("Sản phẩm này chưa có QR Code!\n\nHãy chỉnh sửa sản phẩm để tự động tạo QR Code.", 
+                        "Thông báo", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Information);
+                    return;
+                }
+
+                frmViewQRCode qrForm = new frmViewQRCode(
+                    product.QRCodeUrl, 
+                    product.ProductName, 
+                    product.Sku
+                );
+                qrForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi hiển thị QR Code: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

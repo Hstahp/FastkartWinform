@@ -91,5 +91,6 @@ namespace DAL.EF
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Wishlist> Wishlist { get; set; }
+        public string QRCodeUrl { get; set; }
     }
 }
