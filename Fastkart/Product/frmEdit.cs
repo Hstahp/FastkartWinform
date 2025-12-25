@@ -1,4 +1,6 @@
 ﻿using BLL;
+using DAL.EF;
+using DTO;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -20,8 +22,10 @@ namespace GUI.Product
     {
         private ProductBLL _productBLL;
         private int _productId;
-        private string _existingImageUrl; 
-        private string _newImagePath;
+        private string _selectedImagePath;
+        private string oldProductThumbnail;
+        private bool _isImageRemoved = false;
+        private Image defaultPlaceholderImage;
         public frmEdit(int productId)
         {
             InitializeComponent();
@@ -39,13 +43,10 @@ namespace GUI.Product
             loadUnit();
             loadStockStatus();
 
-            this.guna2PanelImageUpload.AllowDrop = true;
             this.Load += frmEdit_Load;
-            this.guna2PanelImageUpload.DragEnter += guna2PanelImageUpload_DragEnter;
-            this.guna2PanelImageUpload.DragDrop += guna2PanelImageUpload_DragDrop;
-            this.guna2PanelImageUpload.Click += guna2PanelImageUpload_Click;
-            this.labelImagePlaceholder.Click += guna2PanelImageUpload_Click;
             this.btnSaveProduct.Click += new System.EventHandler(this.btnSaveProduct_Click);
+            this.btnSelectImage.Click += new System.EventHandler(this.btnSelectImage_Click);
+            this.btnRemoveImage.Click += new System.EventHandler(this.btnRemoveImage_Click);
         }
 
         private void frmEdit_Load(object sender, EventArgs e)
@@ -55,7 +56,7 @@ namespace GUI.Product
 
         private void loadCategory()
         {
-            var categories = _productBLL.GetAllCategoy();
+            var categories = _productBLL.GetAllCategory();
             cboCategory.DataSource = categories;
             cboCategory.DisplayMember = "CategoryName";
             cboCategory.ValueMember = "Uid";
@@ -96,7 +97,7 @@ namespace GUI.Product
 
         private void loadBrand()
         {
-            var brands = _productBLL.getAllBrand();
+            var brands = _productBLL.GetAllBrand();
             cboBrand.DataSource = brands;
             cboBrand.DisplayMember = "BrandName";
             cboBrand.ValueMember = "Uid";
@@ -119,43 +120,37 @@ namespace GUI.Product
             cboStockStatus.SelectedIndex = 0;
         }
 
-        private void guna2PanelImageUpload_DragEnter(object sender, DragEventArgs e)
+        private void btnSelectImage_Click(object sender, EventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Image Files (*.jpg;*.jpeg;*.png;*.gif;*.bmp)|*.jpg;*.jpeg;*.png;*.gif;*.bmp|All Files (*.*)|*.*";
+            openFileDialog.Title = "Select a Product Image";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-
-                if (files.Length > 0 &&
-                    (files[0].ToLower().EndsWith(".jpg") ||
-                     files[0].ToLower().EndsWith(".png") ||
-                     files[0].ToLower().EndsWith(".jpeg")))
-                {
-                    e.Effect = DragDropEffects.Copy;
-                    return;
-                }
-            }
-            e.Effect = DragDropEffects.None;
-        }
-
-        private void guna2PanelImageUpload_DragDrop(object sender, DragEventArgs e)
-        {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-
-            if (files.Length > 0)
-            {
-                string filePath = files[0];
-
                 try
                 {
-                    SetImagePreview(filePath);
-                    this._newImagePath = filePath;
-                    this._existingImageUrl = null;
+                    _isImageRemoved = false;
+                    _selectedImagePath = openFileDialog.FileName;
+                    picProduct.Image = Image.FromFile(_selectedImagePath);
+
+                    if (!picProduct.Visible)
+                    {
+                        picProduct.Visible = true;
+                    }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Lỗi xử lý tệp ảnh: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Error loading image: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void btnRemoveImage_Click(object sender, EventArgs e)
+        {
+            picProduct.Image = defaultPlaceholderImage;
+            _selectedImagePath = null;
+            _isImageRemoved = true;
         }
 
         private void btnSaveProduct_Click(object sender, EventArgs e)
@@ -165,27 +160,7 @@ namespace GUI.Product
                 return;
             }
 
-            string thumbnailData = null;
-
-            if (!string.IsNullOrEmpty(this._newImagePath) && File.Exists(this._newImagePath))
-            {
-                try
-                {
-                    byte[] fileBytes = File.ReadAllBytes(this._newImagePath);
-                    thumbnailData = Convert.ToBase64String(fileBytes);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Lỗi đọc file ảnh mới: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-            }
-            else if (!string.IsNullOrEmpty(this._existingImageUrl))
-            {
-                thumbnailData = this._existingImageUrl;
-            }
-
-            var updatedProduct = new DTO.Product
+            var updatedProduct = new DTO.ProductDTO()
             {
                 Uid = this._productId,
 
@@ -196,23 +171,28 @@ namespace GUI.Product
                 UnitUid = Convert.ToInt32(cboUnit.SelectedValue),
 
                 Status = radioActive.Checked ? "Active" : "Inactive",
-                Position = int.TryParse(cboPosition.Text, out int pos) ? pos : 0,
+                Position = int.TryParse(txtPosition.Text, out int pos) ? pos : (int?)null,
 
                 Description = rtbDescription.Text,
 
                 Weight = double.TryParse(txtWeight.Text, out double weight) ? weight : (double?)null,
+
                 Price = decimal.TryParse(txtPrice.Text, out decimal price) ? price : (decimal?)null,
                 Discount = int.TryParse(txtDiscount.Text, out int discount) ? discount : (int?)null,
 
                 Sku = txtSKU.Text,
-                StockQuantity = int.TryParse(txtStockQuantity.Text, out int qty) ? qty : (int?)null,
+                Quantity = int.TryParse(txtQuantity.Text, out int qty) ? qty : (int?)null,
+                StockQuantity = int.TryParse(txtStockQuantity.Text, out int stockqty) ? stockqty : (int?)null,
                 StockStatusUid = Convert.ToInt32(cboStockStatus.SelectedValue),
 
                 IsFeatured = toggleIsFeatured.Checked,
                 Exchangeable = toggleExchangeable.Checked,
                 Refundable = toggleRefundable.Checked,
 
-                Thumbnail = thumbnailData,
+                Thumbnail = _isImageRemoved ? null : string.IsNullOrEmpty(_selectedImagePath) ? oldProductThumbnail : _selectedImagePath,
+
+                ManufactureDate = dtpManufactureDate.Value,
+                ExpiryDate = dtpExpiryDate.Value,
 
                 UpdatedAt = DateTime.Now,
                 UpdatedBy = Environment.UserName,
@@ -224,19 +204,33 @@ namespace GUI.Product
 
                 if (success)
                 {
-                    this.DialogResult = DialogResult.OK;
-                    this.Close();
+                    MessageBox.Show(
+                        "Product updated successfully!",
+                        "Success",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
                 }
                 else
                 {
-                    MessageBox.Show("Cập nhật sản phẩm thất bại. Vui lòng kiểm tra lại dữ liệu.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(
+                        "Failed to update the product. Please check the input data and try again.",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi lưu dữ liệu: {ex.Message}", "Lỗi hệ thống", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                MessageBox.Show($"Lỗi DB chi tiết: {ex.Message}", "Lỗi hệ thống");
+                MessageBox.Show(
+                    $"An error occurred while saving the data.\nDetails: {ex.Message}",
+                    "System Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
             }
+
         }
 
 
@@ -244,207 +238,120 @@ namespace GUI.Product
         {
             if (string.IsNullOrWhiteSpace(txtProductName.Text))
             {
-                MessageBox.Show("Vui lòng nhập Tên sản phẩm.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please enter the product name.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
             if (string.IsNullOrWhiteSpace(txtSKU.Text))
             {
-                MessageBox.Show("Vui lòng nhập Sku", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please enter the SKU.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
             if (cboSubcategory.SelectedValue == null)
             {
-                MessageBox.Show("Vui lòng chọn Danh mục phụ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select a subcategory.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
+
             decimal priceValue;
             if (!decimal.TryParse(txtPrice.Text, out priceValue))
             {
-                MessageBox.Show("Giá không hợp lệ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Invalid price value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             if (priceValue < 0)
             {
-                MessageBox.Show("Giá không được phép là số âm.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Price cannot be negative.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             if (priceValue % 1m != 0)
             {
-                MessageBox.Show("Giá phải là số nguyên (không được nhập kiểu thập phân).", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Price must be an integer (decimal values are not allowed).", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
-            int positionValue;
-            if (!int.TryParse(cboPosition.Text, out positionValue))
+            if (dtpExpiryDate.Value <= dtpManufactureDate.Value)
             {
-                MessageBox.Show("Vị trí phải là số nguyên.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("The expiration date cannot be earlier than the manufacturing date!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
-            if (positionValue < 0)
+
+
+            if (!string.IsNullOrWhiteSpace(txtPosition.Text))
             {
-                MessageBox.Show("Vị trí không được phép là số âm.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (!int.TryParse(txtPosition.Text, out int positionValue))
+                {
+                    MessageBox.Show("Position must be a number.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                if (positionValue < 0)
+                {
+                    MessageBox.Show("Position cannot be negative.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+            }
+
+            int QtyValue;
+            if (!int.TryParse(txtQuantity.Text, out QtyValue))
+            {
+                MessageBox.Show("Current quantity must be an integer.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            if (QtyValue < 0)
+            {
+                MessageBox.Show("Current quantity cannot be negative.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             int stockQtyValue;
             if (!int.TryParse(txtStockQuantity.Text, out stockQtyValue))
             {
-                MessageBox.Show("Số lượng tồn kho phải là số nguyên.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Stock quantity must be an integer.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
             if (stockQtyValue < 0)
             {
-                MessageBox.Show("Số lượng tồn kho không được phép là số âm.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Stock quantity cannot be negative.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (QtyValue > stockQtyValue)
+            {
+                MessageBox.Show("Current quantity cannot be greater than stock quantity.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             int discountValue;
             if (!int.TryParse(txtDiscount.Text, out discountValue))
             {
-                MessageBox.Show("Chiết khấu phải là số nguyên.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Discount must be an integer.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
             if (discountValue < 0 || discountValue > 100)
             {
-                MessageBox.Show("Chiết khấu phải là số nguyên từ 0 đến 100.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Discount must be an integer between 0 and 100.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
+
             return true;
         }
 
-        private async void guna2PanelImageUpload_Click(object sender, EventArgs e)
+        public List<string> LoadProductImage(string dataThumbnails)
         {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Filter = "Tệp hình ảnh|*.jpg;*.jpeg;*.png;*.gif;*.bmp";
-                openFileDialog.Title = "Chọn hình ảnh sản phẩm";
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    try
-                    {
-                        string filePath = openFileDialog.FileName;
-                        var image = await SetImagePreview(filePath);
-
-                        if (image != null)
-                        {
-                            this._newImagePath = filePath;
-                            this._existingImageUrl = null; 
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Lỗi khi tải ảnh: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        ClearImagePreview();
-                    }
-                }
-            }
-        }
-
-        private async Task<Image> SetImagePreview(string filePathOrUrl)
-        {
-            this.btnRemoveImage.BringToFront();
-
-            try
-            {
-                Image image = null;
-
-                if (Uri.IsWellFormedUriString(filePathOrUrl, UriKind.Absolute))
-                {
-                    using (var client = new HttpClient())
-                    {
-                        byte[] imageBytes = await client.GetByteArrayAsync(filePathOrUrl);
-                        using (var ms = new MemoryStream(imageBytes))
-                        {
-                            image = Image.FromStream(ms);
-                        }
-                    }
-                }
-                else if (File.Exists(filePathOrUrl))
-                {
-                    image = Image.FromFile(filePathOrUrl);
-                }
-
-                if (image != null)
-                {
-                    guna2PictureBoxPreview.Image = image;
-                    guna2PictureBoxPreview.Visible = true;
-                    labelImagePlaceholder.Visible = false;
-                    btnRemoveImage.Visible = true; 
-
-                    this.labelImagePlaceholder.Text = $"Đã tải: {System.IO.Path.GetFileName(filePathOrUrl)}";
-                    this.labelImagePlaceholder.ForeColor = System.Drawing.Color.Green;
-                }
-
-                return image;
-            }
-            catch (Exception ex)
-            {
-
-                MessageBox.Show($"Không thể tải ảnh: {ex.Message}", "Lỗi Tải Ảnh", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                ClearImagePreview();
-                return null;
-            }
-        }
-
-        private void ClearImagePreview()
-        {
-            if (guna2PictureBoxPreview.Image != null)
-            {
-                guna2PictureBoxPreview.Image.Dispose();
-                guna2PictureBoxPreview.Image = null;
-            }
-
-            guna2PictureBoxPreview.Visible = false;
-            labelImagePlaceholder.Visible = true;
-            btnRemoveImage.Visible = false; 
-
-            this._existingImageUrl = null;
-            this._newImagePath = null;
-
-            this.labelImagePlaceholder.Text = "Thả file vào đây hoặc click để tải lên";
-            this.labelImagePlaceholder.ForeColor = System.Drawing.Color.Gray;
-        }
-
-        private void btnRemoveImage_Click(object sender, EventArgs e)
-        {
-            ClearImagePreview();
-        }
-
-        private void ClearForm()
-        {
-            txtProductName.Clear();
-            txtSKU.Clear();
-            txtPrice.Text = "";
-            txtDiscount.Text = "";
-            txtStockQuantity.Text = "";
-            txtWeight.Clear();
-            rtbDescription.Clear();
-            this._newImagePath = null;
-
-            cboSubcategory.SelectedIndex = 0;
-            cboBrand.SelectedIndex = 0;
-            cboUnit.SelectedIndex = 0;
-            cboStockStatus.SelectedIndex = 0;
-
-            radioActive.Checked = true;
-            toggleIsFeatured.Checked = false;
-            toggleExchangeable.Checked = false;
-            toggleRefundable.Checked = false;
-
-            this.labelImagePlaceholder.Text = "Thả file vào đây hoặc click để tải lên";
-            this.labelImagePlaceholder.ForeColor = System.Drawing.Color.Gray;
+           return string.IsNullOrEmpty(dataThumbnails) ? new List<string>() : JsonConvert.DeserializeObject<List<string>>(dataThumbnails);
         }
 
         private void LoadProductData(int productId)
         {
-            DTO.Product product = _productBLL.GetProductById(productId);
+            ProductDTO product = _productBLL.GetProductById(productId);
 
             if (product == null)
             {
-                MessageBox.Show("Không tìm thấy sản phẩm cần chỉnh sửa.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("No product needing editing were found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 return;
             }
@@ -453,14 +360,7 @@ namespace GUI.Product
 
             txtProductName.Text = product.ProductName;
 
-            if (product.SubCategory != null)
-            {
-                cboCategory.SelectedValue = product.SubCategory.CategoryUid;
-            }
-            else
-            {
-                cboCategory.SelectedIndex = 0;
-            }
+            cboCategory.SelectedValue = product.CategoryUid;
             loadSubcategory();
             cboSubcategory.SelectedValue = product.SubCategoryUid;
             cboBrand.SelectedValue = product.BrandUid;
@@ -479,13 +379,23 @@ namespace GUI.Product
                 radioInactive.Checked = true;
             }
 
-            cboPosition.Text = product.Position?.ToString() ?? "0";
+            txtPosition.Text = product.Position?.ToString() ?? "0";
 
             string plainText = Regex.Replace(product.Description, @"<[^>]+>", string.Empty);
             plainText = plainText.Replace("&nbsp;", " ").Trim();
             rtbDescription.Text = plainText;
 
-             LoadProductImage(product.Thumbnail);
+            List<string> thumbnails = LoadProductImage(product.Thumbnail);
+            if (thumbnails != null && thumbnails.Any())
+            {
+                oldProductThumbnail = thumbnails[0];
+                picProduct.SizeMode = PictureBoxSizeMode.Zoom;
+                picProduct.LoadAsync(thumbnails[0]);
+            }
+            else
+            {
+                oldProductThumbnail = null;
+            }
 
             txtWeight.Text = product.Weight?.ToString() ?? "";
 
@@ -510,41 +420,12 @@ namespace GUI.Product
 
             txtSKU.Text = product.Sku;
             txtStockQuantity.Text = product.StockQuantity?.ToString() ?? "0";
+            txtQuantity.Text = product.Quantity?.ToString() ?? "0";
             cboStockStatus.SelectedValue = product.StockStatusUid;
+            dtpManufactureDate.Value = product.ManufactureDate;
+            dtpExpiryDate.Value = product.ExpiryDate;
 
             cboCategory.SelectedIndexChanged += cboCategory_SelectedIndexChanged;
-        }
-
-        // File: frmEdit.cs
-
-        private async void LoadProductImage(string thumbnailJson)
-        {
-            ClearImagePreview();
-
-            if (string.IsNullOrEmpty(thumbnailJson)) return;
-
-            try
-            {
-                List<string> urls = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(thumbnailJson);
-
-                if (urls != null && urls.Count > 0)
-                {
-                    string imageUrl = urls[0];
-                    var image = await SetImagePreview(imageUrl);
-                    if (image != null)
-                    {
-                        this._existingImageUrl = imageUrl;
-                        this._newImagePath = null;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Hiển thị lỗi nếu JSON không hợp lệ
-                MessageBox.Show($"Lỗi cấu trúc dữ liệu ảnh cũ: {ex.Message}", "Lỗi Dữ Liệu");
-                this.labelImagePlaceholder.Text = "Lỗi đọc dữ liệu ảnh cũ.";
-                this.labelImagePlaceholder.ForeColor = System.Drawing.Color.Red;
-            }
         }
     }
 }

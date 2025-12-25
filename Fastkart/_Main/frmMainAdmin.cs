@@ -1,7 +1,8 @@
 ﻿using Common;
 using DTO;
-using GUI;
-using GUI.ProductDTO;
+using GUI.Category;
+using GUI.Product;
+using GUI.SubCategory;
 using Helpers;
 using Newtonsoft.Json.Linq;
 using System;
@@ -257,6 +258,67 @@ namespace GUI
             btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(249, 250, 251);
             return btn;
         }
+
+        private void OpenAddNewProductForm()
+        {
+            if (currentSubMenuPanel != pnlProductSub)
+            {
+                HandleParentMenuClick(pnlProductSub, lblProductArrow);
+            }
+
+            OpenChildForm(new Product.frmCreate(), btnAddProduct);
+        }
+
+        private void OpenEditProductForm(int productId)
+        {
+            if (currentSubMenuPanel != pnlProductSub)
+            {
+                HandleParentMenuClick(pnlProductSub, lblProductArrow);
+            }
+
+            OpenChildForm(new Product.frmEdit(productId), btnProducts);
+        }
+
+        private void OpenAddNewCategoryForm()
+        {
+            if (currentSubMenuPanel != pnlCategorySub)
+            {
+                HandleParentMenuClick(pnlCategorySub, lblCategoryArrow);
+            }
+
+            OpenChildForm(new Category.frmCreate(), btnAddCategory);
+        }
+
+        private void OpenEditCategoryForm(int id)
+        {
+            if (currentSubMenuPanel != pnlCategorySub)
+            {
+                HandleParentMenuClick(pnlCategorySub, lblCategoryArrow);
+            }
+
+            OpenChildForm(new Category.frmEdit(id), btnAddCategory);
+        }
+
+        private void OpenAddNewSubcategoryForm()
+        {
+            if (currentSubMenuPanel != pnlSubCategorySub)
+            {
+                HandleParentMenuClick(pnlSubCategorySub, lblSubCategoryArrow);
+            }
+
+            OpenChildForm(new SubCategory.frmCreate(), btnAddSubCategory);
+        }
+
+        private void OpenEditSubcategoryForm(int id)
+        {
+            if (currentSubMenuPanel != pnlSubCategorySub)
+            {
+                HandleParentMenuClick(pnlSubCategorySub, lblSubCategoryArrow);
+            }
+
+            OpenChildForm(new SubCategory.frmEdit(id), btnAddSubCategory);
+        }
+
         private void OpenAddNewUserForm()
         {
             if (currentSubMenuPanel != pnlUserSub)
@@ -472,6 +534,11 @@ namespace GUI
             HandleParentMenuClick(pnlCategorySub, lblCategoryArrow);
         }
 
+        private void btnSubCategory_Click(object sender, EventArgs e)
+        {
+            HandleParentMenuClick(pnlSubCategorySub, lblSubCategoryArrow);
+        }
+
         private void btnAttributes_Click(object sender, EventArgs e)
         {
             HandleParentMenuClick(pnlAttributesSub, lblAttributesArrow);
@@ -546,6 +613,11 @@ namespace GUI
                 btnCategory.BackColor = sidebarHover;
                 lblCategoryArrow.BackColor = sidebarHover;
             }
+            else if (parentPanel == pnlSubCategorySub)
+            {
+                btnSubCategory.BackColor = sidebarHover;
+                lblSubCategoryArrow.BackColor = sidebarHover;
+            }
             else if (parentPanel == pnlAttributesSub)
             {
                 btnAttributes.BackColor = sidebarHover;
@@ -573,6 +645,7 @@ namespace GUI
             AddHoverToParentButton(btnDashboard, null);
             AddHoverToParentButton(btnProduct, lblProductArrow);
             AddHoverToParentButton(btnCategory, lblCategoryArrow);
+            AddHoverToParentButton(btnSubCategory, lblSubCategoryArrow);
             AddHoverToParentButton(btnAttributes, lblAttributesArrow);
             AddHoverToParentButton(btnUser, lblUserArrow);
             AddHoverToParentButton(btnRoles, lblRolesArrow);
@@ -582,6 +655,8 @@ namespace GUI
             AddHoverToChildButton(btnAddProduct);
             AddHoverToChildButton(btnCategoryList);
             AddHoverToChildButton(btnAddCategory);
+            AddHoverToChildButton(btnSubCategoryList);
+            AddHoverToChildButton(btnAddSubCategory);
             AddHoverToChildButton(btnAttributesList);
             AddHoverToChildButton(btnAddAttribute);
             AddHoverToChildButton(btnAllUser);
@@ -617,6 +692,7 @@ namespace GUI
                     Button parentBtnToKeepHovered = null;
                     if (currentActiveButton.Parent == pnlProductSub) parentBtnToKeepHovered = btnProduct;
                     else if (currentActiveButton.Parent == pnlCategorySub) parentBtnToKeepHovered = btnCategory;
+                    else if (currentActiveButton.Parent == pnlSubCategorySub) parentBtnToKeepHovered = btnSubCategory;
                     else if (currentActiveButton.Parent == pnlAttributesSub) parentBtnToKeepHovered = btnAttributes;
                     else if (currentActiveButton.Parent == pnlUserSub) parentBtnToKeepHovered = btnUser;
                     else if (currentActiveButton.Parent == pnlRolesSub) parentBtnToKeepHovered = btnRoles;
@@ -654,6 +730,7 @@ namespace GUI
                         Button parentBtnToKeepHovered = null;
                         if (currentActiveButton.Parent == pnlProductSub) parentBtnToKeepHovered = btnProduct;
                         else if (currentActiveButton.Parent == pnlCategorySub) parentBtnToKeepHovered = btnCategory;
+                        else if (currentActiveButton.Parent == pnlSubCategorySub) parentBtnToKeepHovered = btnSubCategory;
                         else if (currentActiveButton.Parent == pnlAttributesSub) parentBtnToKeepHovered = btnAttributes;
                         else if (currentActiveButton.Parent == pnlUserSub) parentBtnToKeepHovered = btnUser;
                         else if (currentActiveButton.Parent == pnlRolesSub) parentBtnToKeepHovered = btnRoles;
@@ -696,24 +773,69 @@ namespace GUI
             CollapseCurrentSubMenu();
         }
 
-        private void btnProducts_Click(object sender, EventArgs e)
+        private void btnProducts_Click(object sender, EventArgs e) 
         {
-            OpenChildForm(new frmIndex() { BackColor = Color.FromArgb(249, 250, 251) }, btnProducts);
+            frmAllProduct frmAllProduct = new frmAllProduct();
+
+            frmAllProduct.RequestAddProduct += (s, args) =>
+            {
+               OpenAddNewProductForm();
+            };
+
+            frmAllProduct.RequestEditProduct += (s, productId) =>
+            {
+                OpenEditProductForm(productId);
+            };
+
+            OpenChildForm(frmAllProduct, btnProducts);
         }
 
         private void btnAddProduct_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new frmCreate() { BackColor = Color.FromArgb(249, 250, 251) }, btnAddProduct);
+            OpenChildForm(new Product.frmCreate(), btnAddProduct);
         }
 
         private void btnCategoryList_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnCategoryList);
+            frmAllCategory frmAllCategory = new frmAllCategory();
+
+            frmAllCategory.RequestAddCategory += (s, args) =>
+            {
+                OpenAddNewCategoryForm();
+            };
+
+            frmAllCategory.RequestEditCategory += (s, id) =>
+            {
+                OpenEditCategoryForm(id);
+            };
+            OpenChildForm(frmAllCategory, btnCategoryList);
         }
 
         private void btnAddCategory_Click(object sender, EventArgs e)
         {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAddCategory);
+            OpenChildForm(new Category.frmCreate(), btnAddCategory);
+        }
+
+        private void btnSubCategoryList_Click(object sender, EventArgs e)
+        {
+            frmAllSubCategory frmAllSubCategory = new frmAllSubCategory();
+
+            frmAllSubCategory.RequestAddSubcategory += (s, args) =>
+            {
+                OpenAddNewSubcategoryForm();
+            };
+
+            frmAllSubCategory.RequestEditSubcategory += (s, id) =>
+            {
+                OpenEditSubcategoryForm(id);
+            };
+
+            OpenChildForm(frmAllSubCategory, btnSubCategoryList);
+        }
+
+        private void btnAddSubCategory_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new SubCategory.frmCreate(), btnAddSubCategory);
         }
 
         private void btnAttributesList_Click(object sender, EventArgs e)

@@ -30,6 +30,7 @@ namespace DAL.EF
 
         public int UnitUid { get; set; }
 
+        public int Quantity { get; set; }
         public int StockQuantity { get; set; }
 
         public int StockStatusUid { get; set; }
@@ -62,6 +63,8 @@ namespace DAL.EF
         [Required]
         [StringLength(255)]
         public string Slug { get; set; }
+        public DateTime ManufactureDate { get; set; }   
+        public DateTime ExpiryDate { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

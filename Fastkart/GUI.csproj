@@ -103,6 +103,24 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Category\frmAllCategory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Category\frmAllCategory.Designer.cs">
+      <DependentUpon>frmAllCategory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Category\frmCreate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Category\frmCreate.Designer.cs">
+      <DependentUpon>frmCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Category\frmEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Category\frmEdit.Designer.cs">
+      <DependentUpon>frmEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\frmDashboard.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -145,11 +163,11 @@
     <Compile Include="Product\frmEdit.Designer.cs">
       <DependentUpon>frmEdit.cs</DependentUpon>
     </Compile>
-    <Compile Include="Product\frmIndex.cs">
+    <Compile Include="Product\frmAllProduct.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Product\frmIndex.Designer.cs">
-      <DependentUpon>frmIndex.cs</DependentUpon>
+    <Compile Include="Product\frmAllProduct.Designer.cs">
+      <DependentUpon>frmAllProduct.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -170,6 +188,24 @@
     </Compile>
     <Compile Include="Role\frmPermission.Designer.cs">
       <DependentUpon>frmPermission.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SubCategory\frmAllSubCategory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubCategory\frmAllSubCategory.Designer.cs">
+      <DependentUpon>frmAllSubCategory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SubCategory\frmCreate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubCategory\frmCreate.Designer.cs">
+      <DependentUpon>frmCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SubCategory\frmEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubCategory\frmEdit.Designer.cs">
+      <DependentUpon>frmEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="User\frmAddNewUser.cs">
       <SubType>Form</SubType>
@@ -201,6 +237,15 @@
     <Compile Include="_Main\frmMainAdmin.Designer.cs">
       <DependentUpon>frmMainAdmin.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Category\frmAllCategory.resx">
+      <DependentUpon>frmAllCategory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Category\frmCreate.resx">
+      <DependentUpon>frmCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Category\frmEdit.resx">
+      <DependentUpon>frmEdit.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dashboard\frmDashboard.resx">
       <DependentUpon>frmDashboard.cs</DependentUpon>
     </EmbeddedResource>
@@ -213,8 +258,8 @@
     <EmbeddedResource Include="Product\frmEdit.resx">
       <DependentUpon>frmEdit.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Product\frmIndex.resx">
-      <DependentUpon>frmIndex.cs</DependentUpon>
+    <EmbeddedResource Include="Product\frmAllProduct.resx">
+      <DependentUpon>frmAllProduct.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -226,6 +271,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SubCategory\frmAllSubCategory.resx">
+      <DependentUpon>frmAllSubCategory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SubCategory\frmCreate.resx">
+      <DependentUpon>frmCreate.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="User\frmAddNewUser.resx">
       <DependentUpon>frmAddNewUser.cs</DependentUpon>
     </EmbeddedResource>

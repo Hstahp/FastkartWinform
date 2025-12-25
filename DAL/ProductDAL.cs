@@ -20,16 +20,23 @@ namespace DAL
     {
         private ApplicationDBConnect _context;
 
-        public ProductDAL() { 
+        public ProductDAL()
+        {
             _context = new ApplicationDBConnect();
         }
 
-        public List<Product> GetAllProduct(string statusFilter, string sort, int skip, int limit) {
+        public List<Product> GetAllProduct(string keyword, string statusFilter, string sort, int skip, int limit)
+        {
             try
             {
                 var query = _context.Product
                     .Include("ProductSubCategory")
                     .Where(p => !p.Deleted);
+
+                if (!string.IsNullOrWhiteSpace(keyword))
+                {
+                    query = query.Where(p => p.ProductName.Contains(keyword));
+                }
 
                 if (!string.IsNullOrEmpty(statusFilter))
                 {
@@ -39,19 +46,20 @@ namespace DAL
                 if (!string.IsNullOrEmpty(sort))
                 {
                     var sortArray = sort.Split('-');
-                    string sortKey = sortArray[0];      
+                    string sortKey = sortArray[0];
                     string sortValue = sortArray[1];
 
                     query = query.OrderBy($"{sortKey} {(sortValue == "desc" ? "descending" : "ascending")}");
-                } else
+                }
+                else
                 {
                     query = query.OrderByDescending(p => p.Position);
                 }
 
-                    return query
-                        .Skip(skip)
-                        .Take(limit)
-                        .ToList();
+                return query
+                    .Skip(skip)
+                    .Take(limit)
+                    .ToList();
 
             }
             catch (Exception ex)
@@ -60,11 +68,16 @@ namespace DAL
             }
         }
 
-        public int Count(string statusFilter)
+        public int Count(string keyword ,string statusFilter)
         {
             try
             {
                 var query = _context.Product.AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(keyword))
+                {
+                    query = query.Where(p => p.ProductName.Contains(keyword));
+                }
 
                 if (!string.IsNullOrEmpty(statusFilter))
                 {
@@ -73,17 +86,18 @@ namespace DAL
 
                 query = query.Where(p => !p.Deleted);
                 return query.Count();
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return 0;
             }
         }
 
-        public List<ProductCategory> GetAllCategoy()
+        public List<ProductCategory> GetAllCategory()
         {
             try
             {
-                return _context.ProductCategory.Where(p => p.Deleted == false && p.Status == "Active").AsNoTracking().ToList();
+                return _context.ProductCategory.Where(p => p.Deleted == false).AsNoTracking().ToList();
             }
             catch (Exception ex)
             {
@@ -95,7 +109,7 @@ namespace DAL
         {
             try
             {
-                return _context.ProductSubCategory.Where(t => t.CategoryUid == id && t.Status == "Active" && !t.Deleted).AsNoTracking().ToList();
+                return _context.ProductSubCategory.Where(t => t.CategoryUid == id && !t.Deleted).AsNoTracking().ToList();
             }
             catch
             {
@@ -103,7 +117,7 @@ namespace DAL
             }
         }
 
-        public List<Brand> getAllBrand()
+        public List<Brand> GetAllBrand()
         {
             try
             {
@@ -158,7 +172,7 @@ namespace DAL
 
                 return rowsAffected > 0;
             }
-            catch (System.Data.Entity.Validation.DbEntityValidationException ex) 
+            catch (System.Data.Entity.Validation.DbEntityValidationException ex)
             {
                 var errorMessages = ex.EntityValidationErrors
                     .SelectMany(x => x.ValidationErrors)
@@ -196,9 +210,14 @@ namespace DAL
                 p.Uid != currentProductId);
         }
 
+        public bool IsLockedSubcategory(int id)
+        {
+            return _context.ProductSubCategory.Any(p => p.Uid == id && p.Status == "Inactive" && !p.Deleted);
+        }
+
         public Product GetProductById(int productId)
         {
-            return _context.Product.AsNoTracking().FirstOrDefault(p => p.Uid == productId && p.Deleted == false);
+            return _context.Product.Include(p => p.ProductSubCategory).AsNoTracking().FirstOrDefault(p => p.Uid == productId && p.Deleted == false);
         }
 
         public ProductSubCategory GetSubCategoryById(int subCategoryUid)
@@ -228,13 +247,16 @@ namespace DAL
                 entityToUpdate.ProductName = productEntity.ProductName;
                 entityToUpdate.Price = productEntity.Price;
                 entityToUpdate.UpdatedAt = DateTime.Now;
+                entityToUpdate.UpdatedBy = productEntity.UpdatedBy;
                 entityToUpdate.SubCategoryUid = productEntity.SubCategoryUid;
                 entityToUpdate.BrandUid = productEntity.BrandUid;
                 entityToUpdate.UnitUid = productEntity.UnitUid;
+                entityToUpdate.Description = productEntity.Description;
 
                 entityToUpdate.Discount = productEntity.Discount;
                 entityToUpdate.Position = productEntity.Position;
                 entityToUpdate.Weight = productEntity.Weight;
+                entityToUpdate.Quantity = productEntity.Quantity;
                 entityToUpdate.StockQuantity = productEntity.StockQuantity;
                 entityToUpdate.StockStatusUid = productEntity.StockStatusUid;
 
@@ -245,6 +267,10 @@ namespace DAL
                 entityToUpdate.Exchangeable = productEntity.Exchangeable;
                 entityToUpdate.Refundable = productEntity.Refundable;
                 entityToUpdate.Sku = productEntity.Sku;
+                entityToUpdate.ManufactureDate = productEntity.ManufactureDate;
+                entityToUpdate.ExpiryDate = productEntity.ExpiryDate;
+                entityToUpdate.UpdatedAt = DateTime.Now;
+                entityToUpdate.UpdatedBy = Environment.UserName;
 
                 int rowsAffected = _context.SaveChanges();
                 return rowsAffected > 0;
@@ -253,11 +279,10 @@ namespace DAL
             {
                 throw new Exception("DAL Error during UpdateProduct: " + ex.Message, ex);
 
-                return false;
             }
         }
 
-    public bool SoftDeleteProduct(int productId, string deletedBy)
+        public bool SoftDeleteProduct(int productId, string deletedBy)
         {
             try
             {
@@ -265,11 +290,12 @@ namespace DAL
 
                 if (productToModify == null)
                 {
-                    return true; 
+                    return true;
                 }
 
                 productToModify.Deleted = true;
-                productToModify.UpdatedAt = DateTime.Now; 
+                productToModify.UpdatedAt = DateTime.Now;
+                productToModify.UpdatedBy = Environment.UserName;
 
                 _context.Entry(productToModify).State = EntityState.Modified;
 
@@ -280,6 +306,45 @@ namespace DAL
             catch (Exception ex)
             {
                 return false;
+            }
+        }
+
+        public string updateChangeMulti(string status, List<int> productUids)
+        {
+            try
+            {
+                var products = _context.Product.Where(p => productUids.Contains(p.Uid)).ToList();
+                switch (status)
+                {
+                    case "Active":
+                    case "Inactive":
+                        foreach (var p in products)
+                        {
+                            p.Status = status;
+                            p.UpdatedAt = DateTime.Now;
+                            p.UpdatedBy = Environment.UserName;
+                        }
+                        _context.SaveChanges();
+                        return "success";
+                    case "Delete":
+                        foreach (var p in products)
+                        {
+                            p.Deleted = true;
+                            p.UpdatedAt = DateTime.Now;
+                            p.UpdatedBy = Environment.UserName;
+                        }
+
+                        _context.SaveChanges();
+                        return "deleted";
+                    default:
+                        return "invalid";
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return null;
             }
         }
     }

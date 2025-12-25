@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTO
 {
-    public class ProductCategory
+    public class ProductCategoryDTO
     {
         public int Uid { get; set; }
         public string CategoryName { get; set; }
@@ -15,7 +15,6 @@ namespace DTO
         public string Status { get; set; }
         public int? Position { get; set; }
         public string Slug { get; set; }
-        public ICollection<ProductSubCategory> SubCategories { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public string CreatedBy { get; set; }

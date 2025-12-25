@@ -1,7 +1,6 @@
 ﻿using BLL;
 using Common;
 using DTO;
-using GUI.Product;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,39 +9,42 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace GUI.ProductDTO
+namespace GUI.Category
 {
-    public partial class frmIndex : Form
+    public partial class frmAllCategory : Form
     {
-        private ProductBLL _productBLL;
+        private CategoryBLL _categoryBLL;
+        public event EventHandler RequestAddCategory;
+        public event EventHandler<int> RequestEditCategory;
         private string filter = null;
         private string sort = null;
+        private string keyword = null;
         private int totalPage = 1;
         private int limit = 6;
         private int pageCurrent = 1;
 
-        public frmIndex()
+        public frmAllCategory()
         {
             InitializeComponent();
-            _productBLL = new ProductBLL();
+            _categoryBLL = new CategoryBLL();
 
             // Đăng ký các sự kiện cho GridView
             dgvProducts.CellPainting += dgvProducts_CellPainting;
             dgvProducts.CellMouseMove += dgvProducts_CellMouseMove;
             dgvProducts.CellMouseLeave += dgvProducts_CellMouseLeave;
             dgvProducts.CellClick += dgvProducts_CellClick;
+            dgvProducts.CellContentClick += dgvProducts_CellContentClick;
         }
 
         private void frmIndex_Load(object sender, EventArgs e)
         {
             // 1. CHECK QUYỀN XEM
-            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_VIEW))
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_VIEW))
             {
                 MessageBox.Show("Bạn không có quyền truy cập trang Quản lý Sản phẩm!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 this.Close();
@@ -50,9 +52,9 @@ namespace GUI.ProductDTO
             }
 
             // 2. CHECK QUYỀN THÊM (Ẩn nút Add)
-            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_CREATE))
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_CREATE))
             {
-                if (btnAddProduct != null) btnAddProduct.Visible = false;
+                if (btnAdd != null) btnAdd.Visible = false;
             }
 
             // (Lưu ý: Việc ẩn hiện nút Sửa/Xóa sẽ được xử lý trực tiếp trong sự kiện CellPainting bên dưới)
@@ -72,8 +74,8 @@ namespace GUI.ProductDTO
                 e.PaintBackground(e.CellBounds, true);
 
                 // Check quyền
-                bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_EDIT);
-                bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_DELETE);
+                bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_EDIT);
+                bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_DELETE);
 
                 int size = 20;
                 int padding = 5;
@@ -108,8 +110,8 @@ namespace GUI.ProductDTO
                 return;
             }
 
-            bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_EDIT);
-            bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_DELETE);
+            bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_EDIT);
+            bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_DELETE);
 
             Rectangle cellRect = dgvProducts.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
             int relativeX = MousePosition.X - dgvProducts.PointToScreen(cellRect.Location).X;
@@ -142,8 +144,8 @@ namespace GUI.ProductDTO
 
             if (dgvProducts.Columns[e.ColumnIndex].Name == "colAction")
             {
-                bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_EDIT);
-                bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_DELETE);
+                bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_EDIT);
+                bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_DELETE);
 
                 Rectangle cellRect = dgvProducts.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
                 int relativeX = dgvProducts.PointToClient(Cursor.Position).X - cellRect.Left;
@@ -153,27 +155,33 @@ namespace GUI.ProductDTO
 
                 object uidValue = dgvProducts.Rows[e.RowIndex].Cells["colUid"].Value;
                 if (uidValue == null) return;
-                int productId = Convert.ToInt32(uidValue);
+                int categoryId = Convert.ToInt32(uidValue);
 
                 // 1. Click XEM
                 if (relativeX >= padding && relativeX < padding + iconSize)
                 {
-                    MessageBox.Show("Xem sản phẩm: " + productId);
+                    MessageBox.Show("Xem sản phẩm: " + categoryId);
                 }
                 // 2. Click SỬA (Có quyền mới click được)
                 else if (canEdit && relativeX >= padding + 30 && relativeX < padding + 30 + iconSize)
                 {
-                    OpenEditForm(productId);
+                    OpenEditForm(categoryId);
                 }
                 // 3. Click XÓA (Có quyền mới click được)
                 else if (canDelete && relativeX >= padding + 60 && relativeX < padding + 60 + iconSize)
                 {
-                    if (MessageBox.Show("Bạn có chắc chắn muốn xóa sản phẩm này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBox.Show("Are you sure you want to delete this product?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
                         // Gọi hàm xóa sản phẩm tại đây nếu bạn đã cài đặt
-                        // _productBLL.DeleteProduct(productId);
-                        // LoadData();
-                        MessageBox.Show("Đã gửi yêu cầu xóa ID: " + productId);
+                        int result = _categoryBLL.Delete(categoryId);
+                        if(result > 0)
+                        {
+                            MessageBox.Show($"Cannot delete category because it contains {result} subcategory. Please delete or move subcategory first.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        } else
+                        {
+                            MessageBox.Show("Deleted successfully");
+                        }
+                        LoadData();
                     }
                 }
             }
@@ -198,26 +206,18 @@ namespace GUI.ProductDTO
             }
         }
 
-        private void OpenEditForm(int productId)
+        private void OpenEditForm(int id)
         {
-            frmEdit editForm = new frmEdit(productId);
-            DialogResult result = editForm.ShowDialog();
-
-            if (result == DialogResult.OK)
-            {
-                MessageBox.Show("Cập nhật sản phẩm thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LoadData();
-                dgvProducts.Refresh();
-            }
+            RequestEditCategory?.Invoke(this, id);
         }
 
         private async void LoadData()
         {
-            int total = _productBLL.Count(filter);
+            int total = _categoryBLL.Count(keyword, filter);
             totalPage = (int)Math.Ceiling((double)total / limit);
             int skip = (pageCurrent - 1) * limit;
 
-            var products = _productBLL.GetAllProducts(filter, sort, skip, limit);
+            var products = _categoryBLL.GetAllCategory(keyword, filter, sort, skip, limit);
             UpdatePaginationButtons();
 
             dgvProducts.Rows.Clear();
@@ -225,14 +225,7 @@ namespace GUI.ProductDTO
 
             foreach (var p in products)
             {
-                string formattedPrice = p.Price.HasValue
-                    ? p.Price.Value.ToString("#,##0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN")) + " VNĐ"
-                    : "";
-
-                string status = p.Status == "Active" ? "Hoạt động" : "Dừng hoạt động";
-                int rowIndex = dgvProducts.Rows.Add(false, null, p.ProductName,
-                    p.ProductSubCategory?.SubCategoryName ?? "",
-                    p.Position, p.StockQuantity, formattedPrice, status, "", p.Uid);
+                int rowIndex = dgvProducts.Rows.Add(false, null, p.CategoryName, p.Position, p.Status, "", p.Uid);
 
                 var dgvRow = dgvProducts.Rows[rowIndex];
 
@@ -272,13 +265,21 @@ namespace GUI.ProductDTO
             await Task.WhenAll(tasks);
         }
 
+        private void dgvProducts_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex == colSelect.Index)
+            {
+                dgvProducts.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
         private void LoadFilter()
         {
             var data = new List<object>
             {
-                new { Id = "", Name = "Tất cả" },
-                new { Id = "Active", Name = "Hoạt động" },
-                new { Id = "Inactive", Name = "Dừng hoạt động" }
+                new { Id = "", Name = "All" },
+                new { Id = "Active", Name = "Active" },
+                new { Id = "Inactive", Name = "Inactive" }
             };
 
             cboFilter.DataSource = data;
@@ -301,12 +302,10 @@ namespace GUI.ProductDTO
         {
             var data = new List<object>
             {
-                new { value = "Position-desc", Name = "Vị trí giảm dần" },
-                new { value = "Position-asc", Name = "Vị trí tăng dần" },
-                new { value = "Price-desc", Name = "Giá giảm dần" },
-                new { value = "Price-asc", Name = "Giá tăng dần" },
-                new { value = "ProductName-asc", Name = "Tiêu đề từ A - Z" },
-                new { value = "ProductName-desc", Name = "Tiêu đề từ Z - A" },
+                new { value = "Position-desc", Name = "Descending position" },
+                new { value = "Position-asc", Name = "ascending position" },
+                new { value = "CategoryName-asc", Name = "Titles from A - Z" },
+                new { value = "CategoryName-desc", Name = "Titles from Z - A" },
             };
 
             cboSort.DataSource = data;
@@ -382,16 +381,73 @@ namespace GUI.ProductDTO
             LoadData();
         }
 
-        private void btnAddProduct_Click(object sender, EventArgs e)
+        private void btnAddCategory_Click(object sender, EventArgs e)
         {
-            frmCreate createForm = new frmCreate();
-            DialogResult result = createForm.ShowDialog();
+            RequestAddCategory?.Invoke(this, EventArgs.Empty);
+        }
 
-            if (result == DialogResult.OK)
+        private void btnApply_Click(object sender, EventArgs e)
+        {
+            string status = cboStatus.SelectedItem.ToString();
+            List<int> productUids = new List<int>();
+
+            foreach (DataGridViewRow row in dgvProducts.Rows)
             {
-                MessageBox.Show("Sản phẩm đã được thêm thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                LoadData();
+                bool isChecked = Convert.ToBoolean(row.Cells["colSelect"].Value ?? false);
+                if (isChecked)
+                {
+                    int uid = Convert.ToInt32(row.Cells["colUid"].Value);
+                    productUids.Add(uid);
+                }
             }
+
+            if (productUids.Count == 0)
+            {
+                MessageBox.Show("No products selected yet.");
+                return;
+            }
+
+            List<(string name, int count)> result = _categoryBLL.updateChangeMulti(status, productUids);
+            if (status == "Delete")
+            {
+                var confirm = MessageBox.Show(
+                    $"Are you sure you want to delete the {productUids.Count} product?",
+                    "Confirm deletion",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning
+                );
+
+                if (confirm != DialogResult.Yes)
+                    return;
+
+                if (result.Any())
+                {
+                    var displayList = result.Select(x => $"{x.name} (Contain {x.count} subcategory)").ToList();
+                    MessageBox.Show(
+                        "The following categories cannot be deleted because they contain subcategories:\n\n- "
+                        + string.Join("\n- ", displayList),
+                        "Delete Failed",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Categories have been deleted successfully.",
+                        "Delete Successful",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+                }
+            }
+            LoadData();
+        }
+
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            keyword = txtSearch.Text.Trim();
+            LoadData();
         }
     }
 }

@@ -72,7 +72,7 @@
     <Compile Include="LoginResultDTO.cs" />
     <Compile Include="PermissionMatrixDTO.cs" />
     <Compile Include="PermissionTypeDTO.cs" />
-    <Compile Include="ProductCategory.cs" />
+    <Compile Include="ProductCategoryDTO.cs" />
     <Compile Include="ProductDTO.cs" />
     <Compile Include="ProductSubCategoryDTO.cs" />
     <Compile Include="RoleDTO.cs" />
