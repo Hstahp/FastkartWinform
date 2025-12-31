@@ -26,11 +26,26 @@ namespace BLL
             _slugHelper = new SlugHelper();
         }
 
-        public List<ProductDTO> GetAllProducts(string keyword,string statusFilter, string sort, int skip, int limit)
+        public List<ProductDTO> GetAllProducts(string keyword, string statusFilter, string sort, int skip, int limit)
         {
+           
+            System.Diagnostics.Debug.WriteLine($"[BLL] GetAllProducts called with:");
+            System.Diagnostics.Debug.WriteLine($"  keyword: '{keyword}'");
+            System.Diagnostics.Debug.WriteLine($"  statusFilter: '{statusFilter}'");
+            System.Diagnostics.Debug.WriteLine($"  sort: '{sort}'");
+            System.Diagnostics.Debug.WriteLine($"  skip: {skip}, limit: {limit}");
+
             var entities = _productDAL.GetAllProduct(keyword, statusFilter, sort, skip, limit);
 
-            return entities.Select(p => new ProductDTO
+            System.Diagnostics.Debug.WriteLine($"[BLL] Products from DAL: {entities.Count}");
+
+            // ✅ THÊM: Debug từng product
+            foreach (var p in entities.Take(5))
+            {
+                System.Diagnostics.Debug.WriteLine($"  - Product: Uid={p.Uid}, SKU='{p.Sku}', Name={p.ProductName}, Stock={p.StockQuantity}, Deleted={p.Deleted}");
+            }
+
+            var result = entities.Select(p => new ProductDTO
             {
                 Uid = p.Uid,
                 ProductName = p.ProductName,
@@ -57,13 +72,21 @@ namespace BLL
                 Position = p.Position,
                 Description = p.Description,
                 Weight = p.Weight,
+                Sku = p.Sku, 
                 CreatedAt = p.CreatedAt
             }).ToList();
+
+            System.Diagnostics.Debug.WriteLine($"[BLL] Returned DTOs: {result.Count}");
+            foreach (var dto in result.Take(3))
+            {
+                System.Diagnostics.Debug.WriteLine($"  [DTO] {dto.ProductName}: Price={dto.Price:N0}, Discount={dto.Discount}%");
+            }
+            return result;
         }
 
         public int Count(string keyword, string statusFilter)
         {
-            return _productDAL.Count(keyword ,statusFilter);
+            return _productDAL.Count(keyword, statusFilter);
         }
 
         public List<ProductCategoryDTO> GetAllCategory()
@@ -152,6 +175,20 @@ namespace BLL
                 throw new Exception($"The subcategory is currently locked; you should switch to a different subcategory or reactivate the subcategory.");
             }
 
+            // ✅ THÊM: Validate Quantity <= StockQuantity
+            int quantity = productDTO.Quantity ?? 0;
+            int stockQuantity = productDTO.StockQuantity ?? 0;
+            
+            if (quantity > stockQuantity)
+            {
+                MessageBox.Show(
+                    $"Current quantity ({quantity}) cannot be greater than stock quantity ({stockQuantity}).",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
+
             string finalSlug = productDTO.Slug;
             if (string.IsNullOrEmpty(finalSlug))
             {
@@ -159,7 +196,6 @@ namespace BLL
             }
 
             var cloudinaryService = new CloudinaryBLL();
-
             List<string> uploadedUrls = new List<string>();
 
             if (!string.IsNullOrEmpty(productDTO.Thumbnail))
@@ -168,7 +204,7 @@ namespace BLL
 
                 if (imageUrl != null)
                 {
-                    uploadedUrls.Add(imageUrl); 
+                    uploadedUrls.Add(imageUrl);
                 }
                 else
                 {
@@ -178,7 +214,6 @@ namespace BLL
 
             string jsonThumbnailArray = Newtonsoft.Json.JsonConvert.SerializeObject(uploadedUrls);
 
-            
             int newPosition;
             if (productDTO.Position == null)
             {
@@ -223,7 +258,6 @@ namespace BLL
 
         public ProductDTO GetProductById(int productId)
         {
-            
             Product productEntity = _productDAL.GetProductById(productId);
 
             if (productEntity == null)
@@ -246,6 +280,7 @@ namespace BLL
                 Quantity = productEntity.Quantity,
                 StockQuantity = productEntity.StockQuantity,
 
+                QRCodeUrl = productEntity.QRCodeUrl,
                 // Dữ liệu String/Bool
                 Description = productEntity.Description,
                 Thumbnail = productEntity.Thumbnail,
@@ -265,6 +300,9 @@ namespace BLL
                 UpdatedBy = productEntity.UpdatedBy,
                 Deleted = productEntity.Deleted
             };
+            System.Diagnostics.Debug.WriteLine($"[BLL] GetProductById({productId}):");
+            System.Diagnostics.Debug.WriteLine($"  Name: {productDTO.ProductName}");
+            System.Diagnostics.Debug.WriteLine($"  Price: {productDTO.Price:N0} | Discount: {productDTO.Discount}%");
 
             return productDTO;
         }
@@ -273,15 +311,26 @@ namespace BLL
         {
             int currentProductId = productDTO.Uid;
             string cleanedProductName = productDTO.ProductName.Trim();
-            string cleanedSku = productDTO.Sku.Trim();
+            string cleanedSku = productDTO.Sku.Trim().ToUpper(); 
+            
+            var existingProduct = _productDAL.GetProductById(currentProductId);
+            if (existingProduct == null)
+            {
+                throw new Exception("Không tìm thấy sản phẩm");
+            }
 
-            if (!_productDAL.IsSkuUnique(cleanedSku, 0))
+            string oldSku = existingProduct.Sku?.ToUpper();
+            bool skuChanged = (oldSku != cleanedSku);
+            
+            // ✅  Truyền currentProductId thay vì 0
+            if (!_productDAL.IsSkuUnique(cleanedSku, currentProductId))
             {
                 MessageBox.Show("SKU already exists, please re-enter", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
-            if (!_productDAL.IsProductNameUnique(cleanedProductName, productDTO.SubCategoryUid, 0))
+            //  Truyền currentProductId thay vì 0
+            if (!_productDAL.IsProductNameUnique(cleanedProductName, productDTO.SubCategoryUid, currentProductId))
             {
                 MessageBox.Show($"The product name '{cleanedProductName}' already exists in this subcategory.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
@@ -291,7 +340,18 @@ namespace BLL
             {
                 throw new Exception($"The subcategory is currently locked; you should switch to a different subcategory or reactivate the subcategory.");
             }
+            int quantity = productDTO.Quantity ?? 0;
+            int stockQuantity = productDTO.StockQuantity ?? 0;
 
+            if (quantity > stockQuantity)
+            {
+                MessageBox.Show(
+                    $"Current quantity ({quantity}) cannot be greater than stock quantity ({stockQuantity}).",
+                    "Validation Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return false;
+            }
             string finalSlug = productDTO.Slug;
             if (string.IsNullOrEmpty(finalSlug))
             {
@@ -332,7 +392,29 @@ namespace BLL
             }
 
             string jsonThumbnailArray = Newtonsoft.Json.JsonConvert.SerializeObject(finalUrls);
+            string qrCodeUrl = existingProduct.QRCodeUrl; // Giữ nguyên URL cũ
 
+            if (skuChanged)
+            {
+                try
+                {
+                    var qrCodeService = new QRCodeBLL();
+                    string labelBase64 = qrCodeService.GenerateLabelBase64(
+                        cleanedSku,
+                        cleanedProductName,
+                        productDTO.Price ?? 0
+                    );
+
+                    if (!string.IsNullOrEmpty(labelBase64))
+                    {
+                        qrCodeUrl = cloudinaryService.UploadProductThumbnail(labelBase64);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"QR Code regeneration failed: {ex.Message}");
+                }
+            }
 
             DAL.EF.Product productEntity = new DAL.EF.Product
             {
@@ -353,6 +435,7 @@ namespace BLL
                 StockStatusUid = productDTO.StockStatusUid,
 
                 Thumbnail = jsonThumbnailArray,
+                QRCodeUrl = qrCodeUrl,
                 Slug = finalSlug,
                 Status = productDTO.Status,
                 IsFeatured = productDTO.IsFeatured,
@@ -363,7 +446,8 @@ namespace BLL
                 ExpiryDate = productDTO.ExpiryDate,
 
                 UpdatedAt = DateTime.Now,
-                UpdatedBy = productDTO.UpdatedBy, 
+                UpdatedBy = productDTO.UpdatedBy,
+                Deleted = productDTO.Deleted
             };
 
             return _productDAL.UpdateProduct(productEntity);
@@ -388,6 +472,86 @@ namespace BLL
         public string updateChangeMulti(string status, List<int> productUids)
         {
             return _productDAL.updateChangeMulti(status, productUids);
+        }
+        /// <summary>
+        /// Tự động tạo QR Code cho tất cả products chưa có QRCodeUrl
+        /// </summary>
+        public int GenerateQRCodeForAllProducts()
+        {
+            var qrCodeService = new QRCodeBLL();
+            var cloudinaryService = new CloudinaryBLL();
+
+            // ✅ FIX: Lấy tất cả products chưa có QR Code VÀ có SKU hợp lệ
+            var allProducts = _productDAL.GetAllProduct("", "", "Uid-asc", 0, 10000);
+            var productsWithoutQR = allProducts
+                .Where(p => string.IsNullOrEmpty(p.QRCodeUrl)
+                            && !p.Deleted
+                            && !string.IsNullOrWhiteSpace(p.Sku)) // ✅ THÊM: Chỉ lấy products có SKU
+                .ToList();
+
+            int successCount = 0;
+            int failCount = 0;
+
+            System.Diagnostics.Debug.WriteLine($"📋 Found {productsWithoutQR.Count} products need QR Code generation");
+
+            foreach (var product in productsWithoutQR)
+            {
+                try
+                {
+                    System.Diagnostics.Debug.WriteLine($"🔄 Processing: {product.Sku} - {product.ProductName}");
+
+                    // ✅ Generate QR Label with proper data
+                    string labelBase64 = qrCodeService.GenerateLabelBase64(
+                        product.Sku.Trim().ToUpper(), // ✅ Normalize SKU
+                        product.ProductName,
+                        product.Price ?? 0
+                    );
+
+                    if (!string.IsNullOrEmpty(labelBase64))
+                    {
+                        // Upload to Cloudinary
+                        string qrUrl = cloudinaryService.UploadProductThumbnail(labelBase64);
+
+                        if (!string.IsNullOrEmpty(qrUrl))
+                        {
+                            // ✅ Update database
+                            product.QRCodeUrl = qrUrl;
+                            product.UpdatedAt = DateTime.Now;
+                            product.UpdatedBy = Environment.UserName; // ✅ THÊM: Track who updated
+
+                            bool updated = _productDAL.UpdateProduct(product);
+                            if (updated)
+                            {
+                                successCount++;
+                                System.Diagnostics.Debug.WriteLine($"✅ Generated QR for: {product.Sku}");
+                            }
+                            else
+                            {
+                                failCount++;
+                                System.Diagnostics.Debug.WriteLine($"❌ Failed to update DB for: {product.Sku}");
+                            }
+                        }
+                        else
+                        {
+                            failCount++;
+                            System.Diagnostics.Debug.WriteLine($"❌ Cloudinary upload failed for: {product.Sku}");
+                        }
+                    }
+                    else
+                    {
+                        failCount++;
+                        System.Diagnostics.Debug.WriteLine($"❌ QR generation failed for: {product.Sku}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    failCount++;
+                    System.Diagnostics.Debug.WriteLine($"❌ Exception for {product.Sku}: {ex.Message}");
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine($"\n📊 SUMMARY: Success={successCount}, Failed={failCount}, Total={productsWithoutQR.Count}");
+            return successCount;
         }
     }
 }

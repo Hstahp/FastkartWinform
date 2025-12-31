@@ -1,5 +1,5 @@
 ﻿using System.Windows.Forms;
-using Guna.UI2.WinForms; 
+using Guna.UI2.WinForms;
 using System.Drawing;
 
 namespace GUI
@@ -25,6 +25,7 @@ namespace GUI
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
             this.btnAddProduct = new Guna.UI2.WinForms.Guna2Button();
+            this.btnGenerateQR = new Guna.UI2.WinForms.Guna2Button();
             this.lblTitle = new System.Windows.Forms.Label();
             this.guna2Panel2 = new Guna.UI2.WinForms.Guna2Panel();
             this.btnApply = new Guna.UI2.WinForms.Guna2Button();
@@ -60,6 +61,7 @@ namespace GUI
             // 
             this.guna2Panel1.BackColor = System.Drawing.Color.White;
             this.guna2Panel1.Controls.Add(this.btnAddProduct);
+            this.guna2Panel1.Controls.Add(this.btnGenerateQR);
             this.guna2Panel1.Controls.Add(this.lblTitle);
             this.guna2Panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.guna2Panel1.Location = new System.Drawing.Point(0, 0);
@@ -86,6 +88,24 @@ namespace GUI
             this.btnAddProduct.TabIndex = 1;
             this.btnAddProduct.Text = "Add Product";
             this.btnAddProduct.Click += new System.EventHandler(this.btnAddProduct_Click);
+            // 
+            // btnGenerateQR
+            // 
+            this.btnGenerateQR.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnGenerateQR.BorderRadius = 5;
+            this.btnGenerateQR.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnGenerateQR.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnGenerateQR.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnGenerateQR.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnGenerateQR.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(99)))), ((int)(((byte)(235)))));
+            this.btnGenerateQR.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.btnGenerateQR.ForeColor = System.Drawing.Color.White;
+            this.btnGenerateQR.Location = new System.Drawing.Point(925, 18);
+            this.btnGenerateQR.Name = "btnGenerateQR";
+            this.btnGenerateQR.Size = new System.Drawing.Size(190, 49);
+            this.btnGenerateQR.TabIndex = 11;
+            this.btnGenerateQR.Text = "🔧 Generate All QR";
+            this.btnGenerateQR.Click += new System.EventHandler(this.btnGenerateQR_Click);
             // 
             // lblTitle
             // 
@@ -476,6 +496,7 @@ namespace GUI
         private Guna.UI2.WinForms.Guna2Panel guna2Panel1;
         private Guna.UI2.WinForms.Guna2Button btnAddProduct;
         private Guna.UI2.WinForms.Guna2Button btnApply;
+        private Guna.UI2.WinForms.Guna2Button btnGenerateQR;
         private System.Windows.Forms.Label lblTitle;
         private Guna.UI2.WinForms.Guna2Panel guna2Panel2;
         private Guna.UI2.WinForms.Guna2TextBox txtSearch;

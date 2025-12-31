@@ -40,5 +40,6 @@ namespace DTO
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
         public bool Deleted { get; set; }
+        public string QRCodeUrl { get; set; }
     }
 }

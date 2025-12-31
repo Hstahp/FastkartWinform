@@ -25,12 +25,21 @@ namespace DAL.EF
         public DateTime OrderDate { get; set; }
 
         public decimal TotalAmount { get; set; }
+        public decimal SubTotal { get; set; }
+        public decimal TaxAmount { get; set; }
+        public decimal DiscountAmount { get; set; }
 
         public string ShippingAddress { get; set; }
 
         public string Status { get; set; }
 
         public string PaymentMethod { get; set; }
+
+        [StringLength(500)]
+        public string OrderNote { get; set; }
+
+        [StringLength(100)]
+        public string CreatedBy { get; set; }
 
         public bool Deleted { get; set; }
 

@@ -2,6 +2,7 @@
 using Common;
 using DTO;
 using GUI;
+using GUI.ScanQR;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -58,8 +59,6 @@ namespace GUI
             {
                 if (btnAddProduct != null) btnAddProduct.Visible = false;
             }
-
-            // (Lưu ý: Việc ẩn hiện nút Sửa/Xóa sẽ được xử lý trực tiếp trong sự kiện CellPainting bên dưới)
 
             LoadData();
             LoadFilter();
@@ -162,7 +161,7 @@ namespace GUI
                 // 1. Click XEM
                 if (relativeX >= padding && relativeX < padding + iconSize)
                 {
-                    MessageBox.Show("Xem sản phẩm: " + productId);
+                    ShowProductQRCode(productId);
                 }
                 // 2. Click SỬA (Có quyền mới click được)
                 else if (canEdit && relativeX >= padding + 30 && relativeX < padding + 30 + iconSize)
@@ -174,7 +173,6 @@ namespace GUI
                 {
                     if (MessageBox.Show("Are you sure you want to delete this product?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     {
-                        // Gọi hàm xóa sản phẩm tại đây nếu bạn đã cài đặt
                         _productBLL.DeleteProduct(productId);
                         MessageBox.Show("Deleted successfully");
                         LoadData();
@@ -209,7 +207,7 @@ namespace GUI
 
         private async void LoadData()
         {
-            int total = _productBLL.Count(keyword ,filter);
+            int total = _productBLL.Count(keyword, filter);
             totalPage = (int)Math.Ceiling((double)total / limit);
             int skip = (pageCurrent - 1) * limit;
 
@@ -425,14 +423,15 @@ namespace GUI
             }
 
             string result = _productBLL.updateChangeMulti(status, productUids);
-            if(result == "success")
+            if (result == "success")
             {
                 MessageBox.Show("Status change successful!");
-            } else
+            }
+            else
             {
                 MessageBox.Show("Deleted successfully!");
             }
-                LoadData();
+            LoadData();
         }
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
@@ -441,5 +440,96 @@ namespace GUI
             LoadData();
         }
 
+        private void ShowProductQRCode(int productId)
+        {
+            try
+            {
+                var product = _productBLL.GetProductById(productId);
+                if (product == null)
+                {
+                    MessageBox.Show("Product not found!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(product.QRCodeUrl))
+                {
+                    MessageBox.Show("This product does not have a QR code!\n\nPlease edit the product to automatically generate a QR code.",
+                        "Notification",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                    return;
+                }
+
+                frmViewQRCode qrForm = new frmViewQRCode(
+                    product.QRCodeUrl,
+                    product.ProductName,
+                    product.Sku
+                );
+                qrForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"QR Code display error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private async void btnGenerateQR_Click(object sender, EventArgs e)
+        {
+            // Check permission
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_EDIT))
+            {
+                MessageBox.Show("You do not have permission to create QR codes!",
+                    "Access Denied",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
+            var confirmResult = MessageBox.Show(
+               "Are you sure you want to create QR codes for ALL products that don't already have QR codes?\n\n" +
+                "⚠️ This process may take a few minutes depending on the number of products.",
+                "Confirm",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirmResult != DialogResult.Yes)
+                return;
+
+            try
+            {
+                // Disable button và show loading
+                btnGenerateQR.Enabled = false;
+                btnGenerateQR.Text = "⏳ Processing...";
+                this.Cursor = Cursors.WaitCursor;
+
+                // ✅ Chạy async để không block UI
+                int successCount = await Task.Run(() => _productBLL.GenerateQRCodeForAllProducts());
+
+                // Show result
+                MessageBox.Show(
+                    $"✅ Complete!\n\n" +
+                    $"A QR code has been created for {successCount} product.",
+                    "Success",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+
+                // Reload data to show updated QR codes
+                LoadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error when creating QR Code:\n\n{ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+            finally
+            {
+                // Restore button state
+                btnGenerateQR.Enabled = true;
+                btnGenerateQR.Text = "🔧 Generate All QR";
+                this.Cursor = Cursors.Default;
+            }
+        }
     }
 }

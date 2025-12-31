@@ -67,9 +67,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BrandDTO.cs" />
+    <Compile Include="CartItemDTO.cs" />
+    <Compile Include="CheckcoutResultDTO.cs" />
     <Compile Include="DashboardDTO.cs" />
     <Compile Include="FunctionDTO.cs" />
     <Compile Include="LoginResultDTO.cs" />
+    <Compile Include="OrderDTO.cs" />
+    <Compile Include="OrderItemDTO.cs" />
+    <Compile Include="PaymentDTO.cs" />
     <Compile Include="PermissionMatrixDTO.cs" />
     <Compile Include="PermissionTypeDTO.cs" />
     <Compile Include="ProductCategoryDTO.cs" />

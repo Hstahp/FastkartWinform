@@ -65,6 +65,11 @@
             this.lblName = new System.Windows.Forms.Label();
             this.picUser = new System.Windows.Forms.PictureBox();
             this.pnlMainContent = new System.Windows.Forms.Panel();
+            this.pnlPOSSub = new System.Windows.Forms.Panel();
+            this.btnScanQR = new System.Windows.Forms.Button();
+            this.btnPOS = new System.Windows.Forms.Button();
+            this.btnPOSMenu = new System.Windows.Forms.Button();
+            this.lblPOSArrow = new System.Windows.Forms.Label();
             this.pnlSidebar.SuspendLayout();
             this.pnlSettingsSub.SuspendLayout();
             this.btnSettings.SuspendLayout();
@@ -102,6 +107,8 @@
             this.pnlSidebar.Controls.Add(this.btnSubCategory);
             this.pnlSidebar.Controls.Add(this.pnlCategorySub);
             this.pnlSidebar.Controls.Add(this.btnCategory);
+            this.pnlSidebar.Controls.Add(this.pnlPOSSub);
+            this.pnlSidebar.Controls.Add(this.btnPOSMenu);
             this.pnlSidebar.Controls.Add(this.pnlProductSub);
             this.pnlSidebar.Controls.Add(this.btnProduct);
             this.pnlSidebar.Controls.Add(this.btnDashboard);
@@ -875,6 +882,92 @@
             this.pnlMainContent.Size = new System.Drawing.Size(1463, 948);
             this.pnlMainContent.TabIndex = 2;
             // 
+            // pnlPOSSub
+            // 
+            this.pnlPOSSub.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(24)))), ((int)(((byte)(39)))));
+            this.pnlPOSSub.Controls.Add(this.btnScanQR);
+            this.pnlPOSSub.Controls.Add(this.btnPOS);
+            this.pnlPOSSub.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlPOSSub.Location = new System.Drawing.Point(0, 265);
+            this.pnlPOSSub.Margin = new System.Windows.Forms.Padding(0);
+            this.pnlPOSSub.Name = "pnlPOSSub";
+            this.pnlPOSSub.Padding = new System.Windows.Forms.Padding(0, 5, 0, 5);
+            this.pnlPOSSub.Size = new System.Drawing.Size(325, 0);
+            this.pnlPOSSub.TabIndex = 14;
+            // 
+            // btnScanQR
+            // 
+            this.btnScanQR.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnScanQR.FlatAppearance.BorderSize = 0;
+            this.btnScanQR.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnScanQR.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnScanQR.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.btnScanQR.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(213)))), ((int)(((byte)(219)))));
+            this.btnScanQR.Location = new System.Drawing.Point(0, 53);
+            this.btnScanQR.Margin = new System.Windows.Forms.Padding(0);
+            this.btnScanQR.Name = "btnScanQR";
+            this.btnScanQR.Padding = new System.Windows.Forms.Padding(60, 0, 0, 0);
+            this.btnScanQR.Size = new System.Drawing.Size(325, 48);
+            this.btnScanQR.TabIndex = 1;
+            this.btnScanQR.Text = "   📷  Scan QR Code";
+            this.btnScanQR.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnScanQR.UseVisualStyleBackColor = true;
+            this.btnScanQR.Click += new System.EventHandler(this.btnScanQR_Click);
+            // 
+            // btnPOS
+            // 
+            this.btnPOS.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnPOS.FlatAppearance.BorderSize = 0;
+            this.btnPOS.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnPOS.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPOS.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.btnPOS.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(213)))), ((int)(((byte)(219)))));
+            this.btnPOS.Location = new System.Drawing.Point(0, 5);
+            this.btnPOS.Margin = new System.Windows.Forms.Padding(0);
+            this.btnPOS.Name = "btnPOS";
+            this.btnPOS.Padding = new System.Windows.Forms.Padding(60, 0, 0, 0);
+            this.btnPOS.Size = new System.Drawing.Size(325, 48);
+            this.btnPOS.TabIndex = 0;
+            this.btnPOS.Text = "   💳  POS System";
+            this.btnPOS.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnPOS.UseVisualStyleBackColor = true;
+            this.btnPOS.Click += new System.EventHandler(this.btnPOS_Click);
+            // 
+            // btnPOSMenu
+            // 
+            this.btnPOSMenu.Controls.Add(this.lblPOSArrow);
+            this.btnPOSMenu.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnPOSMenu.FlatAppearance.BorderSize = 0;
+            this.btnPOSMenu.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnPOSMenu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPOSMenu.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnPOSMenu.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(229)))), ((int)(((byte)(231)))), ((int)(((byte)(235)))));
+            this.btnPOSMenu.Location = new System.Drawing.Point(0, 200);
+            this.btnPOSMenu.Margin = new System.Windows.Forms.Padding(0);
+            this.btnPOSMenu.Name = "btnPOSMenu";
+            this.btnPOSMenu.Padding = new System.Windows.Forms.Padding(25, 0, 0, 0);
+            this.btnPOSMenu.Size = new System.Drawing.Size(325, 65);
+            this.btnPOSMenu.TabIndex = 15;
+            this.btnPOSMenu.Text = "🛒  Point of Sale";
+            this.btnPOSMenu.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnPOSMenu.UseVisualStyleBackColor = true;
+            this.btnPOSMenu.Click += new System.EventHandler(this.btnPOSMenu_Click);
+            // 
+            // lblPOSArrow
+            // 
+            this.lblPOSArrow.BackColor = System.Drawing.Color.Transparent;
+            this.lblPOSArrow.Dock = System.Windows.Forms.DockStyle.Right;
+            this.lblPOSArrow.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.lblPOSArrow.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(156)))), ((int)(((byte)(163)))), ((int)(((byte)(175)))));
+            this.lblPOSArrow.Location = new System.Drawing.Point(275, 0);
+            this.lblPOSArrow.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblPOSArrow.Name = "lblPOSArrow";
+            this.lblPOSArrow.Size = new System.Drawing.Size(50, 65);
+            this.lblPOSArrow.TabIndex = 0;
+            this.lblPOSArrow.Text = "›";
+            this.lblPOSArrow.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblPOSArrow.Click += new System.EventHandler(this.btnPOSMenu_Click);
+            // 
             // frmMainAdmin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
@@ -965,5 +1058,10 @@
         private System.Windows.Forms.Button btnSettings;
         private System.Windows.Forms.Label lblSettingsArrow;
         private System.Windows.Forms.Button btnPermission;
+        private System.Windows.Forms.Panel pnlPOSSub;
+        private System.Windows.Forms.Button btnPOS;
+        private System.Windows.Forms.Button btnScanQR;
+        private System.Windows.Forms.Button btnPOSMenu;
+        private System.Windows.Forms.Label lblPOSArrow;
     }
 }   

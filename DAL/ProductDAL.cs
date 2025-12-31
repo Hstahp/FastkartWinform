@@ -97,6 +97,16 @@ namespace DAL
         {
             try
             {
+                if (_context == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("ERROR: DbContext is null in GetAllCategoy");
+                    return new List<ProductCategory>();
+                }
+                if (_context.ProductCategory == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("ERROR: ProductCategory DbSet is null");
+                    return new List<ProductCategory>();
+                }
                 return _context.ProductCategory.Where(p => p.Deleted == false).AsNoTracking().ToList();
             }
             catch (Exception ex)

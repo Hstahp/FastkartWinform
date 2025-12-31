@@ -90,6 +90,7 @@
     <Compile Include="EF\Users.cs" />
     <Compile Include="EF\Wishlist.cs" />
     <Compile Include="LoginDAL.cs" />
+    <Compile Include="OrderDAL.cs" />
     <Compile Include="ProductDAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoleDAL.cs" />

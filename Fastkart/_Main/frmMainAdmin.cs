@@ -1,7 +1,9 @@
-﻿using Common;
+﻿using BLL;
+using Common;
 using DTO;
 using GUI.Category;
 using GUI.Product;
+using GUI.ScanQR;
 using GUI.SubCategory;
 using Helpers;
 using Newtonsoft.Json.Linq;
@@ -23,7 +25,9 @@ namespace GUI
         private Button currentActiveButton = null;
         private Panel pnlUserDropdown;
         private bool isUserDropdownVisible = false;
-
+        
+        private frmPOS _currentPosForm;
+        private frmScanQR _currentScanQRForm;
         private Color sidebarBg = Color.FromArgb(31, 41, 55);
         private Color sidebarHover = Color.FromArgb(55, 65, 81);
         private Color activeBg = Color.FromArgb(37, 99, 235);
@@ -485,6 +489,7 @@ namespace GUI
             pnlUserSub.Height = 0;
             pnlRolesSub.Height = 0;
             pnlSettingsSub.Height = 0;
+            pnlPOSSub.Height = 0;
         }
 
         private void CollapseCurrentSubMenu()
@@ -558,7 +563,10 @@ namespace GUI
         {
             HandleParentMenuClick(pnlSettingsSub, lblSettingsArrow);
         }
-
+        private void btnPOSMenu_Click(object sender, EventArgs e)
+        {
+            HandleParentMenuClick(pnlPOSSub, lblPOSArrow);
+        }
         #endregion
 
         #region Xử lý Hover & Highlight
@@ -638,6 +646,11 @@ namespace GUI
                 btnSettings.BackColor = sidebarHover;
                 lblSettingsArrow.BackColor = sidebarHover;
             }
+            else if (parentPanel == pnlPOSSub)
+            {
+                btnPOSMenu.BackColor = sidebarHover;
+                lblPOSArrow.BackColor = sidebarHover;
+            }
         }
 
         private void AddHoverEvents()
@@ -664,6 +677,8 @@ namespace GUI
             AddHoverToChildButton(btnAllRoles);
             AddHoverToChildButton(btnCreateRole);
             AddHoverToChildButton(btnProfileSetting);
+            AddHoverToChildButton(btnPOS);
+            AddHoverToChildButton(btnScanQR);
         }
 
         private void AddHoverToParentButton(Button btn, Label lbl)
@@ -916,6 +931,62 @@ namespace GUI
         private void btnPermission_Click(object sender, EventArgs e)
         {
             OpenPermissionForm();
+        }
+        private void btnPOS_Click(object sender, EventArgs e)
+        {
+            OpenPOSForm();
+        }
+        private void btnScanQR_Click(object sender, EventArgs e)
+        {
+            OpenScanQRForm();
+        }
+        private void OpenPOSForm()
+        {
+            _currentPosForm = new frmPOS();
+            _currentPosForm.RequestScanQR += (s, args) =>
+            {
+                OpenScanQRForm();
+            };
+
+            OpenChildForm(_currentPosForm, btnPOS);
+        }
+        private void OpenScanQRForm()
+        {
+            _currentScanQRForm = new frmScanQR();
+
+            // ✅ SỬA: Event trả về SKU (string), không phải Product ID (int)
+            _currentScanQRForm.QRCodeScanned += (s, scannedData) =>
+            {
+                if (_currentPosForm != null)
+                {
+                    try
+                    {
+                        // ✅ Parse QR Code để lấy SKU
+                        var qrCodeBLL = new QRCodeBLL();
+                        string sku = qrCodeBLL.ParseQRCode(scannedData);
+
+                        // ✅ Gọi AddProductBySku() thay vì AddProductById()
+                        _currentPosForm.AddProductBySku(sku);
+
+                        // Quay lại POS form
+                        OpenPOSForm();
+
+                        MessageBox.Show($"✅ Product added (SKU: {sku}) to cart!",
+                                        "Success",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error processing QR Code: {ex.Message}",
+                                        "Error",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error);
+                    }
+                }
+            };
+
+            OpenChildForm(_currentScanQRForm, btnScanQR);
         }
         #endregion
     }
