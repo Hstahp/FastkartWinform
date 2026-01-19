@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using BLL; 
+using BLL;
 using DTO;
 using Common;
 
@@ -19,24 +19,28 @@ namespace GUI
 
         private void FrmAllRole_Load(object sender, EventArgs e)
         {
-           if (!UserSessionDTO.HasPermission(PermCode.FUNC_ROLE, PermCode.TYPE_VIEW))
+            // 1. Check Permission: VIEW
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_ROLE, PermCode.TYPE_VIEW))
             {
-                MessageBox.Show("Bạn không có quyền truy cập trang này!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("You do not have permission to access this page!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 this.Close();
-                return; 
+                return;
             }
 
+            // 2. Check Permission: CREATE (Hide Add Button)
             if (!UserSessionDTO.HasPermission(PermCode.FUNC_ROLE, PermCode.TYPE_CREATE))
             {
                 btnAdd.Visible = false;
             }
 
+            // 3. Check Permission: DELETE (Hide Delete Column)
             bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_ROLE, PermCode.TYPE_DELETE);
             if (dgvRoles.Columns.Contains("colDelete"))
             {
                 dgvRoles.Columns["colDelete"].Visible = canDelete;
             }
 
+            // 4. Check Permission: EDIT (Hide Edit Column)
             bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_ROLE, PermCode.TYPE_EDIT);
             if (dgvRoles.Columns.Contains("colEdit"))
             {
@@ -50,12 +54,12 @@ namespace GUI
         {
             try
             {
-                dgvRoles.AutoGenerateColumns = false; 
+                dgvRoles.AutoGenerateColumns = false;
                 dgvRoles.DataSource = _roleBLL.GetAllRoles(keyword);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message);
+                MessageBox.Show("Error loading data: " + ex.Message);
             }
         }
 
@@ -64,9 +68,11 @@ namespace GUI
             LoadDataRoles(txtSearch.Text.Trim());
         }
 
+        // --- BUTTON ADD ---
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            frmAddRole f = new frmAddRole();
+            // Pass 0 and empty string to indicate ADD MODE
+            frmAddRole f = new frmAddRole(0, "");
 
             var result = f.ShowDialog();
 
@@ -76,36 +82,62 @@ namespace GUI
             }
         }
 
+        // --- GRID ACTIONS (DELETE / EDIT) ---
         private void dgvRoles_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;
 
+            // Variables to store data from the clicked row
             int roleId = 0;
+            string currentRoleName = "";
+
+            // 1. Get Role ID (Uid) - Assuming Column 0 is hidden ID
             if (dgvRoles.Rows[e.RowIndex].Cells[0].Value != null)
             {
                 roleId = Convert.ToInt32(dgvRoles.Rows[e.RowIndex].Cells[0].Value);
             }
 
-            
-            if (dgvRoles.Columns[e.ColumnIndex] == colDelete)
+            // 2. Get Role Name - Assuming Column 1 is Name
+            // NOTE: Check your DataGridView Design to ensure Column Index 1 is RoleName
+            if (dgvRoles.Rows[e.RowIndex].Cells[1].Value != null)
             {
-                if (MessageBox.Show("Bạn có chắc muốn xóa vai trò này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                currentRoleName = dgvRoles.Rows[e.RowIndex].Cells[1].Value.ToString();
+            }
+
+            // --- DELETE LOGIC ---
+            // Check if clicked column is 'colDelete' (Check Name property in Design)
+            if (dgvRoles.Columns[e.ColumnIndex].Name == "colDelete")
+            {
+                if (MessageBox.Show("Are you sure you want to delete this role?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    if (_roleBLL.DeleteRole(roleId))
+                    string error = "";
+                    // Gọi hàm xóa mới có biến error
+                    if (_roleBLL.DeleteRole(roleId, out error))
                     {
-                        MessageBox.Show("Xóa thành công!");
+                        MessageBox.Show("Deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LoadDataRoles();
                     }
                     else
                     {
-                        MessageBox.Show("Xóa thất bại!");
+                        // Hiện thông báo lỗi nghiệp vụ (Vd: Đang có người dùng...)
+                        MessageBox.Show("Delete failed: " + error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }
 
-            if (dgvRoles.Columns[e.ColumnIndex] == colEdit)
+            // --- EDIT LOGIC ---
+            // Check if clicked column is 'colEdit'
+            if (dgvRoles.Columns[e.ColumnIndex].Name == "colEdit")
             {
-                MessageBox.Show("Chức năng sửa đang phát triển! ID: " + roleId);
+                // Pass RoleId and CurrentName to indicate EDIT MODE
+                frmAddRole f = new frmAddRole(roleId, currentRoleName);
+
+                var result = f.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    LoadDataRoles(); // Reload grid to show updated name
+                }
             }
         }
     }

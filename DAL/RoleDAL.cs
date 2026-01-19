@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DAL.EF;
+using DAL.EF; // Assuming EF context is here
 using DTO;
 
 namespace DAL
@@ -16,10 +16,10 @@ namespace DAL
         }
 
         // ==========================================
-        // PHẦN 1: CÁC HÀM LẤY DỮ LIỆU (GET)
+        // PART 1: GET DATA FUNCTIONS
         // ==========================================
 
-        // 1. Lấy danh sách Loại Quyền (Xem, Thêm, Sửa...)
+        // 1. Get Permission Types (View, Add, Edit...)
         public List<PermissionTypes> GetPermissionTypes()
         {
             return _context.PermissionTypes.AsNoTracking().OrderBy(p => p.Id).ToList();
@@ -27,51 +27,58 @@ namespace DAL
 
         public List<string> GetPermissionCodesByRole(int roleId)
         {
-            // Join 3 bảng để lấy ra chuỗi "FunctionCode.PermissionCode"
+            // Join 3 tables to get "FunctionCode.PermissionCode" string
             var query = from p in _context.Permissions
                         join f in _context.Functions on p.FunctionId equals f.Uid
                         join t in _context.PermissionTypes on p.PermissionTypeId equals t.Id
-                        where p.RoleId == roleId && p.Allowed == true // Chỉ lấy cái nào được phép
+                        where p.RoleId == roleId && p.Allowed == true
                         select f.Code + "." + t.Code;
 
             return query.ToList();
         }
 
-        // 2. Lấy danh sách Chức năng (Sản phẩm, Đơn hàng...)
+        // 2. Get Active Functions (Products, Orders...)
         public List<Functions> GetActiveFunctions()
         {
             return _context.Functions.AsNoTracking()
-                           .Where(f => f.Deleted == false)
-                           .OrderBy(f => f.Name)
-                           .ToList();
+                            .Where(f => f.Deleted == false)
+                            .OrderBy(f => f.Name)
+                            .ToList();
         }
 
-        // 3. Lấy tất cả danh sách Role (Chưa bị xóa)
+        // 3. Get All Active Roles
         public List<Roles> GetAllRoles()
         {
             return _context.Roles.AsNoTracking()
-                           .Where(r => r.Deleted == false)
-                           .OrderByDescending(r => r.CreatedAt)
-                           .ToList();
+                            .Where(r => r.Deleted == false)
+                            .OrderByDescending(r => r.CreatedAt)
+                            .ToList();
         }
 
-        // 4. Lấy tất cả bảng Phân quyền hiện có
+        // 4. Get All Existing Permissions
         public List<Permissions> GetAllPermissions()
         {
             return _context.Permissions.AsNoTracking().ToList();
         }
 
-
         // ==========================================
-        // PHẦN 2: CÁC HÀM THAO TÁC (ADD, UPDATE, DELETE)
+        // PART 2: MANIPULATION FUNCTIONS (ADD, UPDATE, DELETE)
         // ==========================================
 
-        // 5. Thêm Role mới (Chỉ tên)
+        // 5. Add New Role
         public bool AddRole(RoleDTO roleDto, out string error)
         {
             error = "";
             try
             {
+                // Validate duplicate name for Add
+                bool isDuplicate = _context.Roles.Any(r => r.RoleName == roleDto.RoleName.Trim() && r.Deleted == false);
+                if (isDuplicate)
+                {
+                    error = "Role name already exists. Please choose another name.";
+                    return false;
+                }
+
                 var roleEntity = new Roles
                 {
                     RoleName = roleDto.RoleName.Trim(),
@@ -91,7 +98,7 @@ namespace DAL
             }
         }
 
-        // 6. Cập nhật quyền (Dùng cho Matrix)
+        // 6. Update Permission (For Matrix)
         public bool UpdatePermission(int roleId, int functionId, int permTypeId, bool allowed)
         {
             try
@@ -103,11 +110,10 @@ namespace DAL
 
                 if (perm != null)
                 {
-                    perm.Allowed = allowed; // Cập nhật
+                    perm.Allowed = allowed;
                 }
                 else
                 {
-                    // Thêm mới nếu chưa có
                     _context.Permissions.Add(new Permissions
                     {
                         RoleId = roleId,
@@ -125,24 +131,89 @@ namespace DAL
             }
         }
 
-        // 7. Xóa Role (Xóa mềm)
-        public bool DeleteRole(int roleId)
+        // 7. Delete Role (Standard Logic: Prevent if in use)
+        public bool DeleteRole(int roleId, out string error)
         {
+            error = "";
             try
             {
+                bool isInUse = _context.Users.Any(u => u.RoleUid == roleId && u.Deleted == false);
+
+                if (isInUse)
+                {
+                    error = "Cannot delete this Role because it is currently assigned to one or more Users.";
+                    return false;
+                }
+
+                // LOGIC 2: Soft Delete
                 var role = _context.Roles.Find(roleId);
+                // Hoặc nếu bạn dùng Uid: var role = _context.Roles.FirstOrDefault(r => r.Uid == roleId);
+
                 if (role != null)
                 {
                     role.Deleted = true;
+                    role.UpdatedAt = DateTime.Now; // Nên cập nhật ngày xóa
                     _context.SaveChanges();
                     return true;
                 }
+
+                error = "Role not found.";
                 return false;
             }
-            catch
+            catch (Exception ex)
             {
+                error = "Delete error: " + ex.Message;
                 return false;
             }
         }
+
+        // 8. UPDATE ROLE (New Feature)
+        public bool UpdateRole(RoleDTO roleDto, out string error)
+        {
+            error = "";
+            try
+            {
+                if (string.IsNullOrWhiteSpace(roleDto.RoleName))
+                {
+                    error = "Role name cannot be empty.";
+                    return false;
+                }
+
+                string newName = roleDto.RoleName.Trim();
+
+                // Dùng Uid thay vì Id
+                var roleEntity = _context.Roles.FirstOrDefault(r => r.Uid == roleDto.Uid);
+
+                if (roleEntity == null || roleEntity.Deleted == true)
+                {
+                    error = "Role does not exist or has been deleted.";
+                    return false;
+                }
+
+                // Check duplicate (Exclude current Uid)
+                bool isDuplicate = _context.Roles.Any(r => r.RoleName == newName
+                                                        && r.Uid != roleDto.Uid
+                                                        && r.Deleted == false);
+
+                if (isDuplicate)
+                {
+                    error = $"Role name '{newName}' already exists.";
+                    return false;
+                }
+
+                roleEntity.RoleName = newName;
+                roleEntity.UpdatedAt = DateTime.Now;
+
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = "Update error: " + ex.Message;
+                return false;
+            }
+        }
+
+
     }
 }
