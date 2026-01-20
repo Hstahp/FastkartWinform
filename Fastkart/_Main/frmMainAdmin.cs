@@ -5,6 +5,7 @@ using GUI.Category;
 using GUI.Product;
 using GUI.ScanQR;
 using GUI.SubCategory;
+using GUI.Coupon;
 using Helpers;
 using Newtonsoft.Json.Linq;
 using System;
@@ -33,6 +34,7 @@ namespace GUI
         private Color activeBg = Color.FromArgb(37, 99, 235);
         private Color textNormal = Color.FromArgb(229, 231, 235);
         private Color textMuted = Color.FromArgb(156, 163, 175);
+
 
         public frmMainAdmin()
         {
@@ -479,6 +481,83 @@ namespace GUI
             HighlightActiveButton(clickedButton);
         }
 
+        
+
+        // Hàm hỗ trợ tạo nút nhanh (Copy style của bạn)
+        private Button CreateSidebarButton(string text)
+        {
+            return new Button
+            {
+                Text = text,
+                Dock = DockStyle.Top,
+                Height = 45,
+                FlatStyle = FlatStyle.Flat,
+                FlatAppearance = { BorderSize = 0 },
+                ForeColor = textNormal,
+                Font = new Font("Segoe UI", 10),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0),
+                Cursor = Cursors.Hand
+            };
+        }
+
+        // 1. Click nút cha Marketing -> Mở/Đóng submenu
+        private void BtnMarketing_Click(object sender, EventArgs e)
+        {
+            HandleParentMenuClick(pnlMarketingSub, lblMarketingArrow);
+        }
+
+        // 2. Click nút Danh sách -> Mở frmAllCoupons
+        private void BtnCouponList_Click(object sender, EventArgs e)
+        {
+            // Tạo form danh sách
+            GUI.Coupon.frmAllCoupons frm = new GUI.Coupon.frmAllCoupons();
+
+            // Hứng sự kiện "Thêm mới" từ form con
+            frm.RequestAddCoupon += (s, args) => OpenAddNewCouponForm();
+
+            // Hứng sự kiện "Sửa" từ form con
+            frm.RequestEditCoupon += (s, id) => OpenEditCouponForm(id);
+
+            OpenChildForm(frm, btnCouponList);
+        }
+
+        // 3. Click nút Thêm mới -> Mở Popup
+        private void BtnAddCoupon_Click(object sender, EventArgs e)
+        {
+            OpenAddNewCouponForm();
+        }
+
+        // --- HÀM HỖ TRỢ ---
+        private void OpenAddNewCouponForm()
+        {
+            // Mở Submenu nếu chưa mở
+            if (currentSubMenuPanel != pnlMarketingSub)
+                HandleParentMenuClick(pnlMarketingSub, lblMarketingArrow);
+
+            GUI.Coupon.frmAddCoupon frm = new GUI.Coupon.frmAddCoupon(0);
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                // Reload danh sách nếu đang mở form danh sách
+                if (pnlMainContent.Controls.Count > 0 && pnlMainContent.Controls[0] is GUI.Coupon.frmAllCoupons listForm)
+                {
+                    listForm.LoadData();
+                }
+            }
+        }
+
+        private void OpenEditCouponForm(int id)
+        {
+            GUI.Coupon.frmAddCoupon frm = new GUI.Coupon.frmAddCoupon(id);
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                if (pnlMainContent.Controls.Count > 0 && pnlMainContent.Controls[0] is GUI.Coupon.frmAllCoupons listForm)
+                {
+                    listForm.LoadData();
+                }
+            }
+        }
+
         #region Xử lý Submenu
 
         private void CollapseAllSubMenus()
@@ -490,6 +569,7 @@ namespace GUI
             pnlRolesSub.Height = 0;
             pnlSettingsSub.Height = 0;
             pnlPOSSub.Height = 0;
+            if (pnlMarketingSub != null) pnlMarketingSub.Height = 0;
         }
 
         private void CollapseCurrentSubMenu()
@@ -650,6 +730,11 @@ namespace GUI
             {
                 btnPOSMenu.BackColor = sidebarHover;
                 lblPOSArrow.BackColor = sidebarHover;
+            }
+            else if (parentPanel == pnlMarketingSub)
+            {
+                btnMarketing.BackColor = sidebarHover;
+                lblMarketingArrow.BackColor = sidebarHover;
             }
         }
 

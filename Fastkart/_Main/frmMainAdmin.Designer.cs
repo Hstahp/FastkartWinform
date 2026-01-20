@@ -70,6 +70,12 @@
             this.btnPOS = new System.Windows.Forms.Button();
             this.btnPOSMenu = new System.Windows.Forms.Button();
             this.lblPOSArrow = new System.Windows.Forms.Label();
+            this.pnlMarketingSub = new System.Windows.Forms.Panel();
+            this.btnAddCoupon = new System.Windows.Forms.Button();
+            this.btnCouponList = new System.Windows.Forms.Button();
+            this.btnMarketing = new System.Windows.Forms.Button();
+            this.lblMarketingArrow = new System.Windows.Forms.Label();
+            // -----------------------------------------------------
             this.pnlSidebar.SuspendLayout();
             this.pnlSettingsSub.SuspendLayout();
             this.btnSettings.SuspendLayout();
@@ -97,6 +103,8 @@
             this.pnlSidebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(41)))), ((int)(((byte)(55)))));
             this.pnlSidebar.Controls.Add(this.pnlSettingsSub);
             this.pnlSidebar.Controls.Add(this.btnSettings);
+            this.pnlSidebar.Controls.Add(this.pnlMarketingSub);
+            this.pnlSidebar.Controls.Add(this.btnMarketing);
             this.pnlSidebar.Controls.Add(this.pnlRolesSub);
             this.pnlSidebar.Controls.Add(this.btnRoles);
             this.pnlSidebar.Controls.Add(this.pnlUserSub);
@@ -1006,6 +1014,97 @@
             ((System.ComponentModel.ISupportInitialize)(this.picUser)).EndInit();
             this.ResumeLayout(false);
 
+            // 
+            // pnlMarketingSub
+            // 
+            this.pnlMarketingSub.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(24)))), ((int)(((byte)(39)))));
+            this.pnlMarketingSub.Controls.Add(this.btnAddCoupon);
+            this.pnlMarketingSub.Controls.Add(this.btnCouponList);
+            this.pnlMarketingSub.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlMarketingSub.Location = new System.Drawing.Point(0, 590);
+            this.pnlMarketingSub.Margin = new System.Windows.Forms.Padding(0);
+            this.pnlMarketingSub.Name = "pnlMarketingSub";
+            this.pnlMarketingSub.Padding = new System.Windows.Forms.Padding(0, 5, 0, 5);
+            this.pnlMarketingSub.Size = new System.Drawing.Size(325, 0); // Mặc định đóng
+            this.pnlMarketingSub.TabIndex = 12;
+            // 
+            // btnAddCoupon
+            // 
+            this.btnAddCoupon.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnAddCoupon.FlatAppearance.BorderSize = 0;
+            this.btnAddCoupon.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnAddCoupon.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAddCoupon.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAddCoupon.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(213)))), ((int)(((byte)(219)))));
+            this.btnAddCoupon.Location = new System.Drawing.Point(0, 53);
+            this.btnAddCoupon.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAddCoupon.Name = "btnAddCoupon";
+            // CHUẨN: Padding 60 + 3 dấu cách
+            this.btnAddCoupon.Padding = new System.Windows.Forms.Padding(60, 0, 0, 0);
+            this.btnAddCoupon.Size = new System.Drawing.Size(325, 48);
+            this.btnAddCoupon.TabIndex = 4;
+            this.btnAddCoupon.Text = "   Add Coupon";
+            this.btnAddCoupon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAddCoupon.UseVisualStyleBackColor = true;
+            this.btnAddCoupon.Click += new System.EventHandler(this.BtnAddCoupon_Click);
+            // 
+            // btnCouponList
+            // 
+            this.btnCouponList.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnCouponList.FlatAppearance.BorderSize = 0;
+            this.btnCouponList.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnCouponList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCouponList.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCouponList.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(213)))), ((int)(((byte)(219)))));
+            this.btnCouponList.Location = new System.Drawing.Point(0, 5);
+            this.btnCouponList.Margin = new System.Windows.Forms.Padding(0);
+            this.btnCouponList.Name = "btnCouponList";
+            // CHUẨN: Padding 60 + 3 dấu cách
+            this.btnCouponList.Padding = new System.Windows.Forms.Padding(60, 0, 0, 0);
+            this.btnCouponList.Size = new System.Drawing.Size(325, 48);
+            this.btnCouponList.TabIndex = 3;
+            this.btnCouponList.Text = "   Coupon List";
+            this.btnCouponList.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCouponList.UseVisualStyleBackColor = true;
+            this.btnCouponList.Click += new System.EventHandler(this.BtnCouponList_Click);
+            // 
+            // btnMarketing
+            // 
+            this.btnMarketing.Controls.Add(this.lblMarketingArrow);
+            this.btnMarketing.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnMarketing.FlatAppearance.BorderSize = 0;
+            this.btnMarketing.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnMarketing.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMarketing.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnMarketing.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(229)))), ((int)(((byte)(231)))), ((int)(((byte)(235)))));
+            this.btnMarketing.Location = new System.Drawing.Point(0, 525);
+            this.btnMarketing.Margin = new System.Windows.Forms.Padding(0);
+            this.btnMarketing.Name = "btnMarketing";
+            // CHUẨN: Padding 25 (Bằng Product/Category)
+            this.btnMarketing.Padding = new System.Windows.Forms.Padding(25, 0, 0, 0);
+            this.btnMarketing.Size = new System.Drawing.Size(325, 65);
+            this.btnMarketing.TabIndex = 11;
+            // CHUẨN: Text là Coupons + 2 dấu cách
+            this.btnMarketing.Text = "🎫  Coupons";
+            this.btnMarketing.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnMarketing.UseVisualStyleBackColor = true;
+            this.btnMarketing.Click += new System.EventHandler(this.BtnMarketing_Click);
+            // 
+            // lblMarketingArrow
+            // 
+            this.lblMarketingArrow.BackColor = System.Drawing.Color.Transparent;
+            this.lblMarketingArrow.Dock = System.Windows.Forms.DockStyle.Right;
+            this.lblMarketingArrow.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.lblMarketingArrow.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(156)))), ((int)(((byte)(163)))), ((int)(((byte)(175)))));
+            this.lblMarketingArrow.Location = new System.Drawing.Point(275, 0);
+            this.lblMarketingArrow.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblMarketingArrow.Name = "lblMarketingArrow";
+            this.lblMarketingArrow.Size = new System.Drawing.Size(50, 65);
+            this.lblMarketingArrow.TabIndex = 0;
+            this.lblMarketingArrow.Text = "›";
+            this.lblMarketingArrow.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblMarketingArrow.Click += new System.EventHandler(this.BtnMarketing_Click);
+
         }
 
         #endregion
@@ -1063,5 +1162,10 @@
         private System.Windows.Forms.Button btnScanQR;
         private System.Windows.Forms.Button btnPOSMenu;
         private System.Windows.Forms.Label lblPOSArrow;
+        private System.Windows.Forms.Panel pnlMarketingSub;
+        private System.Windows.Forms.Button btnCouponList;
+        private System.Windows.Forms.Button btnAddCoupon;
+        private System.Windows.Forms.Button btnMarketing;
+        private System.Windows.Forms.Label lblMarketingArrow;
     }
 }   

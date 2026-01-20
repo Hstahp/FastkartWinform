@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CategoryDAL.cs" />
+    <Compile Include="CouponDAL.cs" />
     <Compile Include="DashboardDAL.cs" />
     <Compile Include="DbConnection\DBConnection.cs" />
     <Compile Include="EF\ApplicationDBConnect.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="EF\Brand.cs" />
     <Compile Include="EF\Cart.cs" />
     <Compile Include="EF\CartItem.cs" />
+    <Compile Include="EF\Coupons.cs" />
     <Compile Include="EF\C__EFMigrationsHistory.cs" />
     <Compile Include="EF\CloudinarySettings.cs" />
     <Compile Include="EF\Functions.cs" />

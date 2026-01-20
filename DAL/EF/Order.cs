@@ -43,6 +43,9 @@ namespace DAL.EF
 
         public bool Deleted { get; set; }
 
+        [StringLength(50)]
+        public string CouponCode { get; set; }
+
         public virtual Users Users { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

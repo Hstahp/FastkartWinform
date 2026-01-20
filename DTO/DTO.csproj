@@ -69,6 +69,7 @@
     <Compile Include="BrandDTO.cs" />
     <Compile Include="CartItemDTO.cs" />
     <Compile Include="CheckcoutResultDTO.cs" />
+    <Compile Include="CouponDTO.cs" />
     <Compile Include="DashboardDTO.cs" />
     <Compile Include="FunctionDTO.cs" />
     <Compile Include="LoginResultDTO.cs" />

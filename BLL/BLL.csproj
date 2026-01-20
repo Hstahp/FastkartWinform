@@ -130,6 +130,7 @@
   <ItemGroup>
     <Compile Include="CategoryBLL.cs" />
     <Compile Include="CloudinaryBLL.cs" />
+    <Compile Include="CouponBLL.cs" />
     <Compile Include="DashboardBLL.cs" />
     <Compile Include="OrderBLL.cs" />
     <Compile Include="ProductBLL.cs" />

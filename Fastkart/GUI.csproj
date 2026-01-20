@@ -141,6 +141,18 @@
     <Compile Include="Category\frmEdit.Designer.cs">
       <DependentUpon>frmEdit.cs</DependentUpon>
     </Compile>
+    <Compile Include="Coupon\frmAddCoupon.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Coupon\frmAddCoupon.Designer.cs">
+      <DependentUpon>frmAddCoupon.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Coupon\frmAllCoupons.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Coupon\frmAllCoupons.Designer.cs">
+      <DependentUpon>frmAllCoupons.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\frmDashboard.cs">
       <SubType>Form</SubType>
     </Compile>

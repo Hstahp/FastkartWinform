@@ -33,6 +33,7 @@ namespace DAL.EF
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Wishlist> Wishlist { get; set; }
 
+        public virtual DbSet<Coupons> Coupons { get; set; }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BlogCategories>()
