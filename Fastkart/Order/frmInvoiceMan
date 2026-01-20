@@ -1,0 +1,38 @@
+﻿agement.cs
+public partial class frmInvoiceManagement : Form
+{
+    private OrderBLL _orderBLL;
+    private InvoiceBLL _invoiceBLL;
+    private PaymentBLL _paymentBLL;
+
+    private string _statusFilter = "";
+    private string _keyword = "";
+    private DateTime? _fromDate = null;
+    private DateTime? _toDate = null;
+    private int _currentPage = 1;
+    private int _pageSize = 10;
+    private int _totalPages = 1;
+    private int _selectedOrderId = 0;
+
+    // ✅ THÊM: Khai báo các control để tránh lỗi
+    private Label lblTotalUsers;
+    private Label lblTotalProducts;
+    private Label lblTotalRevenue;
+    private Label lblTotalOrders;
+    private Label lblTodayRevenue;
+    private Label lblTodayOrders;
+    private Label lblLowStock;
+    private Label lblAvgOrder;
+
+    public frmInvoiceManagement()
+    {
+        InitializeComponent();
+        _orderBLL = new OrderBLL();
+        _invoiceBLL = new InvoiceBLL();
+        _paymentBLL = new PaymentBLL();
+
+        this.Load += FrmInvoiceManagement_Load;
+    }
+    
+    // ... phần code còn lại
+}

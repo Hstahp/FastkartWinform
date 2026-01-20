@@ -37,6 +37,15 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
+    <Reference Include="AForge, Version=2.2.5.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.2.2.5\lib\AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video, Version=2.2.5.0, Culture=neutral, PublicKeyToken=cbfb6e07d173c401, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.Video.2.2.5\lib\AForge.Video.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video.DirectShow, Version=2.2.5.0, Culture=neutral, PublicKeyToken=61ea4348d43881b7, processorArchitecture=MSIL">
+      <HintPath>..\packages\AForge.Video.DirectShow.2.2.5\lib\AForge.Video.DirectShow.dll</HintPath>
+    </Reference>
     <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
       <HintPath>..\packages\BouncyCastle.Cryptography.2.4.0\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
     </Reference>
@@ -76,6 +85,11 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="QRCoder, Version=1.7.0.0, Culture=neutral, PublicKeyToken=c4ed5b9ae8358a28, processorArchitecture=MSIL">
+      <HintPath>..\packages\QRCoder.1.7.0\lib\net40\QRCoder.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -101,8 +115,32 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="zxing, Version=0.16.11.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.11\lib\net47\zxing.dll</HintPath>
+    </Reference>
+    <Reference Include="zxing.presentation, Version=0.16.11.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.11\lib\net47\zxing.presentation.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Category\frmAllCategory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Category\frmAllCategory.Designer.cs">
+      <DependentUpon>frmAllCategory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Category\frmCreate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Category\frmCreate.Designer.cs">
+      <DependentUpon>frmCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Category\frmEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Category\frmEdit.Designer.cs">
+      <DependentUpon>frmEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\frmDashboard.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -133,11 +171,29 @@
     <Compile Include="Login\frmResetPassword.Designer.cs">
       <DependentUpon>frmResetPassword.cs</DependentUpon>
     </Compile>
-    <Compile Include="Order\frmPayment.cs">
-      <SubType>UserControl</SubType>
+    <Compile Include="Order\frmInvoiceManagement.cs">
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Order\frmPayment.Designer.cs">
-      <DependentUpon>frmPayment.cs</DependentUpon>
+    <Compile Include="Order\frmInvoiceManagement.Designer.cs">
+      <DependentUpon>frmInvoiceManagement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Payment\frmMoMoWaitPayment.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payment\frmMoMoWaitPayment.Designer.cs">
+      <DependentUpon>frmMoMoWaitPayment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Payment\frmPaymentMethod.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Payment\frmPaymentMethod.Designer.cs">
+      <DependentUpon>frmPaymentMethod.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Order\frmPaymentList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Order\frmPaymentList.Designer.cs">
+      <DependentUpon>frmPaymentList.cs</DependentUpon>
     </Compile>
     <Compile Include="Product\frmCreate.cs">
       <SubType>Form</SubType>
@@ -151,11 +207,11 @@
     <Compile Include="Product\frmEdit.Designer.cs">
       <DependentUpon>frmEdit.cs</DependentUpon>
     </Compile>
-    <Compile Include="Product\frmIndex.cs">
+    <Compile Include="Product\frmAllProduct.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Product\frmIndex.Designer.cs">
-      <DependentUpon>frmIndex.cs</DependentUpon>
+    <Compile Include="Product\frmAllProduct.Designer.cs">
+      <DependentUpon>frmAllProduct.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -176,6 +232,42 @@
     </Compile>
     <Compile Include="Role\frmPermission.Designer.cs">
       <DependentUpon>frmPermission.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ScanQR\frmPOS.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ScanQR\frmPOS.Designer.cs">
+      <DependentUpon>frmPOS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ScanQR\frmScanQR.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ScanQR\frmScanQR.Designer.cs">
+      <DependentUpon>frmScanQR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ScanQR\frmViewQRCode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ScanQR\frmViewQRCode.Designer.cs">
+      <DependentUpon>frmViewQRCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SubCategory\frmAllSubCategory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubCategory\frmAllSubCategory.Designer.cs">
+      <DependentUpon>frmAllSubCategory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SubCategory\frmCreate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubCategory\frmCreate.Designer.cs">
+      <DependentUpon>frmCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SubCategory\frmEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubCategory\frmEdit.Designer.cs">
+      <DependentUpon>frmEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="User\frmAddNewUser.cs">
       <SubType>Form</SubType>
@@ -207,14 +299,23 @@
     <Compile Include="_Main\frmMainAdmin.Designer.cs">
       <DependentUpon>frmMainAdmin.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Category\frmAllCategory.resx">
+      <DependentUpon>frmAllCategory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Category\frmCreate.resx">
+      <DependentUpon>frmCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Category\frmEdit.resx">
+      <DependentUpon>frmEdit.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dashboard\frmDashboard.resx">
       <DependentUpon>frmDashboard.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Login\frmLogin.resx">
       <DependentUpon>frmLogin.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Order\frmPayment.resx">
-      <DependentUpon>frmPayment.cs</DependentUpon>
+    <EmbeddedResource Include="Order\frmPaymentList.resx">
+      <DependentUpon>frmPaymentList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Product\frmCreate.resx">
       <DependentUpon>frmCreate.cs</DependentUpon>
@@ -222,8 +323,8 @@
     <EmbeddedResource Include="Product\frmEdit.resx">
       <DependentUpon>frmEdit.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Product\frmIndex.resx">
-      <DependentUpon>frmIndex.cs</DependentUpon>
+    <EmbeddedResource Include="Product\frmAllProduct.resx">
+      <DependentUpon>frmAllProduct.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -235,6 +336,15 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="ScanQR\frmViewQRCode.resx">
+      <DependentUpon>frmViewQRCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SubCategory\frmAllSubCategory.resx">
+      <DependentUpon>frmAllSubCategory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SubCategory\frmCreate.resx">
+      <DependentUpon>frmCreate.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="User\frmAddNewUser.resx">
       <DependentUpon>frmAddNewUser.cs</DependentUpon>
     </EmbeddedResource>
@@ -247,6 +357,7 @@
     <EmbeddedResource Include="_Main\frmMainAdmin.resx">
       <DependentUpon>frmMainAdmin.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="Order\frmInvoiceMan" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -257,6 +368,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="_Main\frmMainAdmin.Designer" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

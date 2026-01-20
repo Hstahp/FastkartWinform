@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTO
 {
-    public class Brand
+    public class BrandDTO
     {
         public int Uid { get; set; }
         public string BrandName { get; set; }

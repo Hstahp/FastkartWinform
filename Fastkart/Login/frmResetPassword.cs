@@ -1,5 +1,6 @@
 ﻿using BLL;
 using Guna.UI2.WinForms;
+using Helpers; // ✅ THÊM DÒNG NÀY
 using System;
 using System.Windows.Forms;
 
@@ -13,7 +14,7 @@ namespace GUI
         public frmResetPassword(string email)
         {
             InitializeComponent();
-            _email = email; // Nhận email
+            _email = email;
 
             _dragControl = new Guna2DragControl(this);
             _dragControl.TargetControl = this.panelReset;
@@ -26,7 +27,7 @@ namespace GUI
             string confirmPass = txtConfirmPassword.Text;
 
             // 1. Kiểm tra rỗng
-            if (string.IsNullOrEmpty(newPass) || string.IsNullOrEmpty(confirmPass))
+            if (!ValidationHelper.IsNotEmpty(newPass) || !ValidationHelper.IsNotEmpty(confirmPass))
             {
                 MessageBox.Show("Please fill in both password fields.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -39,7 +40,19 @@ namespace GUI
                 return;
             }
 
-            // 3. Gọi BLL để reset
+            // ✅ 3. THÊM KIỂM TRA ĐỘ MẠNH MẬT KHẨU
+            if (!ValidationHelper.IsPasswordStrong(newPass))
+            {
+                MessageBox.Show(
+                    ValidationHelper.GetPasswordRequirementsMessage(),
+                    "Weak Password",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+                return;
+            }
+
+            // 4. Gọi BLL để reset
             UserBLL userBLL = new UserBLL();
             if (userBLL.ResetPassword(_email, newPass))
             {
@@ -65,7 +78,6 @@ namespace GUI
 
         private void controlBoxClose_Click(object sender, EventArgs e)
         {
-            // Nút X cũng đưa về trang Login
             Form loginForm = Application.OpenForms["frmLogin"];
             if (loginForm != null)
             {

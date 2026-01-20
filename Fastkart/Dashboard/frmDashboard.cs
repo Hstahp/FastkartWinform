@@ -13,17 +13,6 @@ namespace GUI
         private DashboardBLL _dashboardBLL;
         private ReportBLL _reportBLL;
 
-        // --- KHAI BÁO BIẾN GIAO DIỆN ---
-        //private Label lblTotalUsers, lblTotalProducts, lblTotalRevenue, lblTotalOrders;
-        //private Label lblTodayRevenue, lblTodayOrders, lblLowStock, lblAvgOrder;
-
-        //private Chart chartRevenue7Days;
-        //private Chart chartTopProducts;
-        //private Chart chartOrderStatus;
-
-        //private DataGridView dgvRecentOrders;
-        //private DataGridView dgvLowStock;
-
         public frmDashboard()
         {
             InitializeComponent();
@@ -199,14 +188,27 @@ namespace GUI
             TableLayoutPanel kpiLayout = new TableLayoutPanel { Dock = DockStyle.Top, Height = 240, ColumnCount = 4, RowCount = 2, Padding = new Padding(0, 0, 0, 20) };
             for (int i = 0; i < 4; i++) kpiLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 
-            kpiLayout.Controls.Add(CreateKPICard(out lblTotalUsers, "Tổng người dùng", Color.FromArgb(52, 152, 219)), 0, 0);
-            kpiLayout.Controls.Add(CreateKPICard(out lblTotalProducts, "Tổng sản phẩm", Color.FromArgb(46, 204, 113)), 1, 0);
-            kpiLayout.Controls.Add(CreateKPICard(out lblTotalRevenue, "Tổng doanh thu", Color.FromArgb(155, 89, 182)), 2, 0);
-            kpiLayout.Controls.Add(CreateKPICard(out lblTotalOrders, "Tổng đơn hàng", Color.FromArgb(230, 126, 34)), 3, 0);
-            kpiLayout.Controls.Add(CreateKPICard(out lblTodayRevenue, "Doanh thu hôm nay", Color.FromArgb(52, 73, 94)), 0, 1);
-            kpiLayout.Controls.Add(CreateKPICard(out lblTodayOrders, "Đơn hàng hôm nay", Color.FromArgb(231, 76, 60)), 1, 1);
-            kpiLayout.Controls.Add(CreateKPICard(out lblLowStock, "Sắp hết hàng", Color.FromArgb(241, 196, 15)), 2, 1);
-            kpiLayout.Controls.Add(CreateKPICard(out lblAvgOrder, "Giá trị TB/Đơn", Color.FromArgb(26, 188, 156)), 3, 1);
+            Label tempLblTotalUsers, tempLblTotalProducts, tempLblTotalRevenue, tempLblTotalOrders;
+            Label tempLblTodayRevenue, tempLblTodayOrders, tempLblLowStock, tempLblAvgOrder;
+
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalUsers, "Tổng người dùng", Color.FromArgb(52, 152, 219)), 0, 0);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalProducts, "Tổng sản phẩm", Color.FromArgb(46, 204, 113)), 1, 0);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalRevenue, "Tổng doanh thu", Color.FromArgb(155, 89, 182)), 2, 0);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalOrders, "Tổng đơn hàng", Color.FromArgb(230, 126, 34)), 3, 0);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTodayRevenue, "Doanh thu hôm nay", Color.FromArgb(52, 73, 94)), 0, 1);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTodayOrders, "Đơn hàng hôm nay", Color.FromArgb(231, 76, 60)), 1, 1);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblLowStock, "Sắp hết hàng", Color.FromArgb(241, 196, 15)), 2, 1);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblAvgOrder, "Giá trị TB/Đơn", Color.FromArgb(26, 188, 156)), 3, 1);
+
+            // Gán vào Designer controls
+            lblTotalUsers = tempLblTotalUsers;
+            lblTotalProducts = tempLblTotalProducts;
+            lblTotalRevenue = tempLblTotalRevenue;
+            lblTotalOrders = tempLblTotalOrders;
+            lblTodayRevenue = tempLblTodayRevenue;
+            lblTodayOrders = tempLblTodayOrders;
+            lblLowStock = tempLblLowStock;
+            lblAvgOrder = tempLblAvgOrder;
 
             // 2. Charts Top
             TableLayoutPanel chartsTopLayout = new TableLayoutPanel { Dock = DockStyle.Top, Height = 350, ColumnCount = 2, Padding = new Padding(0, 0, 0, 20) };

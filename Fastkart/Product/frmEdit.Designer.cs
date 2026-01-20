@@ -25,10 +25,12 @@
             this.guna2PanelMain = new Guna.UI2.WinForms.Guna2Panel();
             this.btnSaveProduct = new Guna.UI2.WinForms.Guna2Button();
             this.guna2PanelInventory = new Guna.UI2.WinForms.Guna2Panel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtStockQuantity = new Guna.UI2.WinForms.Guna2TextBox();
             this.cboStockStatus = new Guna.UI2.WinForms.Guna2ComboBox();
             this.labelStockStatus = new System.Windows.Forms.Label();
-            this.txtStockQuantity = new Guna.UI2.WinForms.Guna2TextBox();
-            this.labelStockQuantity = new System.Windows.Forms.Label();
+            this.txtQuantity = new Guna.UI2.WinForms.Guna2TextBox();
+            this.labelQuantity = new System.Windows.Forms.Label();
             this.txtSKU = new Guna.UI2.WinForms.Guna2TextBox();
             this.labelSKU = new System.Windows.Forms.Label();
             this.labelPanelInventory = new System.Windows.Forms.Label();
@@ -39,16 +41,19 @@
             this.labelPrice = new System.Windows.Forms.Label();
             this.labelPanelPrice = new System.Windows.Forms.Label();
             this.guna2PanelImages = new Guna.UI2.WinForms.Guna2Panel();
-            this.guna2PanelImageUpload = new Guna.UI2.WinForms.Guna2Panel();
-            this.guna2PictureBoxPreview = new Guna.UI2.WinForms.Guna2PictureBox();
-            this.labelImagePlaceholder = new System.Windows.Forms.Label();
+            this.picProduct = new System.Windows.Forms.PictureBox();
             this.btnRemoveImage = new Guna.UI2.WinForms.Guna2Button();
+            this.btnSelectImage = new Guna.UI2.WinForms.Guna2Button();
             this.labelImages = new System.Windows.Forms.Label();
             this.guna2PanelDescription = new Guna.UI2.WinForms.Guna2Panel();
             this.rtbDescription = new System.Windows.Forms.RichTextBox();
             this.labelProductDescription = new System.Windows.Forms.Label();
             this.labelPanelDescription = new System.Windows.Forms.Label();
             this.guna2PanelInfo = new Guna.UI2.WinForms.Guna2Panel();
+            this.dtpExpiryDate = new System.Windows.Forms.DateTimePicker();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.dtpManufactureDate = new System.Windows.Forms.DateTimePicker();
             this.txtWeight = new Guna.UI2.WinForms.Guna2TextBox();
             this.labelWeight = new System.Windows.Forms.Label();
             this.cboBrand = new Guna.UI2.WinForms.Guna2ComboBox();
@@ -61,7 +66,7 @@
             this.labelSubcategory = new System.Windows.Forms.Label();
             this.txtProductName = new Guna.UI2.WinForms.Guna2TextBox();
             this.labelProductName = new System.Windows.Forms.Label();
-            this.cboPosition = new Guna.UI2.WinForms.Guna2TextBox();
+            this.txtPosition = new Guna.UI2.WinForms.Guna2TextBox();
             this.labelPosition = new System.Windows.Forms.Label();
             this.radioInactive = new Guna.UI2.WinForms.Guna2CustomRadioButton();
             this.labelInactive = new System.Windows.Forms.Label();
@@ -79,8 +84,7 @@
             this.guna2PanelInventory.SuspendLayout();
             this.guna2PanelPrice.SuspendLayout();
             this.guna2PanelImages.SuspendLayout();
-            this.guna2PanelImageUpload.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBoxPreview)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picProduct)).BeginInit();
             this.guna2PanelDescription.SuspendLayout();
             this.guna2PanelInfo.SuspendLayout();
             this.SuspendLayout();
@@ -99,7 +103,7 @@
             this.guna2PanelMain.Location = new System.Drawing.Point(0, 0);
             this.guna2PanelMain.Name = "guna2PanelMain";
             this.guna2PanelMain.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelMain.Size = new System.Drawing.Size(900, 1102);
+            this.guna2PanelMain.Size = new System.Drawing.Size(1356, 1102);
             this.guna2PanelMain.TabIndex = 0;
             // 
             // btnSaveProduct
@@ -112,7 +116,8 @@
             this.btnSaveProduct.FillColor = System.Drawing.Color.DodgerBlue;
             this.btnSaveProduct.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold);
             this.btnSaveProduct.ForeColor = System.Drawing.Color.White;
-            this.btnSaveProduct.Location = new System.Drawing.Point(642, 1136);
+            this.btnSaveProduct.Location = new System.Drawing.Point(1111, 1184);
+            this.btnSaveProduct.Margin = new System.Windows.Forms.Padding(3, 3, 3, 10);
             this.btnSaveProduct.Name = "btnSaveProduct";
             this.btnSaveProduct.Size = new System.Drawing.Size(211, 54);
             this.btnSaveProduct.TabIndex = 6;
@@ -124,10 +129,12 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.guna2PanelInventory.BackColor = System.Drawing.Color.White;
             this.guna2PanelInventory.BorderRadius = 10;
+            this.guna2PanelInventory.Controls.Add(this.label1);
+            this.guna2PanelInventory.Controls.Add(this.txtStockQuantity);
             this.guna2PanelInventory.Controls.Add(this.cboStockStatus);
             this.guna2PanelInventory.Controls.Add(this.labelStockStatus);
-            this.guna2PanelInventory.Controls.Add(this.txtStockQuantity);
-            this.guna2PanelInventory.Controls.Add(this.labelStockQuantity);
+            this.guna2PanelInventory.Controls.Add(this.txtQuantity);
+            this.guna2PanelInventory.Controls.Add(this.labelQuantity);
             this.guna2PanelInventory.Controls.Add(this.txtSKU);
             this.guna2PanelInventory.Controls.Add(this.labelSKU);
             this.guna2PanelInventory.Controls.Add(this.labelPanelInventory);
@@ -135,8 +142,39 @@
             this.guna2PanelInventory.Location = new System.Drawing.Point(23, 940);
             this.guna2PanelInventory.Name = "guna2PanelInventory";
             this.guna2PanelInventory.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelInventory.Size = new System.Drawing.Size(820, 190);
+            this.guna2PanelInventory.Size = new System.Drawing.Size(1236, 238);
             this.guna2PanelInventory.TabIndex = 5;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.label1.Location = new System.Drawing.Point(27, 142);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(105, 20);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "Stock Quantity";
+            // 
+            // txtStockQuantity
+            // 
+            this.txtStockQuantity.BorderRadius = 5;
+            this.txtStockQuantity.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtStockQuantity.DefaultText = "";
+            this.txtStockQuantity.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtStockQuantity.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
+            this.txtStockQuantity.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtStockQuantity.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtStockQuantity.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtStockQuantity.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtStockQuantity.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtStockQuantity.Location = new System.Drawing.Point(203, 135);
+            this.txtStockQuantity.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtStockQuantity.Name = "txtStockQuantity";
+            this.txtStockQuantity.PlaceholderText = "0";
+            this.txtStockQuantity.SelectedText = "";
+            this.txtStockQuantity.Size = new System.Drawing.Size(250, 30);
+            this.txtStockQuantity.TabIndex = 12;
             // 
             // cboStockStatus
             // 
@@ -152,7 +190,7 @@
             this.cboStockStatus.Items.AddRange(new object[] {
             "Còn hàng",
             "Hết hàng"});
-            this.cboStockStatus.Location = new System.Drawing.Point(203, 137);
+            this.cboStockStatus.Location = new System.Drawing.Point(203, 179);
             this.cboStockStatus.Name = "cboStockStatus";
             this.cboStockStatus.Size = new System.Drawing.Size(250, 36);
             this.cboStockStatus.TabIndex = 11;
@@ -162,42 +200,42 @@
             this.labelStockStatus.AutoSize = true;
             this.labelStockStatus.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelStockStatus.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelStockStatus.Location = new System.Drawing.Point(23, 145);
+            this.labelStockStatus.Location = new System.Drawing.Point(27, 195);
             this.labelStockStatus.Name = "labelStockStatus";
             this.labelStockStatus.Size = new System.Drawing.Size(89, 20);
             this.labelStockStatus.TabIndex = 10;
             this.labelStockStatus.Text = "Stock Status";
             // 
-            // txtStockQuantity
+            // txtQuantity
             // 
-            this.txtStockQuantity.BorderRadius = 5;
-            this.txtStockQuantity.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtStockQuantity.DefaultText = "0";
-            this.txtStockQuantity.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
-            this.txtStockQuantity.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
-            this.txtStockQuantity.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtStockQuantity.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtStockQuantity.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtStockQuantity.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtStockQuantity.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtStockQuantity.Location = new System.Drawing.Point(203, 91);
-            this.txtStockQuantity.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtStockQuantity.Name = "txtStockQuantity";
-            this.txtStockQuantity.PlaceholderText = "";
-            this.txtStockQuantity.SelectedText = "";
-            this.txtStockQuantity.Size = new System.Drawing.Size(250, 30);
-            this.txtStockQuantity.TabIndex = 9;
+            this.txtQuantity.BorderRadius = 5;
+            this.txtQuantity.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtQuantity.DefaultText = "";
+            this.txtQuantity.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtQuantity.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
+            this.txtQuantity.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtQuantity.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtQuantity.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtQuantity.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtQuantity.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtQuantity.Location = new System.Drawing.Point(203, 91);
+            this.txtQuantity.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtQuantity.Name = "txtQuantity";
+            this.txtQuantity.PlaceholderText = "0";
+            this.txtQuantity.SelectedText = "";
+            this.txtQuantity.Size = new System.Drawing.Size(250, 30);
+            this.txtQuantity.TabIndex = 9;
             // 
-            // labelStockQuantity
+            // labelQuantity
             // 
-            this.labelStockQuantity.AutoSize = true;
-            this.labelStockQuantity.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.labelStockQuantity.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelStockQuantity.Location = new System.Drawing.Point(23, 94);
-            this.labelStockQuantity.Name = "labelStockQuantity";
-            this.labelStockQuantity.Size = new System.Drawing.Size(105, 20);
-            this.labelStockQuantity.TabIndex = 8;
-            this.labelStockQuantity.Text = "Stock Quantity";
+            this.labelQuantity.AutoSize = true;
+            this.labelQuantity.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.labelQuantity.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.labelQuantity.Location = new System.Drawing.Point(23, 94);
+            this.labelQuantity.Name = "labelQuantity";
+            this.labelQuantity.Size = new System.Drawing.Size(65, 20);
+            this.labelQuantity.TabIndex = 8;
+            this.labelQuantity.Text = "Quantity";
             // 
             // txtSKU
             // 
@@ -256,14 +294,14 @@
             this.guna2PanelPrice.Location = new System.Drawing.Point(23, 794);
             this.guna2PanelPrice.Name = "guna2PanelPrice";
             this.guna2PanelPrice.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelPrice.Size = new System.Drawing.Size(820, 130);
+            this.guna2PanelPrice.Size = new System.Drawing.Size(1236, 130);
             this.guna2PanelPrice.TabIndex = 4;
             // 
             // txtDiscount
             // 
             this.txtDiscount.BorderRadius = 5;
             this.txtDiscount.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtDiscount.DefaultText = "0";
+            this.txtDiscount.DefaultText = "";
             this.txtDiscount.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
             this.txtDiscount.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
             this.txtDiscount.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
@@ -274,7 +312,7 @@
             this.txtDiscount.Location = new System.Drawing.Point(203, 91);
             this.txtDiscount.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtDiscount.Name = "txtDiscount";
-            this.txtDiscount.PlaceholderText = "";
+            this.txtDiscount.PlaceholderText = "0";
             this.txtDiscount.SelectedText = "";
             this.txtDiscount.Size = new System.Drawing.Size(250, 30);
             this.txtDiscount.TabIndex = 9;
@@ -294,7 +332,7 @@
             // 
             this.txtPrice.BorderRadius = 5;
             this.txtPrice.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtPrice.DefaultText = "0";
+            this.txtPrice.DefaultText = "";
             this.txtPrice.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
             this.txtPrice.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
             this.txtPrice.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
@@ -305,7 +343,7 @@
             this.txtPrice.Location = new System.Drawing.Point(203, 50);
             this.txtPrice.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtPrice.Name = "txtPrice";
-            this.txtPrice.PlaceholderText = "";
+            this.txtPrice.PlaceholderText = "0";
             this.txtPrice.SelectedText = "";
             this.txtPrice.Size = new System.Drawing.Size(250, 30);
             this.txtPrice.TabIndex = 7;
@@ -338,68 +376,60 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.guna2PanelImages.BackColor = System.Drawing.Color.White;
             this.guna2PanelImages.BorderRadius = 10;
-            this.guna2PanelImages.Controls.Add(this.guna2PanelImageUpload);
+            this.guna2PanelImages.Controls.Add(this.picProduct);
+            this.guna2PanelImages.Controls.Add(this.btnRemoveImage);
+            this.guna2PanelImages.Controls.Add(this.btnSelectImage);
             this.guna2PanelImages.Controls.Add(this.labelImages);
             this.guna2PanelImages.FillColor = System.Drawing.Color.White;
             this.guna2PanelImages.Location = new System.Drawing.Point(23, 626);
             this.guna2PanelImages.Name = "guna2PanelImages";
             this.guna2PanelImages.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelImages.Size = new System.Drawing.Size(820, 152);
+            this.guna2PanelImages.Size = new System.Drawing.Size(1236, 152);
             this.guna2PanelImages.TabIndex = 3;
             // 
-            // guna2PanelImageUpload
+            // picProduct
             // 
-            this.guna2PanelImageUpload.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.guna2PanelImageUpload.BorderColor = System.Drawing.Color.Gainsboro;
-            this.guna2PanelImageUpload.BorderRadius = 10;
-            this.guna2PanelImageUpload.BorderThickness = 1;
-            this.guna2PanelImageUpload.Controls.Add(this.guna2PictureBoxPreview);
-            this.guna2PanelImageUpload.Controls.Add(this.labelImagePlaceholder);
-            this.guna2PanelImageUpload.Controls.Add(this.btnRemoveImage);
-            this.guna2PanelImageUpload.Location = new System.Drawing.Point(203, 51);
-            this.guna2PanelImageUpload.Name = "guna2PanelImageUpload";
-            this.guna2PanelImageUpload.Size = new System.Drawing.Size(594, 78);
-            this.guna2PanelImageUpload.TabIndex = 6;
-            // 
-            // guna2PictureBoxPreview
-            // 
-            this.guna2PictureBoxPreview.BorderRadius = 8;
-            this.guna2PictureBoxPreview.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.guna2PictureBoxPreview.ImageRotate = 0F;
-            this.guna2PictureBoxPreview.Location = new System.Drawing.Point(0, 0);
-            this.guna2PictureBoxPreview.Name = "guna2PictureBoxPreview";
-            this.guna2PictureBoxPreview.Size = new System.Drawing.Size(594, 78);
-            this.guna2PictureBoxPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.guna2PictureBoxPreview.TabIndex = 1;
-            this.guna2PictureBoxPreview.TabStop = false;
-            this.guna2PictureBoxPreview.Visible = false;
-            // 
-            // labelImagePlaceholder
-            // 
-            this.labelImagePlaceholder.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.labelImagePlaceholder.AutoSize = true;
-            this.labelImagePlaceholder.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.labelImagePlaceholder.ForeColor = System.Drawing.Color.Gray;
-            this.labelImagePlaceholder.Location = new System.Drawing.Point(185, 30);
-            this.labelImagePlaceholder.Name = "labelImagePlaceholder";
-            this.labelImagePlaceholder.Size = new System.Drawing.Size(249, 20);
-            this.labelImagePlaceholder.TabIndex = 0;
-            this.labelImagePlaceholder.Text = "Thả file vào đây hoặc click để tải lên";
+            this.picProduct.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.picProduct.Location = new System.Drawing.Point(215, 23);
+            this.picProduct.Name = "picProduct";
+            this.picProduct.Size = new System.Drawing.Size(156, 109);
+            this.picProduct.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picProduct.TabIndex = 6;
+            this.picProduct.TabStop = false;
             // 
             // btnRemoveImage
             // 
-            this.btnRemoveImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRemoveImage.BorderRadius = 15;
-            this.btnRemoveImage.FillColor = System.Drawing.Color.Red;
-            this.btnRemoveImage.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.btnRemoveImage.ForeColor = System.Drawing.Color.White;
-            this.btnRemoveImage.Location = new System.Drawing.Point(529, 3);
+            this.btnRemoveImage.BorderColor = System.Drawing.Color.Red;
+            this.btnRemoveImage.BorderRadius = 5;
+            this.btnRemoveImage.BorderThickness = 1;
+            this.btnRemoveImage.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnRemoveImage.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnRemoveImage.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnRemoveImage.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnRemoveImage.FillColor = System.Drawing.Color.White;
+            this.btnRemoveImage.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold);
+            this.btnRemoveImage.ForeColor = System.Drawing.Color.Red;
+            this.btnRemoveImage.Location = new System.Drawing.Point(409, 94);
             this.btnRemoveImage.Name = "btnRemoveImage";
-            this.btnRemoveImage.Size = new System.Drawing.Size(40, 40);
-            this.btnRemoveImage.TabIndex = 2;
-            this.btnRemoveImage.Text = "X";
-            this.btnRemoveImage.Click += new System.EventHandler(this.btnRemoveImage_Click);
+            this.btnRemoveImage.Size = new System.Drawing.Size(180, 35);
+            this.btnRemoveImage.TabIndex = 4;
+            this.btnRemoveImage.Text = "Remove";
+            // 
+            // btnSelectImage
+            // 
+            this.btnSelectImage.BorderRadius = 5;
+            this.btnSelectImage.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnSelectImage.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnSelectImage.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnSelectImage.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnSelectImage.FillColor = System.Drawing.Color.DodgerBlue;
+            this.btnSelectImage.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold);
+            this.btnSelectImage.ForeColor = System.Drawing.Color.White;
+            this.btnSelectImage.Location = new System.Drawing.Point(409, 39);
+            this.btnSelectImage.Name = "btnSelectImage";
+            this.btnSelectImage.Size = new System.Drawing.Size(180, 35);
+            this.btnSelectImage.TabIndex = 3;
+            this.btnSelectImage.Text = "Select Image";
             // 
             // labelImages
             // 
@@ -425,7 +455,7 @@
             this.guna2PanelDescription.Location = new System.Drawing.Point(23, 440);
             this.guna2PanelDescription.Name = "guna2PanelDescription";
             this.guna2PanelDescription.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelDescription.Size = new System.Drawing.Size(820, 175);
+            this.guna2PanelDescription.Size = new System.Drawing.Size(1236, 175);
             this.guna2PanelDescription.TabIndex = 2;
             // 
             // rtbDescription
@@ -435,7 +465,7 @@
             this.rtbDescription.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.rtbDescription.Location = new System.Drawing.Point(203, 51);
             this.rtbDescription.Name = "rtbDescription";
-            this.rtbDescription.Size = new System.Drawing.Size(594, 100);
+            this.rtbDescription.Size = new System.Drawing.Size(783, 100);
             this.rtbDescription.TabIndex = 7;
             this.rtbDescription.Text = "";
             // 
@@ -467,6 +497,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.guna2PanelInfo.BackColor = System.Drawing.Color.White;
             this.guna2PanelInfo.BorderRadius = 10;
+            this.guna2PanelInfo.Controls.Add(this.dtpExpiryDate);
+            this.guna2PanelInfo.Controls.Add(this.label3);
+            this.guna2PanelInfo.Controls.Add(this.label2);
+            this.guna2PanelInfo.Controls.Add(this.dtpManufactureDate);
             this.guna2PanelInfo.Controls.Add(this.txtWeight);
             this.guna2PanelInfo.Controls.Add(this.labelWeight);
             this.guna2PanelInfo.Controls.Add(this.cboBrand);
@@ -479,7 +513,7 @@
             this.guna2PanelInfo.Controls.Add(this.labelSubcategory);
             this.guna2PanelInfo.Controls.Add(this.txtProductName);
             this.guna2PanelInfo.Controls.Add(this.labelProductName);
-            this.guna2PanelInfo.Controls.Add(this.cboPosition);
+            this.guna2PanelInfo.Controls.Add(this.txtPosition);
             this.guna2PanelInfo.Controls.Add(this.labelPosition);
             this.guna2PanelInfo.Controls.Add(this.radioInactive);
             this.guna2PanelInfo.Controls.Add(this.labelInactive);
@@ -497,8 +531,44 @@
             this.guna2PanelInfo.Location = new System.Drawing.Point(23, 23);
             this.guna2PanelInfo.Name = "guna2PanelInfo";
             this.guna2PanelInfo.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelInfo.Size = new System.Drawing.Size(820, 400);
+            this.guna2PanelInfo.Size = new System.Drawing.Size(1236, 400);
             this.guna2PanelInfo.TabIndex = 0;
+            // 
+            // dtpExpiryDate
+            // 
+            this.dtpExpiryDate.Location = new System.Drawing.Point(807, 297);
+            this.dtpExpiryDate.Name = "dtpExpiryDate";
+            this.dtpExpiryDate.Size = new System.Drawing.Size(200, 22);
+            this.dtpExpiryDate.TabIndex = 34;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.label3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.label3.Location = new System.Drawing.Point(680, 297);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(81, 20);
+            this.label3.TabIndex = 33;
+            this.label3.Text = "ExpiryDate";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.label2.Location = new System.Drawing.Point(680, 260);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(124, 20);
+            this.label2.TabIndex = 32;
+            this.label2.Text = "ManufactureDate";
+            // 
+            // dtpManufactureDate
+            // 
+            this.dtpManufactureDate.Location = new System.Drawing.Point(807, 260);
+            this.dtpManufactureDate.Name = "dtpManufactureDate";
+            this.dtpManufactureDate.Size = new System.Drawing.Size(200, 22);
+            this.dtpManufactureDate.TabIndex = 31;
             // 
             // txtWeight
             // 
@@ -512,7 +582,7 @@
             this.txtWeight.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.txtWeight.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtWeight.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtWeight.Location = new System.Drawing.Point(580, 111);
+            this.txtWeight.Location = new System.Drawing.Point(807, 111);
             this.txtWeight.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtWeight.Name = "txtWeight";
             this.txtWeight.PlaceholderText = "";
@@ -525,7 +595,7 @@
             this.labelWeight.AutoSize = true;
             this.labelWeight.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelWeight.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelWeight.Location = new System.Drawing.Point(459, 117);
+            this.labelWeight.Location = new System.Drawing.Point(679, 116);
             this.labelWeight.Name = "labelWeight";
             this.labelWeight.Size = new System.Drawing.Size(79, 20);
             this.labelWeight.TabIndex = 28;
@@ -545,7 +615,7 @@
             this.cboBrand.Items.AddRange(new object[] {
             "Không có thương hiệu",
             "FastKart"});
-            this.cboBrand.Location = new System.Drawing.Point(580, 63);
+            this.cboBrand.Location = new System.Drawing.Point(807, 67);
             this.cboBrand.Name = "cboBrand";
             this.cboBrand.Size = new System.Drawing.Size(250, 30);
             this.cboBrand.TabIndex = 27;
@@ -555,7 +625,7 @@
             this.labelBrand.AutoSize = true;
             this.labelBrand.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelBrand.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelBrand.Location = new System.Drawing.Point(459, 67);
+            this.labelBrand.Location = new System.Drawing.Point(680, 73);
             this.labelBrand.Name = "labelBrand";
             this.labelBrand.Size = new System.Drawing.Size(48, 20);
             this.labelBrand.TabIndex = 26;
@@ -576,7 +646,7 @@
             "Kilogram",
             "Cái",
             "Hộp"});
-            this.cboUnit.Location = new System.Drawing.Point(580, 153);
+            this.cboUnit.Location = new System.Drawing.Point(807, 153);
             this.cboUnit.Name = "cboUnit";
             this.cboUnit.Size = new System.Drawing.Size(240, 30);
             this.cboUnit.TabIndex = 25;
@@ -586,7 +656,7 @@
             this.labelUnit.AutoSize = true;
             this.labelUnit.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelUnit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelUnit.Location = new System.Drawing.Point(459, 162);
+            this.labelUnit.Location = new System.Drawing.Point(679, 156);
             this.labelUnit.Name = "labelUnit";
             this.labelUnit.Size = new System.Drawing.Size(36, 20);
             this.labelUnit.TabIndex = 24;
@@ -685,32 +755,32 @@
             this.labelProductName.TabIndex = 20;
             this.labelProductName.Text = "Product Name";
             // 
-            // cboPosition
+            // txtPosition
             // 
-            this.cboPosition.BorderRadius = 5;
-            this.cboPosition.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cboPosition.DefaultText = "0";
-            this.cboPosition.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
-            this.cboPosition.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
-            this.cboPosition.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.cboPosition.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.cboPosition.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.cboPosition.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.cboPosition.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.cboPosition.Location = new System.Drawing.Point(580, 267);
-            this.cboPosition.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.cboPosition.Name = "cboPosition";
-            this.cboPosition.PlaceholderText = "Tự động tăng";
-            this.cboPosition.SelectedText = "";
-            this.cboPosition.Size = new System.Drawing.Size(250, 30);
-            this.cboPosition.TabIndex = 19;
+            this.txtPosition.BorderRadius = 5;
+            this.txtPosition.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtPosition.DefaultText = "";
+            this.txtPosition.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtPosition.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
+            this.txtPosition.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtPosition.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtPosition.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtPosition.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtPosition.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtPosition.Location = new System.Drawing.Point(807, 334);
+            this.txtPosition.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtPosition.Name = "txtPosition";
+            this.txtPosition.PlaceholderText = "Tự động tăng";
+            this.txtPosition.SelectedText = "";
+            this.txtPosition.Size = new System.Drawing.Size(250, 30);
+            this.txtPosition.TabIndex = 19;
             // 
             // labelPosition
             // 
             this.labelPosition.AutoSize = true;
             this.labelPosition.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelPosition.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelPosition.Location = new System.Drawing.Point(459, 271);
+            this.labelPosition.Location = new System.Drawing.Point(680, 338);
             this.labelPosition.Name = "labelPosition";
             this.labelPosition.Size = new System.Drawing.Size(61, 20);
             this.labelPosition.TabIndex = 18;
@@ -721,9 +791,9 @@
             this.radioInactive.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.radioInactive.CheckedState.BorderThickness = 0;
             this.radioInactive.CheckedState.FillColor = System.Drawing.Color.Red;
-            this.radioInactive.Location = new System.Drawing.Point(680, 230);
+            this.radioInactive.Location = new System.Drawing.Point(946, 220);
             this.radioInactive.Name = "radioInactive";
-            this.radioInactive.Size = new System.Drawing.Size(15, 15);
+            this.radioInactive.Size = new System.Drawing.Size(44, 20);
             this.radioInactive.TabIndex = 17;
             this.radioInactive.Text = "guna2CustomRadioButton1";
             this.radioInactive.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
@@ -735,7 +805,7 @@
             this.labelInactive.AutoSize = true;
             this.labelInactive.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelInactive.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelInactive.Location = new System.Drawing.Point(698, 227);
+            this.labelInactive.Location = new System.Drawing.Point(986, 219);
             this.labelInactive.Name = "labelInactive";
             this.labelInactive.Size = new System.Drawing.Size(60, 20);
             this.labelInactive.TabIndex = 16;
@@ -746,7 +816,7 @@
             this.labelActive.AutoSize = true;
             this.labelActive.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelActive.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelActive.Location = new System.Drawing.Point(601, 227);
+            this.labelActive.Location = new System.Drawing.Point(842, 220);
             this.labelActive.Name = "labelActive";
             this.labelActive.Size = new System.Drawing.Size(50, 20);
             this.labelActive.TabIndex = 15;
@@ -758,9 +828,9 @@
             this.radioActive.CheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.radioActive.CheckedState.BorderThickness = 0;
             this.radioActive.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(185)))), ((int)(((byte)(129)))));
-            this.radioActive.Location = new System.Drawing.Point(580, 230);
+            this.radioActive.Location = new System.Drawing.Point(802, 220);
             this.radioActive.Name = "radioActive";
-            this.radioActive.Size = new System.Drawing.Size(15, 15);
+            this.radioActive.Size = new System.Drawing.Size(44, 20);
             this.radioActive.TabIndex = 14;
             this.radioActive.Text = "guna2CustomRadioButton1";
             this.radioActive.UncheckedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(125)))), ((int)(((byte)(137)))), ((int)(((byte)(149)))));
@@ -772,7 +842,7 @@
             this.labelStatus.AutoSize = true;
             this.labelStatus.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelStatus.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelStatus.Location = new System.Drawing.Point(459, 227);
+            this.labelStatus.Location = new System.Drawing.Point(680, 220);
             this.labelStatus.Name = "labelStatus";
             this.labelStatus.Size = new System.Drawing.Size(49, 20);
             this.labelStatus.TabIndex = 13;
@@ -784,7 +854,7 @@
             this.toggleRefundable.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(185)))), ((int)(((byte)(129)))));
             this.toggleRefundable.CheckedState.InnerBorderColor = System.Drawing.Color.White;
             this.toggleRefundable.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.toggleRefundable.Location = new System.Drawing.Point(203, 338);
+            this.toggleRefundable.Location = new System.Drawing.Point(203, 311);
             this.toggleRefundable.Name = "toggleRefundable";
             this.toggleRefundable.Size = new System.Drawing.Size(35, 20);
             this.toggleRefundable.TabIndex = 12;
@@ -798,7 +868,7 @@
             this.labelRefundable.AutoSize = true;
             this.labelRefundable.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelRefundable.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelRefundable.Location = new System.Drawing.Point(23, 338);
+            this.labelRefundable.Location = new System.Drawing.Point(23, 309);
             this.labelRefundable.Name = "labelRefundable";
             this.labelRefundable.Size = new System.Drawing.Size(85, 20);
             this.labelRefundable.TabIndex = 11;
@@ -810,7 +880,7 @@
             this.toggleExchangeable.CheckedState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(16)))), ((int)(((byte)(185)))), ((int)(((byte)(129)))));
             this.toggleExchangeable.CheckedState.InnerBorderColor = System.Drawing.Color.White;
             this.toggleExchangeable.CheckedState.InnerColor = System.Drawing.Color.White;
-            this.toggleExchangeable.Location = new System.Drawing.Point(203, 271);
+            this.toggleExchangeable.Location = new System.Drawing.Point(203, 256);
             this.toggleExchangeable.Name = "toggleExchangeable";
             this.toggleExchangeable.Size = new System.Drawing.Size(35, 20);
             this.toggleExchangeable.TabIndex = 10;
@@ -824,7 +894,7 @@
             this.labelExchangeable.AutoSize = true;
             this.labelExchangeable.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.labelExchangeable.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.labelExchangeable.Location = new System.Drawing.Point(23, 271);
+            this.labelExchangeable.Location = new System.Drawing.Point(23, 256);
             this.labelExchangeable.Name = "labelExchangeable";
             this.labelExchangeable.Size = new System.Drawing.Size(101, 20);
             this.labelExchangeable.TabIndex = 9;
@@ -871,7 +941,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(900, 1102);
+            this.ClientSize = new System.Drawing.Size(1356, 1102);
             this.Controls.Add(this.guna2PanelMain);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "frmEdit";
@@ -883,9 +953,7 @@
             this.guna2PanelPrice.PerformLayout();
             this.guna2PanelImages.ResumeLayout(false);
             this.guna2PanelImages.PerformLayout();
-            this.guna2PanelImageUpload.ResumeLayout(false);
-            this.guna2PanelImageUpload.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.guna2PictureBoxPreview)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picProduct)).EndInit();
             this.guna2PanelDescription.ResumeLayout(false);
             this.guna2PanelDescription.PerformLayout();
             this.guna2PanelInfo.ResumeLayout(false);
@@ -913,7 +981,7 @@
         private System.Windows.Forms.Label labelActive;
         private Guna.UI2.WinForms.Guna2CustomRadioButton radioInactive;
         private System.Windows.Forms.Label labelInactive;
-        private Guna.UI2.WinForms.Guna2TextBox cboPosition;
+        private Guna.UI2.WinForms.Guna2TextBox txtPosition;
         private System.Windows.Forms.Label labelPosition;
         private Guna.UI2.WinForms.Guna2TextBox txtProductName;
         private System.Windows.Forms.Label labelProductName;
@@ -930,22 +998,27 @@
         private System.Windows.Forms.Label labelPanelDescription;
         private System.Windows.Forms.Label labelProductDescription;
         private System.Windows.Forms.RichTextBox rtbDescription;
-        private Guna.UI2.WinForms.Guna2Panel guna2PanelImageUpload;
-        private System.Windows.Forms.Label labelImagePlaceholder;
-        private Guna.UI2.WinForms.Guna2PictureBox guna2PictureBoxPreview;
         private System.Windows.Forms.Label labelImages;
         private Guna.UI2.WinForms.Guna2TextBox txtDiscount;
         private System.Windows.Forms.Label labelDiscount;
         private Guna.UI2.WinForms.Guna2TextBox txtPrice;
         private System.Windows.Forms.Label labelPrice;
         private System.Windows.Forms.Label labelPanelPrice;
-        private Guna.UI2.WinForms.Guna2TextBox txtStockQuantity;
-        private System.Windows.Forms.Label labelStockQuantity;
+        private Guna.UI2.WinForms.Guna2TextBox txtQuantity;
+        private Guna.UI2.WinForms.Guna2Button btnSelectImage;
+        private System.Windows.Forms.Label labelQuantity;
         private Guna.UI2.WinForms.Guna2TextBox txtSKU;
         private System.Windows.Forms.Label labelSKU;
         private System.Windows.Forms.Label labelPanelInventory;
         private Guna.UI2.WinForms.Guna2ComboBox cboStockStatus;
         private System.Windows.Forms.Label labelStockStatus;
         private Guna.UI2.WinForms.Guna2Button btnRemoveImage;
+        private Guna.UI2.WinForms.Guna2TextBox txtStockQuantity;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.PictureBox picProduct;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.DateTimePicker dtpManufactureDate;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.DateTimePicker dtpExpiryDate;
     }
 }

@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CategoryDAL.cs" />
     <Compile Include="DashboardDAL.cs" />
     <Compile Include="DbConnection\DBConnection.cs" />
     <Compile Include="EF\ApplicationDBConnect.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="ProductDAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoleDAL.cs" />
+    <Compile Include="SubCategoryDAL.cs" />
     <Compile Include="UserDAL.cs" />
   </ItemGroup>
   <ItemGroup>

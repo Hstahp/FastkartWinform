@@ -12,6 +12,6 @@ namespace Common
         public const string DBConnectSQLEXPRESS ="";
         public const string DEFAULT_IMG_USER =  "[\"https://res.cloudinary.com/dfeaar87r/image/upload/v1763101391/default-avatar_uek2f1.png\"]";
         public const int MAX_NAME_WIDTH = 120;
-        public const string SEARCH_PLACEHOLDER = "Search by name, email or phone...";
+        public const string SEARCH_PLACEHOLDER = "Search by name, email or phone, ...";
     }
 }

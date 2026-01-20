@@ -20,6 +20,9 @@ namespace DAL.EF
 
         public decimal PriceAtPurchase { get; set; }
 
+        public decimal DiscountAmount { get; set; }
+        public decimal SubTotal { get; set; }
+
         public virtual Order Order { get; set; }
 
         public virtual Product Product { get; set; }

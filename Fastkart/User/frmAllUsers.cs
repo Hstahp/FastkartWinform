@@ -158,18 +158,23 @@ namespace GUI
             dgvUsers.DefaultCellStyle.SelectionForeColor = Color.FromArgb(31, 41, 55);
             dgvUsers.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(249, 250, 251);
 
+          
             foreach (DataGridViewColumn col in dgvUsers.Columns)
             {
+                // Căn giữa header
                 col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
+                // Căn giữa nội dung cell
                 if (col.Name == "colAvatar" || col.Name == "colAction")
                 {
+                    // Avatar và Action đã được xử lý trong CellPainting
                     col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 }
                 else
                 {
-                    col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-                    col.DefaultCellStyle.Padding = new Padding(10, 0, 0, 0);
+                    // ✅ CẬP NHẬT: Căn giữa các cột text (Name, Email, Phone, Role)
+                    col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    col.DefaultCellStyle.Padding = new Padding(5, 0, 5, 0); // Padding nhẹ thay vì lệch trái
                 }
             }
         }

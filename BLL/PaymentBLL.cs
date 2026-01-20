@@ -31,11 +31,11 @@ namespace BLL
             if (!ok) return false;
 
             // Cập nhật trạng thái Order tương ứng
-            if (payment.OrderUid > 0)
-            {
-                // Ví dụ đặt trạng thái Order = "Paid"
-                orderBLL.UpdateOrderStatus(payment.OrderUid, "Paid");
-            }
+            //if (payment.OrderUid > 0)
+            //{
+            //    // Ví dụ đặt trạng thái Order = "Paid"
+            //    orderBLL.UpdateOrderStatus(payment.OrderUid, "Paid");
+            //}
 
             return true;
         }
