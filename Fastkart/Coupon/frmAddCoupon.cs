@@ -8,7 +8,7 @@ namespace GUI.Coupon
 {
     public partial class frmAddCoupon : Form
     {
-        // 1. KHAI BÁO CONTROL
+        // 1. DECLARE CONTROLS
         private TextBox txtCode, txtDesc;
         private ComboBox cboType;
         private NumericUpDown numValue, numMinOrder, numLimit;
@@ -18,56 +18,56 @@ namespace GUI.Coupon
 
         // 2. LOGIC
         private CouponBLL _couponBLL;
-        private int _uid = 0; // 0 = Thêm mới, >0 = Sửa
+        private int _uid = 0; // 0 = Add New, >0 = Edit
 
         public frmAddCoupon(int id = 0)
         {
             _couponBLL = new CouponBLL();
             _uid = id;
 
-            // Tự vẽ giao diện
+            // Initialize Custom UI
             InitializeCustomUI();
 
-            // Nếu là Sửa -> Load dữ liệu cũ lên
+            // If Edit Mode -> Load old data
             if (_uid > 0)
             {
-                lblTitle.Text = "CẬP NHẬT MÃ GIẢM GIÁ";
+                lblTitle.Text = "UPDATE COUPON";
                 LoadDataForEdit();
             }
         }
 
-        // --- HÀM TỰ VẼ GIAO DIỆN (Không cần Designer) ---
+        // --- CUSTOM UI INITIALIZATION (No Designer needed) ---
         private void InitializeCustomUI()
         {
-            // Cài đặt Form
+            // Form Settings
             this.Size = new Size(500, 650);
             this.StartPosition = FormStartPosition.CenterParent;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.BackColor = Color.White;
-            this.Text = _uid == 0 ? "Thêm Mã Mới" : "Cập Nhật Mã";
+            this.Text = _uid == 0 ? "Add New Coupon" : "Update Coupon";
 
-            // Title
+            // Title Label
             lblTitle = new Label
             {
-                Text = "THÊM MÃ KHUYẾN MÃI",
+                Text = "ADD NEW COUPON",
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                ForeColor = Color.FromArgb(37, 99, 235), // Xanh dương
+                ForeColor = Color.FromArgb(37, 99, 235), // Blue
                 AutoSize = true,
                 Top = 20,
                 Left = 140
             };
             this.Controls.Add(lblTitle);
 
-            // Các biến toạ độ để căn chỉnh
+            // Layout Coordinates
             int y = 70;
             int labelX = 40;
             int inputX = 160;
             int inputW = 280;
             int gap = 50;
 
-            // Hàm hỗ trợ vẽ nhanh Label
+            // Helper function to add labels quickly
             void AddLabel(string text, int top)
             {
                 this.Controls.Add(new Label
@@ -81,54 +81,54 @@ namespace GUI.Coupon
                 });
             }
 
-            // 1. Mã Code
-            AddLabel("Mã Coupon:", y);
+            // 1. Coupon Code
+            AddLabel("Coupon Code:", y);
             txtCode = new TextBox { Top = y, Left = inputX, Width = inputW, Font = new Font("Segoe UI", 10), CharacterCasing = CharacterCasing.Upper };
             this.Controls.Add(txtCode); y += gap;
 
-            // 2. Mô tả
-            AddLabel("Mô tả ngắn:", y);
+            // 2. Description
+            AddLabel("Description:", y);
             txtDesc = new TextBox { Top = y, Left = inputX, Width = inputW, Font = new Font("Segoe UI", 10) };
             this.Controls.Add(txtDesc); y += gap;
 
-            // 3. Loại giảm giá
-            AddLabel("Loại giảm:", y);
+            // 3. Discount Type
+            AddLabel("Discount Type:", y);
             cboType = new ComboBox { Top = y, Left = inputX, Width = inputW, Font = new Font("Segoe UI", 10), DropDownStyle = ComboBoxStyle.DropDownList };
-            cboType.Items.AddRange(new object[] { "Phần trăm (%)", "Tiền mặt (VND)" });
+            cboType.Items.AddRange(new object[] { "Percentage (%)", "Fixed Amount (VND)" });
             cboType.SelectedIndex = 0;
             this.Controls.Add(cboType); y += gap;
 
-            // 4. Giá trị giảm
-            AddLabel("Giá trị giảm:", y);
+            // 4. Discount Value
+            AddLabel("Discount Value:", y);
             numValue = new NumericUpDown { Top = y, Left = inputX, Width = inputW, Font = new Font("Segoe UI", 10), Maximum = 1000000000, ThousandsSeparator = true };
             this.Controls.Add(numValue); y += gap;
 
-            // 5. Đơn tối thiểu
-            AddLabel("Đơn tối thiểu:", y);
+            // 5. Min Order Value
+            AddLabel("Min Order Value:", y);
             numMinOrder = new NumericUpDown { Top = y, Left = inputX, Width = inputW, Font = new Font("Segoe UI", 10), Maximum = 1000000000, ThousandsSeparator = true };
             this.Controls.Add(numMinOrder); y += gap;
 
-            // 6. Giới hạn số lượng
-            AddLabel("Số lượng phát:", y);
+            // 6. Usage Limit
+            AddLabel("Usage Limit:", y);
             numLimit = new NumericUpDown { Top = y, Left = inputX, Width = inputW, Font = new Font("Segoe UI", 10), Maximum = 10000 };
             this.Controls.Add(numLimit); y += gap;
 
-            // 7. Ngày bắt đầu
-            AddLabel("Ngày bắt đầu:", y);
+            // 7. Start Date
+            AddLabel("Start Date:", y);
             dtpStart = new DateTimePicker { Top = y, Left = inputX, Width = inputW, Font = new Font("Segoe UI", 10), Format = DateTimePickerFormat.Short };
             this.Controls.Add(dtpStart); y += gap;
 
-            // 8. Ngày kết thúc
-            AddLabel("Ngày kết thúc:", y);
+            // 8. End Date
+            AddLabel("End Date:", y);
             dtpEnd = new DateTimePicker { Top = y, Left = inputX, Width = inputW, Font = new Font("Segoe UI", 10), Format = DateTimePickerFormat.Short };
-            dtpEnd.Value = DateTime.Now.AddDays(30); // Mặc định +30 ngày
+            dtpEnd.Value = DateTime.Now.AddDays(30); // Default +30 days
             this.Controls.Add(dtpEnd); y += 70;
 
-            // --- NÚT BẤM ---
-            // Nút Lưu (Xanh dương)
+            // --- BUTTONS ---
+            // Save Button (Blue)
             btnSave = new Button
             {
-                Text = "LƯU MÃ",
+                Text = "SAVE",
                 Top = y,
                 Left = 160,
                 Width = 110,
@@ -142,10 +142,10 @@ namespace GUI.Coupon
             btnSave.FlatAppearance.BorderSize = 0;
             btnSave.Click += BtnSave_Click;
 
-            // Nút Hủy (Xám)
+            // Cancel Button (Gray)
             btnCancel = new Button
             {
-                Text = "HỦY",
+                Text = "CANCEL",
                 Top = y,
                 Left = 280,
                 Width = 110,
@@ -163,7 +163,7 @@ namespace GUI.Coupon
             this.Controls.Add(btnCancel);
         }
 
-        // --- LOGIC LOAD DỮ LIỆU ĐỂ SỬA ---
+        // --- LOAD DATA FOR EDIT ---
         private void LoadDataForEdit()
         {
             var coupon = _couponBLL.GetCouponById(_uid);
@@ -178,16 +178,16 @@ namespace GUI.Coupon
                 dtpStart.Value = coupon.StartDate;
                 dtpEnd.Value = coupon.EndDate;
 
-                txtCode.Enabled = false; // Không cho sửa mã Code khi đang Edit
+                txtCode.Enabled = false; // Prevent editing Code in Edit mode
             }
         }
 
-        // --- SỰ KIỆN LƯU ---
+        // --- SAVE EVENT ---
         private void BtnSave_Click(object sender, EventArgs e)
         {
-            // Validate đơn giản
-            if (string.IsNullOrWhiteSpace(txtCode.Text)) { MessageBox.Show("Vui lòng nhập Mã Coupon!", "Cảnh báo"); return; }
-            if (dtpStart.Value > dtpEnd.Value) { MessageBox.Show("Ngày kết thúc phải lớn hơn ngày bắt đầu!", "Cảnh báo"); return; }
+            // Simple Validation
+            if (string.IsNullOrWhiteSpace(txtCode.Text)) { MessageBox.Show("Please enter Coupon Code!", "Warning"); return; }
+            if (dtpStart.Value > dtpEnd.Value) { MessageBox.Show("End Date must be after Start Date!", "Warning"); return; }
 
             string error = "";
             CouponDTO dto = new CouponDTO
@@ -208,13 +208,13 @@ namespace GUI.Coupon
 
             if (result)
             {
-                MessageBox.Show("Lưu thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.DialogResult = DialogResult.OK; // Báo cho Form cha biết để reload
+                MessageBox.Show("Saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.DialogResult = DialogResult.OK; // Notify parent form to reload
                 this.Close();
             }
             else
             {
-                MessageBox.Show("Lỗi: " + error, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error: " + error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

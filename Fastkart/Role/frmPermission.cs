@@ -29,50 +29,67 @@ namespace GUI
                 dgvMatrix.Columns.Clear();
                 dgvMatrix.Rows.Clear();
 
+                // 1. Hidden IDs Columns
+                dgvMatrix.Columns.Add("colFuncId", "FuncID");
+                dgvMatrix.Columns["colFuncId"].Visible = false;
 
-                // Cột ID ẩn
-                dgvMatrix.Columns.Add("colFuncId", "FuncID"); dgvMatrix.Columns["colFuncId"].Visible = false;
-                dgvMatrix.Columns.Add("colTypeId", "TypeID"); dgvMatrix.Columns["colTypeId"].Visible = false;
+                dgvMatrix.Columns.Add("colTypeId", "TypeID");
+                dgvMatrix.Columns["colTypeId"].Visible = false;
 
-                // Cột hiển thị
-                var colFunc = new DataGridViewTextBoxColumn { HeaderText = "CHỨC NĂNG", Name = "colFuncName", ReadOnly = true, Width = 250 };
+                // 2. Visible Columns (Translated to English)
+                var colFunc = new DataGridViewTextBoxColumn
+                {
+                    HeaderText = "FUNCTION", // Translated: CHỨC NĂNG
+                    Name = "colFuncName",
+                    ReadOnly = true,
+                    Width = 250
+                };
                 colFunc.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-                colFunc.DefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold); // In đậm tên chức năng
+                colFunc.DefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
                 dgvMatrix.Columns.Add(colFunc);
 
-                var colType = new DataGridViewTextBoxColumn { HeaderText = "QUYỀN", Name = "colTypeName", ReadOnly = true, Width = 150 };
+                var colType = new DataGridViewTextBoxColumn
+                {
+                    HeaderText = "PERMISSION", // Translated: QUYỀN
+                    Name = "colTypeName",
+                    ReadOnly = true,
+                    Width = 150
+                };
                 dgvMatrix.Columns.Add(colType);
 
-                
+                // 3. Dynamic Columns based on Roles (Admin, Staff, etc.)
                 var roles = _roleBLL.GetAllRoles();
 
                 foreach (var role in roles)
                 {
                     var colCheck = new DataGridViewCheckBoxColumn();
-                    colCheck.HeaderText = role.RoleName; // Header là tên Role (Admin, Kế toán...)
-                    colCheck.Name = "role_" + role.Uid;  // Đặt tên theo ID role
-                    colCheck.Tag = role.Uid;             // Lưu ID vào Tag
+                    colCheck.HeaderText = role.RoleName;
+                    colCheck.Name = "role_" + role.Uid;
+                    colCheck.Tag = role.Uid;
                     colCheck.Width = 120;
                     dgvMatrix.Columns.Add(colCheck);
                 }
 
-                // 3. Đổ dữ liệu
+                // 4. Populate Data
                 var matrixData = _roleBLL.GetPermissionMatrix();
 
-                string currentFuncName = ""; // Dùng để group visually
+                string currentFuncName = ""; // Used for visual grouping
 
                 foreach (var item in matrixData)
                 {
+                    // Skip if necessary based on your business logic
                     if (item.PermissionTypeName.Equals("Permission", StringComparison.OrdinalIgnoreCase))
                     {
-                        continue; 
+                        continue;
                     }
+
                     int idx = dgvMatrix.Rows.Add();
                     var row = dgvMatrix.Rows[idx];
 
                     row.Cells["colFuncId"].Value = item.FunctionId;
                     row.Cells["colTypeId"].Value = item.PermissionTypeId;
 
+                    // Grouping Logic: Only show Function Name once per group
                     if (item.FunctionName != currentFuncName)
                     {
                         row.Cells["colFuncName"].Value = item.FunctionName;
@@ -85,13 +102,12 @@ namespace GUI
 
                     row.Cells["colTypeName"].Value = item.PermissionTypeName;
 
-                    
+                    // Check/Uncheck boxes based on database values
                     foreach (var rolePerm in item.RolePermissions)
                     {
                         int roleId = rolePerm.Key;
                         bool isAllowed = rolePerm.Value;
 
-                        
                         string colName = "role_" + roleId;
                         if (dgvMatrix.Columns.Contains(colName))
                         {
@@ -102,12 +118,13 @@ namespace GUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi load phân quyền: " + ex.Message);
+                MessageBox.Show("Error loading permissions: " + ex.Message); // Translated
             }
         }
 
         private void dgvMatrix_CurrentCellDirtyStateChanged(object sender, EventArgs e)
         {
+            // Commits the edit immediately when checkbox is clicked
             if (dgvMatrix.IsCurrentCellDirty)
             {
                 dgvMatrix.CommitEdit(DataGridViewDataErrorContexts.Commit);
@@ -120,6 +137,7 @@ namespace GUI
 
             var col = dgvMatrix.Columns[e.ColumnIndex];
 
+            // Only process if a Role Column (checkbox) was changed
             if (col.Name.StartsWith("role_") && col.Tag != null)
             {
                 int roleId = (int)col.Tag;
@@ -130,7 +148,7 @@ namespace GUI
 
                 bool isChecked = Convert.ToBoolean(row.Cells[e.ColumnIndex].Value);
 
-                
+                // Update Database
                 _roleBLL.UpdatePermission(roleId, funcId, typeId, isChecked);
             }
         }

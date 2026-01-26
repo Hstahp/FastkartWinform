@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing; // Required for Cursors
 using System.Windows.Forms;
 using BLL;
 using DTO;
@@ -14,6 +15,14 @@ namespace GUI
         {
             InitializeComponent();
             _roleBLL = new RoleBLL();
+
+            // Prevent auto generation
+            dgvRoles.AutoGenerateColumns = false;
+
+            // Register Hand Cursor Effect for Icons
+            dgvRoles.CellMouseEnter += dgvRoles_CellMouseEnter;
+            dgvRoles.CellMouseLeave += dgvRoles_CellMouseLeave;
+
             this.Load += FrmAllRole_Load;
         }
 
@@ -54,7 +63,8 @@ namespace GUI
         {
             try
             {
-                dgvRoles.AutoGenerateColumns = false;
+                // Re-initialize BLL to get fresh data
+                _roleBLL = new RoleBLL();
                 dgvRoles.DataSource = _roleBLL.GetAllRoles(keyword);
             }
             catch (Exception ex)
@@ -85,49 +95,41 @@ namespace GUI
         // --- GRID ACTIONS (DELETE / EDIT) ---
         private void dgvRoles_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            // Ignore Header Click
             if (e.RowIndex < 0) return;
 
-            // Variables to store data from the clicked row
-            int roleId = 0;
+            // Safety check for ID
+            if (dgvRoles.Rows[e.RowIndex].Cells["colId"].Value == null) return;
+            int roleId = Convert.ToInt32(dgvRoles.Rows[e.RowIndex].Cells["colId"].Value);
+
             string currentRoleName = "";
-
-            // 1. Get Role ID (Uid) - Assuming Column 0 is hidden ID
-            if (dgvRoles.Rows[e.RowIndex].Cells[0].Value != null)
+            if (dgvRoles.Rows[e.RowIndex].Cells["colName"].Value != null)
             {
-                roleId = Convert.ToInt32(dgvRoles.Rows[e.RowIndex].Cells[0].Value);
+                currentRoleName = dgvRoles.Rows[e.RowIndex].Cells["colName"].Value.ToString();
             }
 
-            // 2. Get Role Name - Assuming Column 1 is Name
-            // NOTE: Check your DataGridView Design to ensure Column Index 1 is RoleName
-            if (dgvRoles.Rows[e.RowIndex].Cells[1].Value != null)
-            {
-                currentRoleName = dgvRoles.Rows[e.RowIndex].Cells[1].Value.ToString();
-            }
+            string colName = dgvRoles.Columns[e.ColumnIndex].Name;
 
             // --- DELETE LOGIC ---
-            // Check if clicked column is 'colDelete' (Check Name property in Design)
-            if (dgvRoles.Columns[e.ColumnIndex].Name == "colDelete")
+            if (colName == "colDelete")
             {
-                if (MessageBox.Show("Are you sure you want to delete this role?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show("Are you sure you want to delete this role?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     string error = "";
-                    // Gọi hàm xóa mới có biến error
                     if (_roleBLL.DeleteRole(roleId, out error))
                     {
-                        MessageBox.Show("Deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        // MessageBox.Show("Deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LoadDataRoles();
                     }
                     else
                     {
-                        // Hiện thông báo lỗi nghiệp vụ (Vd: Đang có người dùng...)
-                        MessageBox.Show("Delete failed: " + error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Delete failed: " + error, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
 
             // --- EDIT LOGIC ---
-            // Check if clicked column is 'colEdit'
-            if (dgvRoles.Columns[e.ColumnIndex].Name == "colEdit")
+            else if (colName == "colEdit")
             {
                 // Pass RoleId and CurrentName to indicate EDIT MODE
                 frmAddRole f = new frmAddRole(roleId, currentRoleName);
@@ -139,6 +141,24 @@ namespace GUI
                     LoadDataRoles(); // Reload grid to show updated name
                 }
             }
+        }
+
+        // --- HAND CURSOR EFFECT ---
+        private void dgvRoles_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                string colName = dgvRoles.Columns[e.ColumnIndex].Name;
+                if (colName == "colEdit" || colName == "colDelete")
+                {
+                    dgvRoles.Cursor = Cursors.Hand;
+                }
+            }
+        }
+
+        private void dgvRoles_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            dgvRoles.Cursor = Cursors.Default;
         }
     }
 }

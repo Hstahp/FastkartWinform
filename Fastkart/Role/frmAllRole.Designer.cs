@@ -14,8 +14,10 @@
 
         private void InitializeComponent()
         {
+            // Declare Styles
             System.Windows.Forms.DataGridViewCellStyle headerStyle = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle rowStyle = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle iconCellStyle = new System.Windows.Forms.DataGridViewCellStyle();
 
             this.lblTitle = new System.Windows.Forms.Label();
             this.txtSearch = new Guna.UI2.WinForms.Guna2TextBox();
@@ -23,12 +25,13 @@
             this.pnlGrid = new Guna.UI2.WinForms.Guna2Panel();
             this.dgvRoles = new Guna.UI2.WinForms.Guna2DataGridView();
 
-            // Khởi tạo các cột
+            // Columns
             this.colId = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colEdit = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.colDelete = new System.Windows.Forms.DataGridViewButtonColumn();
+            // Changed to ImageColumn
+            this.colEdit = new System.Windows.Forms.DataGridViewImageColumn();
+            this.colDelete = new System.Windows.Forms.DataGridViewImageColumn();
 
             this.pnlGrid.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvRoles)).BeginInit();
@@ -107,11 +110,22 @@
             headerStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(246)))), ((int)(((byte)(247)))));
             headerStyle.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             headerStyle.ForeColor = System.Drawing.Color.DimGray;
-            headerStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(246)))), ((int)(((byte)(247)))));
-            headerStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            headerStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(246)))), ((int)(((byte)(247))))); // Fix hover color change
+            headerStyle.SelectionForeColor = System.Drawing.Color.DimGray;
             headerStyle.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.dgvRoles.ColumnHeadersDefaultCellStyle = headerStyle;
             this.dgvRoles.ColumnHeadersHeight = 50;
+            this.dgvRoles.EnableHeadersVisualStyles = false;
+
+            // Row Style
+            rowStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            rowStyle.BackColor = System.Drawing.Color.White;
+            rowStyle.Font = new System.Drawing.Font("Segoe UI", 10F);
+            rowStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
+            rowStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255))))); // Light purple selection
+            rowStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
+            rowStyle.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvRoles.DefaultCellStyle = rowStyle;
 
             // Columns
             this.dgvRoles.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -121,18 +135,7 @@
             this.colEdit,
             this.colDelete});
 
-            // Row Style
-            rowStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            rowStyle.BackColor = System.Drawing.Color.White;
-            rowStyle.Font = new System.Drawing.Font("Segoe UI", 10F);
-            rowStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
-            rowStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
-            rowStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
-            rowStyle.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgvRoles.DefaultCellStyle = rowStyle;
-
             this.dgvRoles.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvRoles.EnableHeadersVisualStyles = false;
             this.dgvRoles.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
             this.dgvRoles.Location = new System.Drawing.Point(0, 0);
             this.dgvRoles.Name = "dgvRoles";
@@ -141,6 +144,8 @@
             this.dgvRoles.RowTemplate.Height = 50;
             this.dgvRoles.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvRoles.TabIndex = 0;
+
+            // Guna Theme Settings (Keep default or adjust to match above)
             this.dgvRoles.ThemeStyle.AlternatingRowsStyle.BackColor = System.Drawing.Color.White;
             this.dgvRoles.ThemeStyle.AlternatingRowsStyle.Font = null;
             this.dgvRoles.ThemeStyle.AlternatingRowsStyle.ForeColor = System.Drawing.Color.Empty;
@@ -150,18 +155,20 @@
             this.dgvRoles.ThemeStyle.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
             this.dgvRoles.ThemeStyle.HeaderStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(88)))), ((int)(((byte)(255)))));
             this.dgvRoles.ThemeStyle.HeaderStyle.BorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            this.dgvRoles.ThemeStyle.HeaderStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dgvRoles.ThemeStyle.HeaderStyle.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.dgvRoles.ThemeStyle.HeaderStyle.ForeColor = System.Drawing.Color.White;
             this.dgvRoles.ThemeStyle.HeaderStyle.HeaightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
             this.dgvRoles.ThemeStyle.HeaderStyle.Height = 50;
             this.dgvRoles.ThemeStyle.ReadOnly = true;
             this.dgvRoles.ThemeStyle.RowsStyle.BackColor = System.Drawing.Color.White;
             this.dgvRoles.ThemeStyle.RowsStyle.BorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
-            this.dgvRoles.ThemeStyle.RowsStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dgvRoles.ThemeStyle.RowsStyle.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.dgvRoles.ThemeStyle.RowsStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
             this.dgvRoles.ThemeStyle.RowsStyle.Height = 50;
             this.dgvRoles.ThemeStyle.RowsStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(231)))), ((int)(((byte)(229)))), ((int)(((byte)(255)))));
             this.dgvRoles.ThemeStyle.RowsStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(69)))), ((int)(((byte)(94)))));
+
+            // Event for Click
             this.dgvRoles.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvRoles_CellContentClick);
 
             // 
@@ -169,14 +176,14 @@
             // 
             this.colId.DataPropertyName = "Uid";
             this.colId.HeaderText = "Uid";
-            this.colId.Name = "colId"; 
+            this.colId.Name = "colId";
             this.colId.Visible = false;
 
             // 
             // colName
             // 
             this.colName.DataPropertyName = "RoleName";
-            this.colName.HeaderText = "Name";
+            this.colName.HeaderText = "Role Name";
             this.colName.Name = "colName";
             this.colName.ReadOnly = true;
 
@@ -184,29 +191,41 @@
             // colDate
             // 
             this.colDate.DataPropertyName = "CreatedAt";
-            this.colDate.HeaderText = "CreateAt";
+            this.colDate.HeaderText = "Created At";
             this.colDate.Name = "colDate";
             this.colDate.ReadOnly = true;
 
-            // 
-            // colEdit
-            // 
-            this.colEdit.FillWeight = 30F;
-            this.colEdit.HeaderText = "Option";
-            this.colEdit.Name = "colEdit"; 
-            this.colEdit.ReadOnly = true;
-            this.colEdit.Text = "✏️";
-            this.colEdit.UseColumnTextForButtonValue = true;
+            // --- ICON STYLE SETUP ---
+            iconCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            iconCellStyle.BackColor = System.Drawing.Color.White;
+            // FIX: Set Selection color to White to avoid blue/purple block on icon
+            iconCellStyle.SelectionBackColor = System.Drawing.Color.White;
+            iconCellStyle.SelectionForeColor = System.Drawing.Color.Black;
+            // PADDING: This makes the icon smaller (contain effect)
+            iconCellStyle.Padding = new System.Windows.Forms.Padding(12);
 
             // 
-            // colDelete
+            // colEdit (Action 1)
+            // 
+            this.colEdit.FillWeight = 30F;
+            this.colEdit.HeaderText = "Action"; // Header text here
+            this.colEdit.Name = "colEdit";
+            this.colEdit.ReadOnly = true;
+            this.colEdit.Image = global::GUI.Properties.Resources.icon_edit; // Ensure this exists
+            this.colEdit.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
+            this.colEdit.DefaultCellStyle = iconCellStyle;
+            this.colEdit.HeaderCell.Style.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+
+            // 
+            // colDelete (Action 2)
             // 
             this.colDelete.FillWeight = 30F;
-            this.colDelete.HeaderText = "";
+            this.colDelete.HeaderText = ""; // Empty header
             this.colDelete.Name = "colDelete";
             this.colDelete.ReadOnly = true;
-            this.colDelete.Text = "🗑️";
-            this.colDelete.UseColumnTextForButtonValue = true;
+            this.colDelete.Image = global::GUI.Properties.Resources.icon_delete; // Ensure this exists
+            this.colDelete.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
+            this.colDelete.DefaultCellStyle = iconCellStyle;
 
             // 
             // frmAllRole
@@ -226,7 +245,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvRoles)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
@@ -239,7 +257,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colId;
         private System.Windows.Forms.DataGridViewTextBoxColumn colName;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDate;
-        private System.Windows.Forms.DataGridViewButtonColumn colEdit;
-        private System.Windows.Forms.DataGridViewButtonColumn colDelete;
+        // Changed to ImageColumn
+        private System.Windows.Forms.DataGridViewImageColumn colEdit;
+        private System.Windows.Forms.DataGridViewImageColumn colDelete;
     }
 }

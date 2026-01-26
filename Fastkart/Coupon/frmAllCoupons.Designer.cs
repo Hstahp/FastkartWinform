@@ -14,8 +14,12 @@
 
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            // Khai báo các Style
+            System.Windows.Forms.DataGridViewCellStyle headerStyle = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle rowStyle = new System.Windows.Forms.DataGridViewCellStyle();
+
+            // Style riêng cho cột Action để CHẶN màu xanh khi click
+            System.Windows.Forms.DataGridViewCellStyle iconCellStyle = new System.Windows.Forms.DataGridViewCellStyle();
 
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.btnAdd = new System.Windows.Forms.Button();
@@ -23,15 +27,15 @@
             this.lblTitle = new System.Windows.Forms.Label();
             this.dgvCoupons = new System.Windows.Forms.DataGridView();
 
-            // Khai báo các cột
+            // Khai báo cột
             this.colId = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDesc = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colLimit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colUsed = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colEdit = new System.Windows.Forms.DataGridViewButtonColumn();
-            this.colDelete = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.colEdit = new System.Windows.Forms.DataGridViewImageColumn();
+            this.colDelete = new System.Windows.Forms.DataGridViewImageColumn();
 
             this.pnlHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCoupons)).BeginInit();
@@ -61,14 +65,13 @@
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAdd.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnAdd.ForeColor = System.Drawing.Color.White;
-            this.btnAdd.Location = new System.Drawing.Point(850, 20); // Y=20 là chuẩn giữa (80-40)/2
+            this.btnAdd.Location = new System.Drawing.Point(850, 20);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(130, 40);
             this.btnAdd.TabIndex = 2;
             this.btnAdd.Text = "+ Add Coupon";
-            this.btnAdd.TextAlign = System.Drawing.ContentAlignment.MiddleCenter; // Căn giữa
-            this.btnAdd.UseCompatibleTextRendering = true; // <--- THÊM DÒNG NÀY ĐỂ FIX LỖI LỆCH CHỮ
             this.btnAdd.UseVisualStyleBackColor = false;
+            this.btnAdd.UseCompatibleTextRendering = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
 
             // 
@@ -91,7 +94,7 @@
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(280, 32);
             this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "COUPON LIST"; // Tiếng Anh
+            this.lblTitle.Text = "COUPON LIST";
 
             // 
             // dgvCoupons
@@ -99,19 +102,36 @@
             this.dgvCoupons.AllowUserToAddRows = false;
             this.dgvCoupons.BackgroundColor = System.Drawing.Color.White;
             this.dgvCoupons.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dgvCoupons.ColumnHeadersHeight = 45;
-
-            // --- STYLE HEADER ---
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(99)))), ((int)(((byte)(235))))); // Blue Header
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False; // Header không rớt dòng
-            this.dgvCoupons.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dgvCoupons.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
+            this.dgvCoupons.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            this.dgvCoupons.ColumnHeadersHeight = 50;
             this.dgvCoupons.EnableHeadersVisualStyles = false;
+            this.dgvCoupons.RowHeadersVisible = false;
+            this.dgvCoupons.RowTemplate.Height = 45;
 
+            // --- Style Header ---
+            headerStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            headerStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
+            headerStyle.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            headerStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            // FIX: Set SelectionBackColor trùng BackColor cho Header
+            headerStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
+            headerStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            headerStyle.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvCoupons.ColumnHeadersDefaultCellStyle = headerStyle;
+
+            // --- Style Chung cho Dòng (Vẫn giữ màu tím khi select dòng chữ) ---
+            rowStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            rowStyle.BackColor = System.Drawing.Color.White;
+            rowStyle.Font = new System.Drawing.Font("Segoe UI", 10F);
+            rowStyle.ForeColor = System.Drawing.Color.Black;
+            rowStyle.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            rowStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(237)))), ((int)(((byte)(233)))), ((int)(((byte)(254)))));
+            rowStyle.SelectionForeColor = System.Drawing.Color.Black;
+            rowStyle.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvCoupons.DefaultCellStyle = rowStyle;
+
+            // Thêm cột
             this.dgvCoupons.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colId,
             this.colCode,
@@ -122,23 +142,9 @@
             this.colEdit,
             this.colDelete});
 
-            // --- STYLE DÒNG DỮ LIỆU ---
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 10F);
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(246)))), ((int)(((byte)(255))))); // Light Blue select
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
-
-            // QUAN TRỌNG: Dòng này giúp chữ luôn nằm 1 hàng, quá dài thì ẩn đi chứ không rớt xuống
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-
-            this.dgvCoupons.DefaultCellStyle = dataGridViewCellStyle2;
             this.dgvCoupons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvCoupons.Location = new System.Drawing.Point(0, 80);
             this.dgvCoupons.Name = "dgvCoupons";
-            this.dgvCoupons.RowHeadersVisible = false;
-            this.dgvCoupons.RowTemplate.Height = 40;
             this.dgvCoupons.Size = new System.Drawing.Size(1000, 520);
             this.dgvCoupons.TabIndex = 1;
             this.dgvCoupons.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvCoupons_CellContentClick);
@@ -150,59 +156,79 @@
             this.colId.HeaderText = "ID";
             this.colId.Name = "colId";
             this.colId.Visible = false;
+
             // 
             // colCode
             // 
             this.colCode.DataPropertyName = "Code";
-            this.colCode.HeaderText = "CODE"; // Tiếng Anh
+            this.colCode.HeaderText = "CODE";
             this.colCode.Name = "colCode";
             this.colCode.Width = 150;
+
             // 
             // colDesc
             // 
             this.colDesc.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.colDesc.DataPropertyName = "Description";
-            this.colDesc.HeaderText = "DESCRIPTION"; // Tiếng Anh
+            this.colDesc.HeaderText = "DESCRIPTION";
             this.colDesc.Name = "colDesc";
+
             // 
             // colValue
             // 
             this.colValue.DataPropertyName = "DisplayText";
-            this.colValue.HeaderText = "VALUE"; // Tiếng Anh
+            this.colValue.HeaderText = "VALUE";
             this.colValue.Name = "colValue";
             this.colValue.Width = 150;
+
             // 
             // colLimit
             // 
             this.colLimit.DataPropertyName = "UsageLimit";
-            this.colLimit.HeaderText = "LIMIT"; // Tiếng Anh
+            this.colLimit.HeaderText = "LIMIT";
             this.colLimit.Name = "colLimit";
             this.colLimit.Width = 80;
+
             // 
             // colUsed
             // 
             this.colUsed.DataPropertyName = "UsedCount";
-            this.colUsed.HeaderText = "USED"; // Tiếng Anh
+            this.colUsed.HeaderText = "USED";
             this.colUsed.Name = "colUsed";
             this.colUsed.Width = 90;
+
+            // --- CẤU HÌNH STYLE RIÊNG CHO CỘT ICON ---
+            // QUAN TRỌNG: Phải set style riêng biệt hoàn toàn mới đè được style chung
+            iconCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            iconCellStyle.NullValue = null;
+            iconCellStyle.Padding = new System.Windows.Forms.Padding(12);
+            iconCellStyle.BackColor = System.Drawing.Color.White;
+
+            // FIX TRIỆT ĐỂ: Khi click vào, ép màu nền vẫn là Trắng (thay vì Tím/Xanh)
+            iconCellStyle.SelectionBackColor = System.Drawing.Color.White;
+            iconCellStyle.SelectionForeColor = System.Drawing.Color.Black;
+
             // 
             // colEdit
             // 
-            this.colEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.colEdit.HeaderText = "";
+            this.colEdit.HeaderText = "Action";
             this.colEdit.Name = "colEdit";
-            this.colEdit.Text = "✏ Edit"; // Tiếng Anh
-            this.colEdit.UseColumnTextForButtonValue = true;
-            this.colEdit.Width = 80;
+            this.colEdit.Width = 50;
+            this.colEdit.Image = global::GUI.Properties.Resources.icon_edit;
+            this.colEdit.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
+            this.colEdit.DefaultCellStyle = iconCellStyle; // <--- ÁP DỤNG STYLE RIÊNG
+            this.colEdit.HeaderCell.Style.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+
             // 
             // colDelete
             // 
-            this.colDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.colDelete.HeaderText = "";
             this.colDelete.Name = "colDelete";
-            this.colDelete.Text = "🗑 Delete"; // Tiếng Anh
-            this.colDelete.UseColumnTextForButtonValue = true;
-            this.colDelete.Width = 80;
+            this.colDelete.Width = 50;
+            this.colDelete.Image = global::GUI.Properties.Resources.icon_delete;
+            this.colDelete.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
+            this.colDelete.DefaultCellStyle = iconCellStyle; // <--- ÁP DỤNG STYLE RIÊNG
+
             // 
             // frmAllCoupons
             // 
@@ -233,7 +259,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colValue;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLimit;
         private System.Windows.Forms.DataGridViewTextBoxColumn colUsed;
-        private System.Windows.Forms.DataGridViewButtonColumn colEdit;
-        private System.Windows.Forms.DataGridViewButtonColumn colDelete;
+        private System.Windows.Forms.DataGridViewImageColumn colEdit;
+        private System.Windows.Forms.DataGridViewImageColumn colDelete;
     }
 }
