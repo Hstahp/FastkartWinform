@@ -77,7 +77,7 @@ namespace GUI
             frmLogin loginForm = Application.OpenForms.OfType<frmLogin>().FirstOrDefault();
             if (loginForm != null)
             {
-                loginForm.ResetForm(); // Xóa text cũ
+                loginForm.ResetForm();
                 loginForm.Show();
             }
             else
@@ -88,54 +88,36 @@ namespace GUI
 
         private void AdjustUserInfoWidth()
         {
-            // 1. Cài đặt giới hạn chiều rộng tối đa cho Tên (pixel)
-           
-
-            // 2. Đo chiều rộng thực tế của text
             Size textSize = TextRenderer.MeasureText(lblName.Text, lblName.Font);
 
             if (textSize.Width > AppConstants.MAX_NAME_WIDTH)
             {
-                // TRƯỜNG HỢP TÊN DÀI: Cắt bớt và thêm ...
                 lblName.AutoSize = false;
                 lblName.Width = AppConstants.MAX_NAME_WIDTH;
-                lblName.AutoEllipsis = true; // Tự động thêm dấu "..." ở cuối
+                lblName.AutoEllipsis = true;
             }
             else
             {
-                // TRƯỜNG HỢP TÊN NGẮN: Hiển thị đầy đủ
                 lblName.AutoSize = true;
                 lblName.AutoEllipsis = false;
             }
 
-            // 3. Căn chỉnh vị trí Role (luôn nằm thẳng hàng với Name)
-            // picUser.Right ~ 60 + 12 padding = 72
             int textStartX = picUser.Right + 12;
-
             lblName.Left = textStartX;
             lblRole.Left = textStartX;
 
-            // 4. Tính toán vị trí nút Mũi tên (Dropdown)
-            // Nó sẽ nằm sau thành phần dài nhất (Name hoặc Role)
             int maxContentRight = Math.Max(lblName.Right, lblRole.Right);
-
-            btnUserDropdown.Left = maxContentRight + 5; // Cách ra 5px
-
-            // 5. Cập nhật độ rộng của cả Panel
+            btnUserDropdown.Left = maxContentRight + 5;
             pnlUserInfo.Width = btnUserDropdown.Right + 20;
         }
 
- 
         private async void InitializeUserInfo()
         {
             if (UserSession.CurrentUser != null)
             {
                 lblName.Text = UserSession.CurrentUser.FullName;
                 lblRole.Text = UserSession.CurrentUser.RoleName;
-
-               
                 AdjustUserInfoWidth();
-             
 
                 string jsonString = UserSession.CurrentUser.ImgUser;
                 if (!string.IsNullOrEmpty(jsonString))
@@ -186,10 +168,8 @@ namespace GUI
             return croppedBmp;
         }
 
-  
         private void InitializeUserDropdown()
         {
- 
             pnlUserDropdown = new Panel
             {
                 Width = 200,
@@ -213,7 +193,6 @@ namespace GUI
                 HideUserDropdown();
             };
 
-            // Logic mở Setting từ Dropdown -> Kích hoạt Sidebar
             btnSettings.Click += (s, e) => {
                 HideUserDropdown();
                 if (currentSubMenuPanel != pnlSettingsSub)
@@ -271,7 +250,6 @@ namespace GUI
             {
                 HandleParentMenuClick(pnlProductSub, lblProductArrow);
             }
-
             OpenChildForm(new Product.frmCreate(), btnAddProduct);
         }
 
@@ -281,7 +259,6 @@ namespace GUI
             {
                 HandleParentMenuClick(pnlProductSub, lblProductArrow);
             }
-
             OpenChildForm(new Product.frmEdit(productId), btnProducts);
         }
 
@@ -291,7 +268,6 @@ namespace GUI
             {
                 HandleParentMenuClick(pnlCategorySub, lblCategoryArrow);
             }
-
             OpenChildForm(new Category.frmCreate(), btnAddCategory);
         }
 
@@ -301,7 +277,6 @@ namespace GUI
             {
                 HandleParentMenuClick(pnlCategorySub, lblCategoryArrow);
             }
-
             OpenChildForm(new Category.frmEdit(id), btnAddCategory);
         }
 
@@ -311,7 +286,6 @@ namespace GUI
             {
                 HandleParentMenuClick(pnlSubCategorySub, lblSubCategoryArrow);
             }
-
             OpenChildForm(new SubCategory.frmCreate(), btnAddSubCategory);
         }
 
@@ -321,7 +295,6 @@ namespace GUI
             {
                 HandleParentMenuClick(pnlSubCategorySub, lblSubCategoryArrow);
             }
-
             OpenChildForm(new SubCategory.frmEdit(id), btnAddSubCategory);
         }
 
@@ -331,7 +304,6 @@ namespace GUI
             {
                 HandleParentMenuClick(pnlUserSub, lblUserArrow);
             }
-           
             OpenChildForm(new frmAddNewUser(), btnAddUser);
         }
 
@@ -341,7 +313,6 @@ namespace GUI
             {
                 HandleParentMenuClick(pnlRolesSub, lblUserArrow);
             }
-
             OpenChildForm(new frmAddRole(), btnCreateRole);
         }
 
@@ -351,7 +322,6 @@ namespace GUI
             {
                 HandleParentMenuClick(pnlRolesSub, lblUserArrow);
             }
-
             OpenChildForm(new frmAllRole(), btnAllRoles);
         }
 
@@ -413,8 +383,6 @@ namespace GUI
                 btnRoles.Visible = false;
                 pnlRolesSub.Visible = false;
             }
-
-            // ... Làm tương tự cho Category, Attributes ...
         }
 
         private void picUser_Paint(object sender, PaintEventArgs e)
@@ -432,9 +400,13 @@ namespace GUI
 
         private void InitializeSearchBox()
         {
+            // ✅ SET TEXT MẶC ĐỊNH (thay cho PlaceholderText)
+            txtSearch.Text = AppConstants.SEARCH_PLACEHOLDER; // "🔍  Search products, orders, customers..."
+            txtSearch.ForeColor = Color.FromArgb(107, 114, 128); // Màu xám nhạt
+
             txtSearch.GotFocus += (s, e) =>
             {
-                if (txtSearch.Text == "🔍  Search products, orders, customers...")
+                if (txtSearch.Text == AppConstants.SEARCH_PLACEHOLDER)
                 {
                     txtSearch.Text = "";
                     txtSearch.ForeColor = Color.FromArgb(31, 41, 55);
@@ -445,7 +417,7 @@ namespace GUI
             {
                 if (string.IsNullOrWhiteSpace(txtSearch.Text))
                 {
-                    txtSearch.Text = "🔍  Search products, orders, customers...";
+                    txtSearch.Text = AppConstants.SEARCH_PLACEHOLDER;
                     txtSearch.ForeColor = Color.FromArgb(107, 114, 128);
                 }
             };
@@ -457,14 +429,10 @@ namespace GUI
         private void OpenChildForm(Form childForm, Button clickedButton)
         {
             HideUserDropdown();
-
-            // BẮT BUỘC PHẢI CÓ DÒNG NÀY:
             childForm.TopLevel = false;
-
             childForm.FormBorderStyle = FormBorderStyle.None;
             childForm.Dock = DockStyle.Fill;
 
-            // (Phần còn lại giữ nguyên)
             if (childForm is frmProfileSetting profileForm)
             {
                 profileForm.ProfileUpdated += (s, e) =>
@@ -569,6 +537,7 @@ namespace GUI
             pnlRolesSub.Height = 0;
             pnlSettingsSub.Height = 0;
             pnlPOSSub.Height = 0;
+            pnlOrderSub.Height = 0;
             if (pnlMarketingSub != null) pnlMarketingSub.Height = 0;
         }
 
@@ -643,10 +612,17 @@ namespace GUI
         {
             HandleParentMenuClick(pnlSettingsSub, lblSettingsArrow);
         }
+
         private void btnPOSMenu_Click(object sender, EventArgs e)
         {
             HandleParentMenuClick(pnlPOSSub, lblPOSArrow);
         }
+
+        private void btnOrder_Click(object sender, EventArgs e)
+        {
+            HandleParentMenuClick(pnlOrderSub, lblOrderArrow);
+        }
+
         #endregion
 
         #region Xử lý Hover & Highlight
@@ -731,6 +707,11 @@ namespace GUI
                 btnPOSMenu.BackColor = sidebarHover;
                 lblPOSArrow.BackColor = sidebarHover;
             }
+            else if (parentPanel == pnlOrderSub)
+            {
+                btnOrder.BackColor = sidebarHover;
+                lblOrderArrow.BackColor = sidebarHover;
+            }
             else if (parentPanel == pnlMarketingSub)
             {
                 btnMarketing.BackColor = sidebarHover;
@@ -748,6 +729,10 @@ namespace GUI
             AddHoverToParentButton(btnUser, lblUserArrow);
             AddHoverToParentButton(btnRoles, lblRolesArrow);
             AddHoverToParentButton(btnSettings, lblSettingsArrow);
+            AddHoverToParentButton(btnPOSMenu, lblPOSArrow); // ✅ SỬA: Đổi từ btnPOS -> btnPOSMenu
+            AddHoverToParentButton(btnOrder, lblOrderArrow);
+            AddHoverToChildButton(btnInvoiceManagement);
+
             AddHoverToChildButton(btnPermission);
             AddHoverToChildButton(btnProducts);
             AddHoverToChildButton(btnAddProduct);
@@ -764,6 +749,7 @@ namespace GUI
             AddHoverToChildButton(btnProfileSetting);
             AddHoverToChildButton(btnPOS);
             AddHoverToChildButton(btnScanQR);
+            AddHoverToChildButton(btnPayment);
         }
 
         private void AddHoverToParentButton(Button btn, Label lbl)
@@ -797,6 +783,8 @@ namespace GUI
                     else if (currentActiveButton.Parent == pnlUserSub) parentBtnToKeepHovered = btnUser;
                     else if (currentActiveButton.Parent == pnlRolesSub) parentBtnToKeepHovered = btnRoles;
                     else if (currentActiveButton.Parent == pnlSettingsSub) parentBtnToKeepHovered = btnSettings;
+                    else if (currentActiveButton.Parent == pnlPOSSub) parentBtnToKeepHovered = btnPOSMenu; // ✅ SỬA
+                    else if (currentActiveButton.Parent == pnlOrderSub) parentBtnToKeepHovered = btnOrder;
 
                     if (btn == parentBtnToKeepHovered)
                     {
@@ -835,6 +823,8 @@ namespace GUI
                         else if (currentActiveButton.Parent == pnlUserSub) parentBtnToKeepHovered = btnUser;
                         else if (currentActiveButton.Parent == pnlRolesSub) parentBtnToKeepHovered = btnRoles;
                         else if (currentActiveButton.Parent == pnlSettingsSub) parentBtnToKeepHovered = btnSettings;
+                        else if (currentActiveButton.Parent == pnlPOSSub) parentBtnToKeepHovered = btnPOSMenu; // ✅ SỬA
+                        else if (currentActiveButton.Parent == pnlOrderSub) parentBtnToKeepHovered = btnOrder;
 
                         if (btn == parentBtnToKeepHovered)
                         {
@@ -952,7 +942,6 @@ namespace GUI
         {
             frmAllUsers frm = new frmAllUsers();
 
-            // Xử lý Add User
             frm.RequestAddUser += (s, args) =>
             {
                 OpenAddNewUserForm();   
@@ -960,21 +949,18 @@ namespace GUI
 
             frm.RequestEditUser += (s, user) =>
             {
-                // Mở ProfileSetting giống như từ sidebar
                 frmProfileSetting editForm = new frmProfileSetting(user);
                 editForm.ProfileUpdated += (sender2, e2) =>
                 {
-                    InitializeUserInfo(); // Cập nhật header nếu edit chính mình
-                    frm.LoadData(); // Reload data trong frmAllUsers
+                    InitializeUserInfo();
+                    frm.LoadData();
                 };
 
-                // Mở Settings submenu
                 if (currentSubMenuPanel != pnlSettingsSub)
                 {
                     HandleParentMenuClick(pnlSettingsSub, lblSettingsArrow);
                 }
 
-                // Mở form trong panel chính
                 OpenChildForm(editForm, btnProfileSetting);
             };
 
@@ -1003,13 +989,10 @@ namespace GUI
 
         private void OpenPermissionForm()
         {
-            // Mở menu cha nếu chưa mở
             if (currentSubMenuPanel != pnlRolesSub)
             {
                 HandleParentMenuClick(pnlRolesSub, lblRolesArrow);
             }
-
-            // Mở form Permission vào panel chính
             OpenChildForm(new frmPermission(), btnPermission);
         }
 
@@ -1017,14 +1000,17 @@ namespace GUI
         {
             OpenPermissionForm();
         }
+
         private void btnPOS_Click(object sender, EventArgs e)
         {
             OpenPOSForm();
         }
+
         private void btnScanQR_Click(object sender, EventArgs e)
         {
             OpenScanQRForm();
         }
+
         private void OpenPOSForm()
         {
             _currentPosForm = new frmPOS();
@@ -1035,25 +1021,20 @@ namespace GUI
 
             OpenChildForm(_currentPosForm, btnPOS);
         }
+
         private void OpenScanQRForm()
         {
             _currentScanQRForm = new frmScanQR();
 
-            // ✅ SỬA: Event trả về SKU (string), không phải Product ID (int)
             _currentScanQRForm.QRCodeScanned += (s, scannedData) =>
             {
                 if (_currentPosForm != null)
                 {
                     try
                     {
-                        // ✅ Parse QR Code để lấy SKU
                         var qrCodeBLL = new QRCodeBLL();
                         string sku = qrCodeBLL.ParseQRCode(scannedData);
-
-                        // ✅ Gọi AddProductBySku() thay vì AddProductById()
                         _currentPosForm.AddProductBySku(sku);
-
-                        // Quay lại POS form
                         OpenPOSForm();
 
                         MessageBox.Show($"✅ Product added (SKU: {sku}) to cart!",
@@ -1072,6 +1053,16 @@ namespace GUI
             };
 
             OpenChildForm(_currentScanQRForm, btnScanQR);
+        }
+
+        private void btnPayment_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new GUI.Order.frmPaymentList(), btnPayment);
+        }
+
+        private void btnInvoiceManagement_Click(object sender, EventArgs e)
+        {
+            OpenChildForm(new GUI.Order.frmInvoiceManagement(), btnInvoiceManagement);
         }
         #endregion
     }

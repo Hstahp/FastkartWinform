@@ -9,6 +9,7 @@ namespace DTO
     public class OrderDTO
     {
         public int Uid { get; set; }
+
         public int? UserUid { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }

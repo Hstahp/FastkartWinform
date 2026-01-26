@@ -51,6 +51,11 @@
             this.btnProduct = new System.Windows.Forms.Button();
             this.lblProductArrow = new System.Windows.Forms.Label();
             this.btnDashboard = new System.Windows.Forms.Button();
+            this.pnlOrderSub = new System.Windows.Forms.Panel();
+            this.btnOrder = new System.Windows.Forms.Button();
+            this.lblOrderArrow = new System.Windows.Forms.Label();
+            this.btnPayment = new System.Windows.Forms.Button();
+            this.btnInvoiceManagement = new System.Windows.Forms.Button();
             this.pnlLogo = new System.Windows.Forms.Panel();
             this.lblLogo = new System.Windows.Forms.Label();
             this.btnAddSubCategory = new System.Windows.Forms.Button();
@@ -77,6 +82,7 @@
             this.lblMarketingArrow = new System.Windows.Forms.Label();
             // -----------------------------------------------------
             this.pnlSidebar.SuspendLayout();
+            this.pnlOrderSub.SuspendLayout();
             this.pnlSettingsSub.SuspendLayout();
             this.btnSettings.SuspendLayout();
             this.pnlRolesSub.SuspendLayout();
@@ -113,6 +119,8 @@
             this.pnlSidebar.Controls.Add(this.btnAttributes);
             this.pnlSidebar.Controls.Add(this.pnlSubCategorySub);
             this.pnlSidebar.Controls.Add(this.btnSubCategory);
+            this.pnlSidebar.Controls.Add(this.pnlOrderSub);      // ✅ THÊM: Submenu Order
+            this.pnlSidebar.Controls.Add(this.btnOrder);         // ✅ THÊM: Button Order
             this.pnlSidebar.Controls.Add(this.pnlCategorySub);
             this.pnlSidebar.Controls.Add(this.btnCategory);
             this.pnlSidebar.Controls.Add(this.pnlPOSSub);
@@ -749,6 +757,95 @@
             this.btnDashboard.UseVisualStyleBackColor = true;
             this.btnDashboard.Click += new System.EventHandler(this.btnDashboard_Click);
             // 
+            // pnlOrderSub (Menu con)
+            // 
+            this.pnlOrderSub.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(24)))), ((int)(((byte)(39)))));
+            this.pnlOrderSub.Controls.Add(this.btnInvoiceManagement);
+            this.pnlOrderSub.Controls.Add(this.btnPayment);
+            this.pnlOrderSub.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlOrderSub.Location = new System.Drawing.Point(0, 330);
+            this.pnlOrderSub.Margin = new System.Windows.Forms.Padding(0);
+            this.pnlOrderSub.Name = "pnlOrderSub";
+            this.pnlOrderSub.Padding = new System.Windows.Forms.Padding(0, 5, 0, 5);
+            this.pnlOrderSub.Size = new System.Drawing.Size(325, 0);
+            this.pnlOrderSub.TabIndex = 21;
+
+            // 
+            // btnPayment
+            // 
+            this.btnPayment.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnPayment.FlatAppearance.BorderSize = 0;
+            this.btnPayment.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnPayment.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnPayment.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.btnPayment.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(213)))), ((int)(((byte)(219)))));
+            this.btnPayment.Location = new System.Drawing.Point(0, 5);
+            this.btnPayment.Margin = new System.Windows.Forms.Padding(0);
+            this.btnPayment.Name = "btnPayment";
+            this.btnPayment.Padding = new System.Windows.Forms.Padding(60, 0, 0, 0);
+            this.btnPayment.Size = new System.Drawing.Size(325, 48);
+            this.btnPayment.TabIndex = 1;
+            this.btnPayment.Text = "   💳  Payment List";
+            this.btnPayment.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnPayment.UseVisualStyleBackColor = true;
+            this.btnPayment.Click += new System.EventHandler(this.btnPayment_Click);
+            // 
+            // btnInvoiceManagement
+            // 
+            this.btnInvoiceManagement.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnInvoiceManagement.FlatAppearance.BorderSize = 0;
+            this.btnInvoiceManagement.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnInvoiceManagement.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnInvoiceManagement.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.btnInvoiceManagement.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(213)))), ((int)(((byte)(219)))));
+            this.btnInvoiceManagement.Location = new System.Drawing.Point(0, 53);
+            this.btnInvoiceManagement.Margin = new System.Windows.Forms.Padding(0);
+            this.btnInvoiceManagement.Name = "btnInvoiceManagement";
+            this.btnInvoiceManagement.Padding = new System.Windows.Forms.Padding(60, 0, 0, 0);
+            this.btnInvoiceManagement.Size = new System.Drawing.Size(325, 48);
+            this.btnInvoiceManagement.TabIndex = 2;
+            this.btnInvoiceManagement.Text = "   📋  Invoice Management";
+            this.btnInvoiceManagement.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnInvoiceManagement.UseVisualStyleBackColor = true;
+            this.btnInvoiceManagement.Click += new System.EventHandler(this.btnInvoiceManagement_Click);
+            // 
+            // btnOrder
+            // 
+            this.btnOrder.Controls.Add(this.lblOrderArrow);
+            this.btnOrder.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnOrder.FlatAppearance.BorderSize = 0;
+            this.btnOrder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
+            this.btnOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnOrder.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.btnOrder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(229)))), ((int)(((byte)(231)))), ((int)(((byte)(235)))));
+            this.btnOrder.Location = new System.Drawing.Point(0, 330);
+            this.btnOrder.Margin = new System.Windows.Forms.Padding(0);
+            this.btnOrder.Name = "btnOrder";
+            this.btnOrder.Padding = new System.Windows.Forms.Padding(25, 0, 0, 0);
+            this.btnOrder.Size = new System.Drawing.Size(325, 65);
+            this.btnOrder.TabIndex = 20;
+            this.btnOrder.Text = "📦  Orders";
+            this.btnOrder.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnOrder.UseVisualStyleBackColor = true;
+            this.btnOrder.Click += new System.EventHandler(this.btnOrder_Click);
+            
+            // 
+            // lblOrderArrow
+            // 
+            this.lblOrderArrow.BackColor = System.Drawing.Color.Transparent;
+            this.lblOrderArrow.Dock = System.Windows.Forms.DockStyle.Right;
+            this.lblOrderArrow.Font = new System.Drawing.Font("Segoe UI", 11F);
+            this.lblOrderArrow.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(156)))), ((int)(((byte)(163)))), ((int)(((byte)(175)))));
+            this.lblOrderArrow.Location = new System.Drawing.Point(275, 0);
+            this.lblOrderArrow.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblOrderArrow.Name = "lblOrderArrow";
+            this.lblOrderArrow.Size = new System.Drawing.Size(50, 65);
+            this.lblOrderArrow.TabIndex = 0;
+            this.lblOrderArrow.Text = "›";
+            this.lblOrderArrow.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblOrderArrow.Click += new System.EventHandler(this.btnOrder_Click);
+            
+            // 
             // pnlLogo
             // 
             this.pnlLogo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(24)))), ((int)(((byte)(39)))));
@@ -992,6 +1089,7 @@
             this.Text = "Fastkart - Admin Dashboard";
             this.Load += new System.EventHandler(this.frmMainAdmin_Load);
             this.pnlSidebar.ResumeLayout(false);
+            this.pnlOrderSub.ResumeLayout(false);
             this.pnlSettingsSub.ResumeLayout(false);
             this.btnSettings.ResumeLayout(false);
             this.pnlRolesSub.ResumeLayout(false);
@@ -1167,5 +1265,10 @@
         private System.Windows.Forms.Button btnAddCoupon;
         private System.Windows.Forms.Button btnMarketing;
         private System.Windows.Forms.Label lblMarketingArrow;
+        private System.Windows.Forms.Panel pnlOrderSub;
+        private System.Windows.Forms.Button btnPayment;
+        private System.Windows.Forms.Button btnInvoiceManagement;
+        private System.Windows.Forms.Button btnOrder;
+        private System.Windows.Forms.Label lblOrderArrow;
     }
-}   
+} 

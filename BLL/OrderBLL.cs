@@ -4,6 +4,7 @@ using DTO;
 using Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BLL
@@ -16,6 +17,10 @@ namespace BLL
         {
             _orderDAL = new OrderDAL();
         }
+
+        // ========================================
+        // PHẦN 1: CHECKOUT METHODS (ĐÃ CÓ)
+        // ========================================
 
         /// <summary>
         /// Xử lý checkout với TIỀN MẶT
@@ -168,7 +173,7 @@ namespace BLL
                     OrderUid = orderUid,
                     PaymentUid = paymentUid,
                     PaymentUrl = momoResponse.qrCodeUrl,
-                    RequestId = momoResponse.requestId, // ✅ THÊM
+                    RequestId = momoResponse.requestId,
                     Message = "Scan QR to pay"
                 };
             }
@@ -198,7 +203,7 @@ namespace BLL
                     _orderDAL.UpdateProductStock(item.ProductUid, item.Quantity);
                 }
 
-                // 4. ✅ THÊM: Update Order Status
+                // 4. Update Order Status
                 _orderDAL.UpdateOrderStatus(orderUid, "Completed");
 
                 System.Diagnostics.Debug.WriteLine($"✅ [MoMo] Payment confirmed: Order={orderUid}, TxnID={transactionId}");
@@ -208,6 +213,106 @@ namespace BLL
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"❌ [MoMo] Confirm Error: {ex.Message}");
+                return false;
+            }
+        }
+
+        // ========================================
+        // PHẦN 2: ORDER MANAGEMENT METHODS (MỚI THÊM)
+        // ========================================
+
+        /// <summary>
+        /// ✅ THÊM: Lấy tổng tiền của đơn hàng (cho frmPayment)
+        /// </summary>
+        public decimal? GetOrderTotalAmount(int orderUid)
+        {
+            try
+            {
+                return _orderDAL.GetOrderTotalAmount(orderUid);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error GetOrderTotalAmount: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// ✅ THÊM: Lấy trạng thái đơn hàng (cho frmPayment)
+        /// </summary>
+        public string GetOrderStatus(int orderUid)
+        {
+            try
+            {
+                return _orderDAL.GetOrderStatus(orderUid);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error GetOrderStatus: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// ✅ THÊM: Lấy danh sách orders với filter & pagination (cho frmInvoiceManagement)
+        /// </summary>
+        public List<OrderDTO> GetAllOrders(string keyword, string status, DateTime? fromDate, DateTime? toDate, int skip, int take)
+        {
+            try
+            {
+                return _orderDAL.GetAllOrders(keyword, status, fromDate, toDate, skip, take);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error GetAllOrders: {ex.Message}");
+                return new List<OrderDTO>();
+            }
+        }
+
+        /// <summary>
+        /// ✅ THÊM: Đếm tổng số orders (cho pagination trong frmInvoiceManagement)
+        /// </summary>
+        public int CountOrders(string keyword, string status, DateTime? fromDate, DateTime? toDate)
+        {
+            try
+            {
+                return _orderDAL.CountOrders(keyword, status, fromDate, toDate);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error CountOrders: {ex.Message}");
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// ✅ THÊM: Lấy chi tiết 1 order (bao gồm OrderItems + Payment) cho frmInvoiceManagement
+        /// </summary>
+        public OrderDTO GetOrderById(int orderUid)
+        {
+            try
+            {
+                return _orderDAL.GetOrderById(orderUid);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error GetOrderById: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// ✅ THÊM: Hủy đơn hàng (hoàn trả stock) cho frmInvoiceManagement
+        /// </summary>
+        public bool CancelOrder(int orderUid, string cancelReason)
+        {
+            try
+            {
+                return _orderDAL.CancelOrder(orderUid, cancelReason);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ Error CancelOrder: {ex.Message}");
                 return false;
             }
         }
