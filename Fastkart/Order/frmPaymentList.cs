@@ -24,7 +24,7 @@ namespace GUI.Order
 
         private void FrmPaymentList_Load(object sender, EventArgs e)
         {
-            this.Text = "Quản lý thanh toán";
+            this.Text = "Payment Management"; // Translated
             this.BackColor = Color.FromArgb(240, 242, 245);
             InitializeUI();
             LoadPayments();
@@ -63,10 +63,10 @@ namespace GUI.Order
             summaryPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             mainPanel.Controls.Add(summaryPanel);
 
-            // DataGridView - ✅ CHIỀU CAO CỐ ĐỊNH
+            // DataGridView - ✅ FIXED HEIGHT
             DataGridView dgv = CreatePaymentGrid();
             dgv.Location = new Point(0, 270);
-            dgv.Size = new Size(mainPanel.Width - 40, mainPanel.Height - 310); // ✅ Chiều cao không đổi
+            dgv.Size = new Size(mainPanel.Width - 40, mainPanel.Height - 310); // ✅ Fixed height
             dgv.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             mainPanel.Controls.Add(dgv);
         }
@@ -82,33 +82,13 @@ namespace GUI.Order
 
             Label lblTitle = new Label
             {
-                Text = "💳 QUẢN LÝ THANH TOÁN",
+                Text = "PAYMENT MANAGEMENT",
                 Font = new Font("Segoe UI", 18, FontStyle.Bold),
                 ForeColor = Color.FromArgb(52, 73, 94),
                 AutoSize = true,
                 Location = new Point(0, 20)
             };
             panel.Controls.Add(lblTitle);
-
-            Button btnRefresh = new Button
-            {
-                Text = "🔄 Làm mới",
-                Size = new Size(140, 40),
-                Location = new Point(panel.Width - 160, 15),
-                Anchor = AnchorStyles.Top | AnchorStyles.Right,
-                BackColor = Color.FromArgb(52, 152, 219),
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            btnRefresh.FlatAppearance.BorderSize = 0;
-            btnRefresh.Click += (s, e) =>
-            {
-                LoadPayments();
-                UpdateSummary();
-            };
-            panel.Controls.Add(btnRefresh);
 
             return panel;
         }
@@ -125,7 +105,7 @@ namespace GUI.Order
             // Payment Method filter
             Label lblMethod = new Label
             {
-                Text = "Phương thức:",
+                Text = "Method:",
                 AutoSize = true,
                 Location = new Point(15, 20),
                 Font = new Font("Segoe UI", 10)
@@ -139,7 +119,7 @@ namespace GUI.Order
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Font = new Font("Segoe UI", 10)
             };
-            cboMethod.Items.AddRange(new object[] { "Tất cả", "Cash", "MoMo" });
+            cboMethod.Items.AddRange(new object[] { "All", "Cash", "MoMo" });
             cboMethod.SelectedIndex = 0;
             cboMethod.SelectedIndexChanged += (s, e) =>
             {
@@ -152,7 +132,7 @@ namespace GUI.Order
             // Payment Status filter
             Label lblStatus = new Label
             {
-                Text = "Trạng thái:",
+                Text = "Status:",
                 AutoSize = true,
                 Location = new Point(300, 20),
                 Font = new Font("Segoe UI", 10)
@@ -166,7 +146,7 @@ namespace GUI.Order
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Font = new Font("Segoe UI", 10)
             };
-            cboStatus.Items.AddRange(new object[] { "Tất cả", "Pending", "Completed", "Failed", "Cancelled" });
+            cboStatus.Items.AddRange(new object[] { "All", "Pending", "Completed", "Failed", "Cancelled" });
             cboStatus.SelectedIndex = 0;
             cboStatus.SelectedIndexChanged += (s, e) =>
             {
@@ -179,7 +159,7 @@ namespace GUI.Order
             // Date Range
             Label lblFrom = new Label
             {
-                Text = "Từ ngày:",
+                Text = "From Date:",
                 AutoSize = true,
                 Location = new Point(15, 55),
                 Font = new Font("Segoe UI", 10)
@@ -203,7 +183,7 @@ namespace GUI.Order
 
             Label lblTo = new Label
             {
-                Text = "Đến ngày:",
+                Text = "To Date:",
                 AutoSize = true,
                 Location = new Point(270, 55),
                 Font = new Font("Segoe UI", 10)
@@ -225,13 +205,13 @@ namespace GUI.Order
             };
             panel.Controls.Add(dtpTo);
 
-            // Clear button
+            // Clear button - ✅ ĐỔI MÀU THÀNH ĐỎ
             Button btnClear = new Button
             {
-                Text = "✖ Xóa bộ lọc",
+                Text = "Clear Filter",
                 Size = new Size(130, 30),
                 Location = new Point(530, 50),
-                BackColor = Color.FromArgb(149, 165, 166),
+                BackColor = Color.FromArgb(231, 76, 60), // ✅ Đổi từ Color.FromArgb(149, 165, 166) thành màu đỏ
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
@@ -273,10 +253,10 @@ namespace GUI.Order
                 cardContainer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             }
 
-            cardContainer.Controls.Add(CreateSummaryCard("💳 Tổng GD", "0", "lblTotalPayments", Color.FromArgb(52, 152, 219)), 0, 0);
-            cardContainer.Controls.Add(CreateSummaryCard("💰 Tổng tiền", "0 đ", "lblTotalAmount", Color.FromArgb(46, 204, 113)), 1, 0);
-            cardContainer.Controls.Add(CreateSummaryCard("💵 Tiền mặt", "0 đ", "lblCashTotal", Color.FromArgb(241, 196, 15)), 2, 0);
-            cardContainer.Controls.Add(CreateSummaryCard("📱 MoMo", "0 đ", "lblMoMoTotal", Color.FromArgb(155, 89, 182)), 3, 0);
+            cardContainer.Controls.Add(CreateSummaryCard("Total Trans", "0", "lblTotalPayments", Color.FromArgb(52, 152, 219)), 0, 0); // Translated
+            cardContainer.Controls.Add(CreateSummaryCard("Total Amount", "0 đ", "lblTotalAmount", Color.FromArgb(46, 204, 113)), 1, 0); // Translated
+            cardContainer.Controls.Add(CreateSummaryCard("Cash Total", "0 đ", "lblCashTotal", Color.FromArgb(241, 196, 15)), 2, 0); // Translated
+            cardContainer.Controls.Add(CreateSummaryCard("MoMo Total", "0 đ", "lblMoMoTotal", Color.FromArgb(155, 89, 182)), 3, 0); // Translated
 
             panel.Controls.Add(cardContainer);
 
@@ -347,7 +327,7 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Uid",
-                HeaderText = "MÃ TT",
+                HeaderText = "PAYMENT ID", // Translated
                 Width = 80,
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
@@ -359,7 +339,7 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "OrderUid",
-                HeaderText = "MÃ ĐH",
+                HeaderText = "ORDER ID", // Translated
                 Width = 90,
                 DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleCenter }
             });
@@ -367,14 +347,14 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "PaymentMethod",
-                HeaderText = "PHƯƠNG THỨC",
+                HeaderText = "METHOD", // Translated
                 Width = 120
             });
 
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Amount",
-                HeaderText = "SỐ TIỀN",
+                HeaderText = "AMOUNT", // Translated
                 Width = 130,
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
@@ -388,7 +368,7 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "PaymentStatus",
-                HeaderText = "TRẠNG THÁI",
+                HeaderText = "STATUS", // Translated
                 Width = 120,
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
@@ -400,7 +380,7 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "TransactionDate",
-                HeaderText = "NGÀY GD",
+                HeaderText = "TRANS. DATE", // Translated
                 Width = 150,
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
@@ -412,7 +392,7 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "BankTransactionCode",
-                HeaderText = "MÃ GIAO DỊCH",
+                HeaderText = "TRANS. CODE", // Translated
                 Width = 200
             });
 
@@ -473,7 +453,7 @@ namespace GUI.Order
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); // Translated
             }
         }
 

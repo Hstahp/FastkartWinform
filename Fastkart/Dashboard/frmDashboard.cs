@@ -17,14 +17,14 @@ namespace GUI
         {
             InitializeComponent();
 
-            // 1. Khởi tạo Logic
+            // 1. Initialize Logic
             _dashboardBLL = new DashboardBLL();
             _reportBLL = new ReportBLL();
 
-            // 2. Khởi tạo Giao diện Responsive
+            // 2. Initialize Responsive Layout
             InitializeResponsiveLayout();
 
-            // 3. Đăng ký sự kiện Load
+            // 3. Register Load Event
             this.Load += FrmDashboard_Load;
         }
 
@@ -34,7 +34,7 @@ namespace GUI
         }
 
         // ================================================================
-        // PHẦN 1: LOGIC & DỮ LIỆU
+        // PART 1: LOGIC & DATA
         // ================================================================
 
         private void LoadDashboardData()
@@ -44,12 +44,12 @@ namespace GUI
                 var kpi = _dashboardBLL.GetKPIData();
                 lblTotalUsers.Text = kpi.TotalUsers.ToString();
                 lblTotalProducts.Text = kpi.TotalProducts.ToString();
-                lblTotalRevenue.Text = $"{kpi.TotalRevenue:N0} đ";
+                lblTotalRevenue.Text = $"{kpi.TotalRevenue:N0} VND"; // Changed "đ" to "VND"
                 lblTotalOrders.Text = kpi.TotalOrders.ToString();
-                lblTodayRevenue.Text = $"{kpi.TodayRevenue:N0} đ";
+                lblTodayRevenue.Text = $"{kpi.TodayRevenue:N0} VND";
                 lblTodayOrders.Text = kpi.TodayOrders.ToString();
                 lblLowStock.Text = kpi.LowStockCount.ToString();
-                lblAvgOrder.Text = $"{kpi.AverageOrderValue:N0} đ";
+                lblAvgOrder.Text = $"{kpi.AverageOrderValue:N0} VND";
 
                 LoadRevenueChart();
                 LoadTopProductChart();
@@ -78,7 +78,7 @@ namespace GUI
             chartTopProducts.Series[0].Points.Clear();
             chartTopProducts.Series[0].ChartType = SeriesChartType.Column;
             chartTopProducts.Series[0].Color = Color.FromArgb(46, 204, 113);
-            chartTopProducts.Series[0]["PointWidth"] = "0.4"; // Độ rộng cột
+            chartTopProducts.Series[0]["PointWidth"] = "0.4"; // Column width
 
             foreach (var item in data) chartTopProducts.Series[0].Points.AddXY(item.ProductName, item.TotalQuantity);
         }
@@ -114,18 +114,18 @@ namespace GUI
                     dgvRecentOrders.Columns["OrderId"].Width = 60;
                 }
                 if (dgvRecentOrders.Columns.Contains("CustomerName"))
-                    dgvRecentOrders.Columns["CustomerName"].HeaderText = "Khách hàng";
+                    dgvRecentOrders.Columns["CustomerName"].HeaderText = "Customer";
                 if (dgvRecentOrders.Columns.Contains("TotalAmount"))
                 {
-                    dgvRecentOrders.Columns["TotalAmount"].HeaderText = "Tổng tiền";
+                    dgvRecentOrders.Columns["TotalAmount"].HeaderText = "Total Amount";
                     dgvRecentOrders.Columns["TotalAmount"].DefaultCellStyle.Format = "N0";
                     dgvRecentOrders.Columns["TotalAmount"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                 }
                 if (dgvRecentOrders.Columns.Contains("Status"))
-                    dgvRecentOrders.Columns["Status"].HeaderText = "Trạng thái";
+                    dgvRecentOrders.Columns["Status"].HeaderText = "Status";
                 if (dgvRecentOrders.Columns.Contains("OrderDate"))
                 {
-                    dgvRecentOrders.Columns["OrderDate"].HeaderText = "Ngày";
+                    dgvRecentOrders.Columns["OrderDate"].HeaderText = "Date";
                     dgvRecentOrders.Columns["OrderDate"].DefaultCellStyle.Format = "dd/MM HH:mm";
                 }
             }
@@ -139,21 +139,21 @@ namespace GUI
 
             if (dgvLowStock.Columns.Count > 0)
             {
-                if (dgvLowStock.Columns.Contains("ProductName")) dgvLowStock.Columns["ProductName"].HeaderText = "Tên SP";
+                if (dgvLowStock.Columns.Contains("ProductName")) dgvLowStock.Columns["ProductName"].HeaderText = "Product Name";
                 if (dgvLowStock.Columns.Contains("StockQuantity"))
                 {
-                    dgvLowStock.Columns["StockQuantity"].HeaderText = "SL";
+                    dgvLowStock.Columns["StockQuantity"].HeaderText = "Qty";
                     dgvLowStock.Columns["StockQuantity"].Width = 60;
                     dgvLowStock.Columns["StockQuantity"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 }
-                if (dgvLowStock.Columns.Contains("Sku")) dgvLowStock.Columns["Sku"].HeaderText = "Mã SKU";
+                if (dgvLowStock.Columns.Contains("Sku")) dgvLowStock.Columns["Sku"].HeaderText = "SKU";
             }
         }
 
-        private void BtnSalesReport_Click(object sender, EventArgs e) { ExportReport("DoanhThu", _reportBLL.ExportSalesReport); }
-        private void BtnProductReport_Click(object sender, EventArgs e) { ExportReport("TopSP", (f, t, p) => _reportBLL.ExportTopProductsReport(10, p)); }
-        private void BtnInventoryReport_Click(object sender, EventArgs e) { ExportReport("TonKho", (f, t, p) => _reportBLL.ExportInventoryReport(p)); }
-        private void BtnCustomerReport_Click(object sender, EventArgs e) { ExportReport("KhachHang", (f, t, p) => _reportBLL.ExportTopCustomersReport(10, p)); }
+        private void BtnSalesReport_Click(object sender, EventArgs e) { ExportReport("SalesReport", _reportBLL.ExportSalesReport); }
+        private void BtnProductReport_Click(object sender, EventArgs e) { ExportReport("TopProduct", (f, t, p) => _reportBLL.ExportTopProductsReport(10, p)); }
+        private void BtnInventoryReport_Click(object sender, EventArgs e) { ExportReport("Inventory", (f, t, p) => _reportBLL.ExportInventoryReport(p)); }
+        private void BtnCustomerReport_Click(object sender, EventArgs e) { ExportReport("Customer", (f, t, p) => _reportBLL.ExportTopCustomersReport(10, p)); }
 
         private void ExportReport(string name, Func<DateTime, DateTime, string, bool> func)
         {
@@ -162,15 +162,15 @@ namespace GUI
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
                     if (func(DateTime.Now, DateTime.Now, sfd.FileName))
-                        MessageBox.Show("Xuất thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Export successful!", "Notification", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     else
-                        MessageBox.Show("Lỗi xuất file!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Error exporting file!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
         // ================================================================
-        // PHẦN 2: CODE TẠO GIAO DIỆN RESPONSIVE (ĐÃ SỬA THỨ TỰ)
+        // PART 2: RESPONSIVE UI CREATION (ORDER FIXED)
         // ================================================================
 
         private void InitializeResponsiveLayout()
@@ -181,7 +181,7 @@ namespace GUI
             this.Controls.Add(mainPanel);
 
             // -------------------------------------------------------
-            // KHỞI TẠO CÁC CONTROL TRƯỚC (CHƯA ADD VÀO PANEL)
+            // INITIALIZE CONTROLS FIRST (NOT ADDED TO PANEL YET)
             // -------------------------------------------------------
 
             // 1. KPI Grid
@@ -191,16 +191,16 @@ namespace GUI
             Label tempLblTotalUsers, tempLblTotalProducts, tempLblTotalRevenue, tempLblTotalOrders;
             Label tempLblTodayRevenue, tempLblTodayOrders, tempLblLowStock, tempLblAvgOrder;
 
-            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalUsers, "Tổng người dùng", Color.FromArgb(52, 152, 219)), 0, 0);
-            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalProducts, "Tổng sản phẩm", Color.FromArgb(46, 204, 113)), 1, 0);
-            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalRevenue, "Tổng doanh thu", Color.FromArgb(155, 89, 182)), 2, 0);
-            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalOrders, "Tổng đơn hàng", Color.FromArgb(230, 126, 34)), 3, 0);
-            kpiLayout.Controls.Add(CreateKPICard(out tempLblTodayRevenue, "Doanh thu hôm nay", Color.FromArgb(52, 73, 94)), 0, 1);
-            kpiLayout.Controls.Add(CreateKPICard(out tempLblTodayOrders, "Đơn hàng hôm nay", Color.FromArgb(231, 76, 60)), 1, 1);
-            kpiLayout.Controls.Add(CreateKPICard(out tempLblLowStock, "Sắp hết hàng", Color.FromArgb(241, 196, 15)), 2, 1);
-            kpiLayout.Controls.Add(CreateKPICard(out tempLblAvgOrder, "Giá trị TB/Đơn", Color.FromArgb(26, 188, 156)), 3, 1);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalUsers, "Total Users", Color.FromArgb(52, 152, 219)), 0, 0);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalProducts, "Total Products", Color.FromArgb(46, 204, 113)), 1, 0);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalRevenue, "Total Revenue", Color.FromArgb(155, 89, 182)), 2, 0);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTotalOrders, "Total Orders", Color.FromArgb(230, 126, 34)), 3, 0);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTodayRevenue, "Today's Revenue", Color.FromArgb(52, 73, 94)), 0, 1);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblTodayOrders, "Today's Orders", Color.FromArgb(231, 76, 60)), 1, 1);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblLowStock, "Low Stock", Color.FromArgb(241, 196, 15)), 2, 1);
+            kpiLayout.Controls.Add(CreateKPICard(out tempLblAvgOrder, "Avg Order Value", Color.FromArgb(26, 188, 156)), 3, 1);
 
-            // Gán vào Designer controls
+            // Assign to Designer controls
             lblTotalUsers = tempLblTotalUsers;
             lblTotalProducts = tempLblTotalProducts;
             lblTotalRevenue = tempLblTotalRevenue;
@@ -215,17 +215,17 @@ namespace GUI
             chartsTopLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 65F));
             chartsTopLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35F));
 
-            chartRevenue7Days = CreateBaseChart("Doanh thu 7 ngày qua");
+            chartRevenue7Days = CreateBaseChart("Revenue (Last 7 Days)");
             ConfigureChartSeries(chartRevenue7Days, SeriesChartType.Line);
             chartsTopLayout.Controls.Add(chartRevenue7Days, 0, 0);
 
-            chartOrderStatus = CreateBaseChart("Trạng thái đơn hàng");
+            chartOrderStatus = CreateBaseChart("Order Status");
             ConfigureChartSeries(chartOrderStatus, SeriesChartType.Pie);
             chartsTopLayout.Controls.Add(chartOrderStatus, 1, 0);
 
             // 3. Chart Bot
             Panel chartBotPanel = new Panel { Dock = DockStyle.Top, Height = 350, Padding = new Padding(0, 0, 0, 20) };
-            chartTopProducts = CreateBaseChart("Top 5 sản phẩm bán chạy");
+            chartTopProducts = CreateBaseChart("Top 5 Best Selling Products");
             ConfigureChartSeries(chartTopProducts, SeriesChartType.Column);
             chartBotPanel.Controls.Add(chartTopProducts);
 
@@ -235,29 +235,29 @@ namespace GUI
             tablesLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
 
             dgvRecentOrders = CreateBaseGrid();
-            tablesLayout.Controls.Add(CreateGridContainer("📋 Đơn hàng gần đây", dgvRecentOrders), 0, 0);
+            tablesLayout.Controls.Add(CreateGridContainer("📋 Recent Orders", dgvRecentOrders), 0, 0);
             dgvLowStock = CreateBaseGrid();
-            tablesLayout.Controls.Add(CreateGridContainer("⚠️ Sắp hết hàng", dgvLowStock), 1, 0);
+            tablesLayout.Controls.Add(CreateGridContainer("⚠️ Low Stock Products", dgvLowStock), 1, 0);
 
             // 5. Export Buttons
             FlowLayoutPanel exportPanel = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 60, BackColor = Color.White, Padding = new Padding(10), FlowDirection = FlowDirection.LeftToRight };
-            exportPanel.Controls.Add(new Label { Text = "📄 Xuất báo cáo:", Font = new Font("Segoe UI", 11, FontStyle.Bold), AutoSize = true, Margin = new Padding(0, 10, 20, 0) });
-            exportPanel.Controls.Add(CreateExportButton("Báo cáo doanh thu", Color.FromArgb(52, 152, 219), BtnSalesReport_Click));
-            exportPanel.Controls.Add(CreateExportButton("Top sản phẩm", Color.FromArgb(46, 204, 113), BtnProductReport_Click));
-            exportPanel.Controls.Add(CreateExportButton("Báo cáo tồn kho", Color.FromArgb(155, 89, 182), BtnInventoryReport_Click));
-            exportPanel.Controls.Add(CreateExportButton("Top khách hàng", Color.FromArgb(230, 126, 34), BtnCustomerReport_Click));
+            exportPanel.Controls.Add(new Label { Text = "📄 Export Reports:", Font = new Font("Segoe UI", 11, FontStyle.Bold), AutoSize = true, Margin = new Padding(0, 10, 20, 0) });
+            exportPanel.Controls.Add(CreateExportButton("Sales Report", Color.FromArgb(52, 152, 219), BtnSalesReport_Click));
+            exportPanel.Controls.Add(CreateExportButton("Top Products", Color.FromArgb(46, 204, 113), BtnProductReport_Click));
+            exportPanel.Controls.Add(CreateExportButton("Inventory Report", Color.FromArgb(155, 89, 182), BtnInventoryReport_Click));
+            exportPanel.Controls.Add(CreateExportButton("Top Customers", Color.FromArgb(230, 126, 34), BtnCustomerReport_Click));
 
 
             // -------------------------------------------------------
-            // QUAN TRỌNG: ADD NGƯỢC TỪ DƯỚI LÊN TRÊN
-            // (Vì Dock = Top: Cái nào Add sau cùng sẽ nằm Trên Cùng)
+            // IMPORTANT: ADD REVERSE FROM BOTTOM TO TOP
+            // (Because Dock = Top: The last added control will be at the very TOP)
             // -------------------------------------------------------
 
-            mainPanel.Controls.Add(exportPanel);      // 5. Nằm dưới cùng
-            mainPanel.Controls.Add(tablesLayout);     // 4. Nằm trên Export
-            mainPanel.Controls.Add(chartBotPanel);    // 3. Nằm trên Tables
-            mainPanel.Controls.Add(chartsTopLayout);  // 2. Nằm trên Chart Bot
-            mainPanel.Controls.Add(kpiLayout);        // 1. Nằm trên cùng (KPI)
+            mainPanel.Controls.Add(exportPanel);      // 5. Bottom
+            mainPanel.Controls.Add(tablesLayout);     // 4. Above Export
+            mainPanel.Controls.Add(chartBotPanel);    // 3. Above Tables
+            mainPanel.Controls.Add(chartsTopLayout);  // 2. Above Chart Bot
+            mainPanel.Controls.Add(kpiLayout);        // 1. Top most (KPI)
         }
 
         // --- HELPERS ---
