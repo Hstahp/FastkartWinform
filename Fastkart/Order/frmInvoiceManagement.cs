@@ -41,6 +41,9 @@
 
                 LoadActionIcon();
                 this.Load += FrmInvoiceManagement_Load;
+                
+                // ✅ THÊM: Auto-reload khi form được kích hoạt
+                this.Activated += FrmInvoiceManagement_Activated;
             }
 
             private void LoadActionIcon()
@@ -202,7 +205,7 @@
                 {
                     if (string.IsNullOrWhiteSpace(txtSearch.Text))
                     {
-                        txtSearch.Text = "🔍 Search...";
+                        txtSearch.Text = "Search...";
                         txtSearch.ForeColor = Color.Gray;
                     }
                 };
@@ -736,6 +739,12 @@
                 {
                     MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+
+            private void FrmInvoiceManagement_Activated(object sender, EventArgs e)
+            {
+                LoadOrders();
+                UpdateSummary();
             }
             #endregion
 

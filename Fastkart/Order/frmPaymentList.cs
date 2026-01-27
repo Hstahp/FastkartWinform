@@ -14,17 +14,34 @@ namespace GUI.Order
         private string _paymentStatusFilter = "";
         private DateTime? _fromDate = null;
         private DateTime? _toDate = null;
+        
+        // ✅ THÊM: Biến phân trang
+        private int _currentPage = 1;
+        private int _pageSize = 10;
+        private int _totalPages = 1;
+        private FlowLayoutPanel pnlPagination;
+        private ComboBox cboPageSize;
 
         public frmPaymentList()
         {
             InitializeComponent();
             _paymentBLL = new PaymentBLL();
             this.Load += FrmPaymentList_Load;
+            
+            // ✅ THÊM: Auto-reload khi form được kích hoạt
+            this.Activated += FrmPaymentList_Activated;
+        }
+
+        private void FrmPaymentList_Activated(object sender, EventArgs e)
+        {
+            // ✅ Reload data khi quay lại form
+            LoadPayments();
+            UpdateSummary();
         }
 
         private void FrmPaymentList_Load(object sender, EventArgs e)
         {
-            this.Text = "Payment Management"; // Translated
+            this.Text = "Payment Management";
             this.BackColor = Color.FromArgb(240, 242, 245);
             InitializeUI();
             LoadPayments();
@@ -33,7 +50,6 @@ namespace GUI.Order
 
         private void InitializeUI()
         {
-            // Main container
             Panel mainPanel = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -42,31 +58,35 @@ namespace GUI.Order
             };
             this.Controls.Add(mainPanel);
 
-            // Header
             Panel headerPanel = CreateHeaderPanel();
             headerPanel.Location = new Point(0, 0);
             headerPanel.Width = mainPanel.Width - 40;
             headerPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             mainPanel.Controls.Add(headerPanel);
 
-            // Filter
             Panel filterPanel = CreateFilterPanel();
             filterPanel.Location = new Point(0, 70);
             filterPanel.Width = mainPanel.Width - 40;
             filterPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             mainPanel.Controls.Add(filterPanel);
 
-            // Summary
             Panel summaryPanel = CreateSummaryPanel();
             summaryPanel.Location = new Point(0, 160);
             summaryPanel.Width = mainPanel.Width - 40;
             summaryPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             mainPanel.Controls.Add(summaryPanel);
 
-            // DataGridView - ✅ FIXED HEIGHT
+            // ✅ THÊM: Pagination panel
+            pnlPagination = CreatePaginationPanel();
+            pnlPagination.Location = new Point(0, mainPanel.Height - 90);
+            pnlPagination.Width = mainPanel.Width - 40;
+            pnlPagination.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            mainPanel.Controls.Add(pnlPagination);
+
+            // ✅ SỬA: DataGridView với chiều cao cố định
             DataGridView dgv = CreatePaymentGrid();
             dgv.Location = new Point(0, 270);
-            dgv.Size = new Size(mainPanel.Width - 40, mainPanel.Height - 310); // ✅ Fixed height
+            dgv.Size = new Size(mainPanel.Width - 40, mainPanel.Height - 370);
             dgv.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             mainPanel.Controls.Add(dgv);
         }
@@ -102,7 +122,6 @@ namespace GUI.Order
                 Padding = new Padding(15)
             };
 
-            // Payment Method filter
             Label lblMethod = new Label
             {
                 Text = "Method:",
@@ -124,12 +143,12 @@ namespace GUI.Order
             cboMethod.SelectedIndexChanged += (s, e) =>
             {
                 _paymentMethodFilter = cboMethod.SelectedIndex == 0 ? "" : cboMethod.SelectedItem.ToString();
+                _currentPage = 1;
                 LoadPayments();
                 UpdateSummary();
             };
             panel.Controls.Add(cboMethod);
 
-            // Payment Status filter
             Label lblStatus = new Label
             {
                 Text = "Status:",
@@ -151,12 +170,12 @@ namespace GUI.Order
             cboStatus.SelectedIndexChanged += (s, e) =>
             {
                 _paymentStatusFilter = cboStatus.SelectedIndex == 0 ? "" : cboStatus.SelectedItem.ToString();
+                _currentPage = 1;
                 LoadPayments();
                 UpdateSummary();
             };
             panel.Controls.Add(cboStatus);
 
-            // Date Range
             Label lblFrom = new Label
             {
                 Text = "From Date:",
@@ -176,6 +195,7 @@ namespace GUI.Order
             dtpFrom.ValueChanged += (s, e) =>
             {
                 _fromDate = dtpFrom.Value.Date;
+                _currentPage = 1;
                 LoadPayments();
                 UpdateSummary();
             };
@@ -200,18 +220,18 @@ namespace GUI.Order
             dtpTo.ValueChanged += (s, e) =>
             {
                 _toDate = dtpTo.Value.Date;
+                _currentPage = 1;
                 LoadPayments();
                 UpdateSummary();
             };
             panel.Controls.Add(dtpTo);
 
-            // Clear button - ✅ ĐỔI MÀU THÀNH ĐỎ
             Button btnClear = new Button
             {
                 Text = "Clear Filter",
                 Size = new Size(130, 30),
                 Location = new Point(530, 50),
-                BackColor = Color.FromArgb(231, 76, 60), // ✅ Đổi từ Color.FromArgb(149, 165, 166) thành màu đỏ
+                BackColor = Color.FromArgb(231, 76, 60),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
@@ -224,6 +244,7 @@ namespace GUI.Order
                 cboStatus.SelectedIndex = 0;
                 _fromDate = null;
                 _toDate = null;
+                _currentPage = 1;
                 LoadPayments();
                 UpdateSummary();
             };
@@ -253,10 +274,10 @@ namespace GUI.Order
                 cardContainer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             }
 
-            cardContainer.Controls.Add(CreateSummaryCard("Total Trans", "0", "lblTotalPayments", Color.FromArgb(52, 152, 219)), 0, 0); // Translated
-            cardContainer.Controls.Add(CreateSummaryCard("Total Amount", "0 đ", "lblTotalAmount", Color.FromArgb(46, 204, 113)), 1, 0); // Translated
-            cardContainer.Controls.Add(CreateSummaryCard("Cash Total", "0 đ", "lblCashTotal", Color.FromArgb(241, 196, 15)), 2, 0); // Translated
-            cardContainer.Controls.Add(CreateSummaryCard("MoMo Total", "0 đ", "lblMoMoTotal", Color.FromArgb(155, 89, 182)), 3, 0); // Translated
+            cardContainer.Controls.Add(CreateSummaryCard("Total Trans", "0", "lblTotalPayments", Color.FromArgb(52, 152, 219)), 0, 0);
+            cardContainer.Controls.Add(CreateSummaryCard("Total Amount", "0 đ", "lblTotalAmount", Color.FromArgb(46, 204, 113)), 1, 0);
+            cardContainer.Controls.Add(CreateSummaryCard("Cash Total", "0 đ", "lblCashTotal", Color.FromArgb(241, 196, 15)), 2, 0);
+            cardContainer.Controls.Add(CreateSummaryCard("MoMo Total", "0 đ", "lblMoMoTotal", Color.FromArgb(155, 89, 182)), 3, 0);
 
             panel.Controls.Add(cardContainer);
 
@@ -323,11 +344,10 @@ namespace GUI.Order
             dgv.EnableHeadersVisualStyles = false;
             dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(249, 250, 251);
 
-            // Columns
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Uid",
-                HeaderText = "PAYMENT ID", // Translated
+                HeaderText = "PAYMENT ID",
                 Width = 80,
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
@@ -339,7 +359,7 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "OrderUid",
-                HeaderText = "ORDER ID", // Translated
+                HeaderText = "ORDER ID",
                 Width = 90,
                 DefaultCellStyle = new DataGridViewCellStyle { Alignment = DataGridViewContentAlignment.MiddleCenter }
             });
@@ -347,14 +367,14 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "PaymentMethod",
-                HeaderText = "METHOD", // Translated
+                HeaderText = "METHOD",
                 Width = 120
             });
 
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Amount",
-                HeaderText = "AMOUNT", // Translated
+                HeaderText = "AMOUNT",
                 Width = 130,
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
@@ -368,7 +388,7 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "PaymentStatus",
-                HeaderText = "STATUS", // Translated
+                HeaderText = "STATUS",
                 Width = 120,
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
@@ -380,7 +400,7 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "TransactionDate",
-                HeaderText = "TRANS. DATE", // Translated
+                HeaderText = "TRANS. DATE",
                 Width = 150,
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
@@ -392,7 +412,7 @@ namespace GUI.Order
             dgv.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "BankTransactionCode",
-                HeaderText = "TRANS. CODE", // Translated
+                HeaderText = "TRANS. CODE",
                 Width = 200
             });
 
@@ -426,6 +446,133 @@ namespace GUI.Order
             }
         }
 
+        // ✅ THÊM: Pagination Panel
+        private FlowLayoutPanel CreatePaginationPanel()
+        {
+            return new FlowLayoutPanel
+            {
+                Name = "pnlPagination",
+                Height = 60,
+                BackColor = Color.White,
+                FlowDirection = FlowDirection.LeftToRight,
+                Padding = new Padding(15, 10, 15, 10)
+            };
+        }
+
+        // ✅ THÊM: Update Pagination UI
+        private void UpdatePagination()
+        {
+            if (pnlPagination == null) return;
+            pnlPagination.Controls.Clear();
+
+            // Page size selector
+            Label lblPageSize = new Label
+            {
+                Text = "Items per page:",
+                AutoSize = true,
+                Font = new Font("Segoe UI", 9),
+                Margin = new Padding(0, 10, 5, 0)
+            };
+            pnlPagination.Controls.Add(lblPageSize);
+
+            cboPageSize = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Width = 60,
+                Font = new Font("Segoe UI", 9),
+                Margin = new Padding(0, 8, 20, 0)
+            };
+            cboPageSize.Items.AddRange(new object[] { 5, 10, 20, 50, 100 });
+            cboPageSize.SelectedItem = _pageSize;
+            cboPageSize.SelectedIndexChanged += (s, e) =>
+            {
+                _pageSize = (int)cboPageSize.SelectedItem;
+                _currentPage = 1;
+                LoadPayments();
+            };
+            pnlPagination.Controls.Add(cboPageSize);
+
+            // Page info
+            Label lblInfo = new Label
+            {
+                Text = $"Page {_currentPage}/{_totalPages}",
+                AutoSize = true,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Margin = new Padding(0, 8, 20, 0)
+            };
+            pnlPagination.Controls.Add(lblInfo);
+
+            // First page button
+            Button btnFirst = CreatePageButton("⏮", () => { _currentPage = 1; LoadPayments(); }, _currentPage > 1);
+            pnlPagination.Controls.Add(btnFirst);
+
+            // Previous button
+            Button btnPrev = CreatePageButton("◄", () => { if (_currentPage > 1) { _currentPage--; LoadPayments(); } }, _currentPage > 1);
+            pnlPagination.Controls.Add(btnPrev);
+
+            // Page number buttons
+            int start = Math.Max(1, _currentPage - 2);
+            int end = Math.Min(_totalPages, _currentPage + 2);
+
+            for (int i = start; i <= end; i++)
+            {
+                int page = i;
+                Button btn = CreatePageButton(page.ToString(), () => { _currentPage = page; LoadPayments(); }, true, page == _currentPage);
+                pnlPagination.Controls.Add(btn);
+            }
+
+            // Next button
+            Button btnNext = CreatePageButton("►", () => { if (_currentPage < _totalPages) { _currentPage++; LoadPayments(); } }, _currentPage < _totalPages);
+            pnlPagination.Controls.Add(btnNext);
+
+            // Last page button
+            Button btnLast = CreatePageButton("⏭", () => { _currentPage = _totalPages; LoadPayments(); }, _currentPage < _totalPages);
+            pnlPagination.Controls.Add(btnLast);
+
+            // Total records
+            var allPayments = _paymentBLL.GetPaymentList();
+            if (!string.IsNullOrEmpty(_paymentMethodFilter))
+                allPayments = allPayments.Where(p => p.PaymentMethod == _paymentMethodFilter).ToList();
+            if (!string.IsNullOrEmpty(_paymentStatusFilter))
+                allPayments = allPayments.Where(p => p.PaymentStatus == _paymentStatusFilter).ToList();
+            if (_fromDate.HasValue)
+                allPayments = allPayments.Where(p => p.TransactionDate >= _fromDate.Value).ToList();
+            if (_toDate.HasValue)
+                allPayments = allPayments.Where(p => p.TransactionDate <= _toDate.Value.AddDays(1)).ToList();
+
+            Label lblTotal = new Label
+            {
+                Text = $"Total: {allPayments.Count} records",
+                AutoSize = true,
+                Font = new Font("Segoe UI", 9, FontStyle.Italic),
+                ForeColor = Color.Gray,
+                Margin = new Padding(20, 10, 0, 0)
+            };
+            pnlPagination.Controls.Add(lblTotal);
+        }
+
+        // ✅ THÊM: Create Page Button
+        private Button CreatePageButton(string text, Action onClick, bool enabled, bool active = false)
+        {
+            Button btn = new Button
+            {
+                Text = text,
+                Size = new Size(40, 35),
+                Enabled = enabled,
+                BackColor = active ? Color.FromArgb(46, 204, 113) : (enabled ? Color.White : Color.FromArgb(189, 195, 199)),
+                ForeColor = active || !enabled ? Color.White : Color.FromArgb(52, 73, 94),
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9, active ? FontStyle.Bold : FontStyle.Regular),
+                Cursor = enabled ? Cursors.Hand : Cursors.Default,
+                Margin = new Padding(2)
+            };
+            btn.FlatAppearance.BorderSize = active ? 0 : 1;
+            btn.FlatAppearance.BorderColor = Color.FromArgb(189, 195, 199);
+            btn.Click += (s, e) => onClick();
+            return btn;
+        }
+
+        // ✅ SỬA: LoadPayments với phân trang
         private void LoadPayments()
         {
             try
@@ -445,15 +592,32 @@ namespace GUI.Order
                 if (_toDate.HasValue)
                     allPayments = allPayments.Where(p => p.TransactionDate <= _toDate.Value.AddDays(1)).ToList();
 
+                // ✅ Tính toán phân trang
+                int total = allPayments.Count;
+                _totalPages = total > 0 ? (int)Math.Ceiling((double)total / _pageSize) : 1;
+
+                if (_currentPage > _totalPages && _totalPages > 0) _currentPage = _totalPages;
+                if (_currentPage < 1) _currentPage = 1;
+
+                // ✅ Lấy data theo trang
+                var pagedPayments = allPayments
+                    .Skip((_currentPage - 1) * _pageSize)
+                    .Take(_pageSize)
+                    .ToList();
+
                 DataGridView dgv = this.Controls.Find("dgvPayments", true).FirstOrDefault() as DataGridView;
                 if (dgv != null)
                 {
-                    dgv.DataSource = allPayments;
+                    dgv.DataSource = null;
+                    dgv.DataSource = pagedPayments;
+                    dgv.Refresh();
                 }
+
+                UpdatePagination();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); // Translated
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -463,7 +627,6 @@ namespace GUI.Order
             {
                 var allPayments = _paymentBLL.GetPaymentList();
 
-                // Apply filters
                 if (!string.IsNullOrEmpty(_paymentMethodFilter))
                     allPayments = allPayments.Where(p => p.PaymentMethod == _paymentMethodFilter).ToList();
 

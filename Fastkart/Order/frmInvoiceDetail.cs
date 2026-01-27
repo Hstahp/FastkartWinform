@@ -34,7 +34,7 @@ namespace GUI.Order
         {
             this.Text = $"Invoice #{_order.Uid}";
             this.Size = new Size(500, 700);
-            this.StartPosition = FormStartPosition.CenterScreen; // ✅ CENTER SCREEN
+            this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.White;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -53,7 +53,7 @@ namespace GUI.Order
 
             Label lblTitle = new Label
             {
-                Text = "📄 INVOICE",
+                Text = "INVOICE",
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
                 ForeColor = Color.FromArgb(52, 73, 94),
                 Location = new Point(15, yPos),
@@ -62,7 +62,7 @@ namespace GUI.Order
             mainPanel.Controls.Add(lblTitle);
             yPos += 40;
 
-            GroupBox grpOrder = CreateGroupBox("📋 Order Info", yPos, 150);
+            GroupBox grpOrder = CreateGroupBox("Order Info", yPos, 150);
             AddRow(grpOrder, "ID:", $"#{_order.Uid}", 25);
             AddRow(grpOrder, "Date:", _order.OrderDate.ToString("dd/MM HH:mm"), 50);
             AddRow(grpOrder, "By:", _order.CreatedBy ?? "N/A", 75);
@@ -71,7 +71,7 @@ namespace GUI.Order
             mainPanel.Controls.Add(grpOrder);
             yPos += 160;
 
-            GroupBox grpPayment = CreateGroupBox("💳 Payment", yPos, 110);
+            GroupBox grpPayment = CreateGroupBox("Payment", yPos, 110);
             AddRow(grpPayment, "Method:", "lblPaymentMethod", 25, true);
             AddRow(grpPayment, "Status:", "lblPaymentStatus", 50, true);
             AddRow(grpPayment, "Code:", "lblTransactionCode", 75, true);
@@ -80,7 +80,7 @@ namespace GUI.Order
 
             Label lblProducts = new Label
             {
-                Text = "📦 Products:",
+                Text = "Products:",
                 Location = new Point(15, yPos),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 10, FontStyle.Bold)
@@ -98,7 +98,7 @@ namespace GUI.Order
             mainPanel.Controls.Add(sumPanel);
             yPos += 100;
 
-            // ✅ BUTTONS - BỎ NÚT CANCEL
+            // ✅ BUTTONS - BỎ NÚT PDF, CHỈ GIỮ PRINT VÀ CLOSE
             FlowLayoutPanel btnPanel = new FlowLayoutPanel
             {
                 Location = new Point(15, yPos),
@@ -107,15 +107,11 @@ namespace GUI.Order
                 Padding = new Padding(0)
             };
 
-            Button btnPDF = CreateBtn("📄 PDF", Color.FromArgb(255, 87, 34), 150);
-            btnPDF.Click += BtnExportPDF_Click;
-            btnPanel.Controls.Add(btnPDF);
-
-            Button btnPrint = CreateBtn("🖨️ Print", Color.FromArgb(46, 204, 113), 150);
+            Button btnPrint = CreateBtn("Print", Color.FromArgb(46, 204, 113), 220);
             btnPrint.Click += BtnPrint_Click;
             btnPanel.Controls.Add(btnPrint);
 
-            Button btnClose = CreateBtn("Close", Color.FromArgb(149, 165, 166), 150);
+            Button btnClose = CreateBtn("Close", Color.FromArgb(149, 165, 166), 220);
             btnClose.Click += (s, e) => this.Close();
             btnPanel.Controls.Add(btnClose);
 
@@ -297,42 +293,6 @@ namespace GUI.Order
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void BtnExportPDF_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                SaveFileDialog sfd = new SaveFileDialog
-                {
-                    Filter = "PDF|*.pdf",
-                    FileName = $"Invoice_{_order.Uid}_{DateTime.Now:yyyyMMddHHmmss}.pdf"
-                };
-
-                if (sfd.ShowDialog() == DialogResult.OK)
-                {
-                    this.Cursor = Cursors.WaitCursor;
-                    bool ok = _invoiceBLL.ExportInvoiceToPDF(_order.Uid, sfd.FileName);
-                    this.Cursor = Cursors.Default;
-
-                    if (ok)
-                    {
-                        if (MessageBox.Show("✅ Exported!\n\nOpen file?", "Success", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
-                        {
-                            System.Diagnostics.Process.Start(sfd.FileName);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("❌ Export failed!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                this.Cursor = Cursors.Default;
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

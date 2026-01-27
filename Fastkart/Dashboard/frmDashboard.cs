@@ -235,13 +235,13 @@ namespace GUI
             tablesLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
 
             dgvRecentOrders = CreateBaseGrid();
-            tablesLayout.Controls.Add(CreateGridContainer("📋 Recent Orders", dgvRecentOrders), 0, 0);
+            tablesLayout.Controls.Add(CreateGridContainer("Recent Orders", dgvRecentOrders), 0, 0);
             dgvLowStock = CreateBaseGrid();
-            tablesLayout.Controls.Add(CreateGridContainer("⚠️ Low Stock Products", dgvLowStock), 1, 0);
+            tablesLayout.Controls.Add(CreateGridContainer("Low Stock Products", dgvLowStock), 1, 0);
 
             // 5. Export Buttons
             FlowLayoutPanel exportPanel = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 60, BackColor = Color.White, Padding = new Padding(10), FlowDirection = FlowDirection.LeftToRight };
-            exportPanel.Controls.Add(new Label { Text = "📄 Export Reports:", Font = new Font("Segoe UI", 11, FontStyle.Bold), AutoSize = true, Margin = new Padding(0, 10, 20, 0) });
+            exportPanel.Controls.Add(new Label { Text = "Export Reports:", Font = new Font("Segoe UI", 11, FontStyle.Bold), AutoSize = true, Margin = new Padding(0, 10, 20, 0) });
             exportPanel.Controls.Add(CreateExportButton("Sales Report", Color.FromArgb(52, 152, 219), BtnSalesReport_Click));
             exportPanel.Controls.Add(CreateExportButton("Top Products", Color.FromArgb(46, 204, 113), BtnProductReport_Click));
             exportPanel.Controls.Add(CreateExportButton("Inventory Report", Color.FromArgb(155, 89, 182), BtnInventoryReport_Click));
