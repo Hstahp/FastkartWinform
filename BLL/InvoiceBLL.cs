@@ -3,7 +3,7 @@ using DAL.EF;
 using DTO;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-using iTextSharp.text.pdf.draw; // ✅ THÊM
+using iTextSharp.text.pdf.draw;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -34,7 +34,6 @@ namespace BLL
         {
             try
             {
-                // 1. Lấy thông tin Order
                 var order = GetOrderDetailsForInvoice(orderUid);
                 if (order == null)
                 {
@@ -42,10 +41,8 @@ namespace BLL
                     return false;
                 }
 
-                // 2. Lấy thông tin Payment
                 var payment = _paymentDAL.GetPaymentByOrderUid(orderUid);
 
-                // 3. Tạo PDF
                 Document document = new Document(PageSize.A4, 40, 40, 40, 40);
                 PdfWriter.GetInstance(document, new FileStream(savePath, FileMode.Create));
                 document.Open();
@@ -59,7 +56,7 @@ namespace BLL
                 var normalFont = new iTextSharp.text.Font(baseFont, 10, iTextSharp.text.Font.NORMAL);
                 var boldFont = new iTextSharp.text.Font(baseFont, 10, iTextSharp.text.Font.BOLD);
 
-                // === HEADER: Thông tin cửa hàng ===
+                // === HEADER ===
                 Paragraph storeName = new Paragraph("FASTKART SUPERMARKET", titleFont);
                 storeName.Alignment = Element.ALIGN_CENTER;
                 storeName.SpacingAfter = 5f;
@@ -70,18 +67,17 @@ namespace BLL
                 storeInfo.SpacingAfter = 10f;
                 document.Add(storeInfo);
 
-                // Đường kẻ ngang
                 LineSeparator line = new LineSeparator(1f, 100f, BaseColor.GRAY, Element.ALIGN_CENTER, -2);
                 document.Add(new Chunk(line));
-                document.Add(new Paragraph(" ", normalFont)); // Spacing
+                document.Add(new Paragraph(" ", normalFont));
 
-                // === INVOICE TITLE ===
-                Paragraph invoiceTitle = new Paragraph("HÓA ĐƠN BÁN HÀNG", headerFont);
+                // === TITLE ===
+                Paragraph invoiceTitle = new Paragraph("SALES INVOICE", headerFont);
                 invoiceTitle.Alignment = Element.ALIGN_CENTER;
                 invoiceTitle.SpacingAfter = 15f;
                 document.Add(invoiceTitle);
 
-                // === Thông tin đơn hàng ===
+                // === INFO TABLE ===
                 PdfPTable infoTable = new PdfPTable(2);
                 infoTable.WidthPercentage = 100;
                 infoTable.SetWidths(new float[] { 1f, 1f });
@@ -90,36 +86,40 @@ namespace BLL
                 // Left column
                 PdfPCell leftCell = new PdfPCell();
                 leftCell.Border = Rectangle.NO_BORDER;
-                leftCell.AddElement(new Phrase($"Mã đơn hàng: #{order.Uid}", boldFont));
-                leftCell.AddElement(new Phrase($"Ngày: {order.OrderDate:dd/MM/yyyy HH:mm}", normalFont));
-                leftCell.AddElement(new Phrase($"Người tạo: {order.CreatedBy ?? "N/A"}", normalFont));
+                leftCell.AddElement(new Phrase($"Order ID: #{order.Uid}", boldFont));
+                leftCell.AddElement(new Phrase($"Date: {order.OrderDate:dd/MM/yyyy HH:mm}", normalFont));
+                leftCell.AddElement(new Phrase($"Cashier: {order.CreatedBy ?? "N/A"}", normalFont));
+
+                // Hiển thị coupon nếu có
+                if (!string.IsNullOrEmpty(order.CouponCode))
+                {
+                    leftCell.AddElement(new Phrase($"Coupon: {order.CouponCode}", boldFont));
+                }
 
                 // Right column
                 PdfPCell rightCell = new PdfPCell();
                 rightCell.Border = Rectangle.NO_BORDER;
                 rightCell.HorizontalAlignment = Element.ALIGN_RIGHT;
-                rightCell.AddElement(new Phrase($"Trạng thái: {order.Status}", boldFont));
-                
+                rightCell.AddElement(new Phrase($"Status: {order.Status}", boldFont));
+
                 if (payment != null)
                 {
-                    rightCell.AddElement(new Phrase($"Thanh toán: {payment.PaymentMethod}", normalFont));
-                    rightCell.AddElement(new Phrase($"TT Thanh toán: {payment.PaymentStatus}", normalFont));
+                    rightCell.AddElement(new Phrase($"Payment: {payment.PaymentMethod}", normalFont));
+                    rightCell.AddElement(new Phrase($"Payment Status: {payment.PaymentStatus}", normalFont));
                 }
 
                 infoTable.AddCell(leftCell);
                 infoTable.AddCell(rightCell);
                 document.Add(infoTable);
 
-                // === Bảng sản phẩm ===
+                // === PRODUCTS TABLE ===
                 PdfPTable itemsTable = new PdfPTable(5);
                 itemsTable.WidthPercentage = 100;
                 itemsTable.SetWidths(new float[] { 1f, 3f, 1.5f, 2f, 2f });
                 itemsTable.SpacingAfter = 15f;
 
-                // Header
-                AddTableHeader(itemsTable, new string[] { "STT", "Sản phẩm", "SL", "Đơn giá", "Thành tiền" }, headerFont);
+                AddTableHeader(itemsTable, new string[] { "No.", "Product", "Qty", "Price", "Total" }, headerFont);
 
-                // Items
                 int stt = 1;
                 foreach (var item in order.OrderItems)
                 {
@@ -132,25 +132,46 @@ namespace BLL
 
                 document.Add(itemsTable);
 
-                // === Tổng tiền ===
+                // === SUMMARY TABLE ===
                 PdfPTable totalTable = new PdfPTable(2);
                 totalTable.WidthPercentage = 50;
                 totalTable.HorizontalAlignment = Element.ALIGN_RIGHT;
                 totalTable.SpacingBefore = 10f;
 
-                AddSummaryRow(totalTable, "Tạm tính:", $"{order.SubTotal:N0} VNĐ", normalFont, boldFont);
-                AddSummaryRow(totalTable, "Giảm giá:", $"-{order.DiscountAmount:N0} VNĐ", normalFont, boldFont);
-                AddSummaryRow(totalTable, "Thuế VAT:", $"{order.TaxAmount:N0} VNĐ", normalFont, boldFont);
+                AddSummaryRow(totalTable, "Subtotal:", $"{order.SubTotal:N0} VND", normalFont, boldFont);
 
-                // Total row with color
-                PdfPCell totalLabelCell = new PdfPCell(new Phrase("TỔNG CỘNG:", headerFont));
+                // Hiển thị discount breakdown nếu có coupon
+                if (!string.IsNullOrEmpty(order.CouponCode))
+                {
+                    // Tính product discount vs coupon discount (giả sử tổng discount đã lưu)
+                    decimal productDiscount = order.OrderItems.Sum(item => item.DiscountAmount);
+                    decimal couponDiscount = order.DiscountAmount - productDiscount;
+
+                    if (productDiscount > 0)
+                    {
+                        AddSummaryRow(totalTable, "Product Discount:", $"-{productDiscount:N0} VND", normalFont, boldFont);
+                    }
+                    if (couponDiscount > 0)
+                    {
+                        AddSummaryRow(totalTable, $"Coupon ({order.CouponCode}):", $"-{couponDiscount:N0} VND", normalFont, boldFont);
+                    }
+                }
+                else if (order.DiscountAmount > 0)
+                {
+                    AddSummaryRow(totalTable, "Discount:", $"-{order.DiscountAmount:N0} VND", normalFont, boldFont);
+                }
+
+                AddSummaryRow(totalTable, "Tax (10%):", $"{order.TaxAmount:N0} VND", normalFont, boldFont);
+
+                // Total row
+                PdfPCell totalLabelCell = new PdfPCell(new Phrase("GRAND TOTAL:", headerFont));
                 totalLabelCell.Border = Rectangle.TOP_BORDER;
                 totalLabelCell.BorderColor = BaseColor.BLACK;
                 totalLabelCell.BorderWidth = 2f;
                 totalLabelCell.HorizontalAlignment = Element.ALIGN_RIGHT;
                 totalLabelCell.Padding = 5f;
 
-                PdfPCell totalValueCell = new PdfPCell(new Phrase($"{order.TotalAmount:N0} VNĐ", headerFont));
+                PdfPCell totalValueCell = new PdfPCell(new Phrase($"{order.TotalAmount:N0} VND", headerFont));
                 totalValueCell.Border = Rectangle.TOP_BORDER;
                 totalValueCell.BorderColor = BaseColor.BLACK;
                 totalValueCell.BorderWidth = 2f;
@@ -163,11 +184,11 @@ namespace BLL
 
                 document.Add(totalTable);
 
-                // === Footer ===
-                document.Add(new Paragraph(" ", normalFont)); // Spacing
+                // === FOOTER ===
+                document.Add(new Paragraph(" ", normalFont));
                 document.Add(new Chunk(line));
 
-                Paragraph footer = new Paragraph("Cảm ơn quý khách! Hẹn gặp lại!", normalFont);
+                Paragraph footer = new Paragraph("Thank you for your purchase! See you again!", normalFont);
                 footer.Alignment = Element.ALIGN_CENTER;
                 footer.SpacingBefore = 10f;
                 document.Add(footer);
@@ -195,10 +216,10 @@ namespace BLL
                 {
                     conn.Open();
 
-                    // Query Order
+                    // Query thêm CouponCode
                     string orderQuery = @"
                         SELECT o.Uid, o.OrderDate, o.TotalAmount, o.SubTotal, o.TaxAmount, o.DiscountAmount,
-                               o.Status, o.OrderNote, o.CreatedBy,
+                               o.Status, o.OrderNote, o.CreatedBy, o.CouponCode,
                                u.FullName AS CustomerName
                         FROM [Order] o
                         LEFT JOIN Users u ON o.UserUid = u.Uid
@@ -225,13 +246,13 @@ namespace BLL
                         Status = reader.GetString(6),
                         OrderNote = reader.IsDBNull(7) ? "" : reader.GetString(7),
                         CreatedBy = reader.IsDBNull(8) ? "" : reader.GetString(8),
-                        CustomerName = reader.IsDBNull(9) ? "Guest" : reader.GetString(9),
+                        CouponCode = reader.IsDBNull(9) ? "" : reader.GetString(9),
+                        CustomerName = reader.IsDBNull(10) ? "Guest" : reader.GetString(10),
                         OrderItems = new List<OrderItemDTO>()
                     };
 
                     reader.Close();
 
-                    // Query OrderItems
                     string itemsQuery = @"
                         SELECT oi.Uid, oi.ProductUid, p.ProductName, p.Sku,
                                oi.Quantity, oi.PriceAtPurchase, oi.DiscountAmount, oi.SubTotal
@@ -283,7 +304,7 @@ namespace BLL
             }
         }
 
-        private void AddSummaryRow(PdfPTable table, string label, string value, 
+        private void AddSummaryRow(PdfPTable table, string label, string value,
             iTextSharp.text.Font labelFont, iTextSharp.text.Font valueFont)
         {
             PdfPCell labelCell = new PdfPCell(new Phrase(label, labelFont));

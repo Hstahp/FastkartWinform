@@ -12,10 +12,12 @@ namespace BLL
     public class OrderBLL
     {
         private OrderDAL _orderDAL;
+        private CouponDAL _couponDAL; 
 
         public OrderBLL()
         {
             _orderDAL = new OrderDAL();
+            _couponDAL = new CouponDAL(); 
         }
 
         // ========================================
@@ -47,6 +49,7 @@ namespace BLL
                     OrderDate = DateTime.Now,
                     OrderNote = orderDto.OrderNote,
                     CreatedBy = orderDto.CreatedBy ?? Environment.UserName,
+                    CouponCode = orderDto.CouponCode,
                     Deleted = false
                 };
 
@@ -81,6 +84,13 @@ namespace BLL
                 };
 
                 int paymentUid = _orderDAL.CreatePayment(paymentEntity);
+
+                // Cập nhật UsedCount nếu dùng coupon
+                if (!string.IsNullOrEmpty(orderDto.CouponCode))
+                {
+                    _couponDAL.IncrementUsedCount(orderDto.CouponCode);
+                    System.Diagnostics.Debug.WriteLine($"✅ Coupon '{orderDto.CouponCode}' used count updated");
+                }
 
                 return new CheckoutResultDTO
                 {
@@ -120,6 +130,7 @@ namespace BLL
                     OrderDate = DateTime.Now,
                     OrderNote = orderDto.OrderNote + " [MoMo QR]",
                     CreatedBy = orderDto.CreatedBy ?? Environment.UserName,
+                    CouponCode = orderDto.CouponCode,
                     Deleted = false
                 };
 
@@ -187,7 +198,7 @@ namespace BLL
         /// <summary>
         /// ✅ Xác nhận thanh toán MoMo thành công (sau khi polling detect payment)
         /// </summary>
-        public bool ConfirmMoMoPayment(int orderUid, int paymentUid, List<OrderItemDTO> orderItems)
+        public bool ConfirmMoMoPayment(int orderUid, int paymentUid, List<OrderItemDTO> orderItems, string couponCode = null) // ✅ SỬA
         {
             try
             {
@@ -205,6 +216,13 @@ namespace BLL
 
                 // 4. Update Order Status
                 _orderDAL.UpdateOrderStatus(orderUid, "Completed");
+
+                // Cập nhật UsedCount cho MoMo
+                if (!string.IsNullOrEmpty(couponCode))
+                {
+                    _couponDAL.IncrementUsedCount(couponCode);
+                    System.Diagnostics.Debug.WriteLine($"✅ [MoMo] Coupon '{couponCode}' used count updated");
+                }
 
                 System.Diagnostics.Debug.WriteLine($"✅ [MoMo] Payment confirmed: Order={orderUid}, TxnID={transactionId}");
 

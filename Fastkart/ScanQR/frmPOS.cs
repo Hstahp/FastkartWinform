@@ -14,13 +14,16 @@ namespace GUI
     public partial class frmPOS : Form
     {
         private ProductBLL _productBLL;
+        private CouponBLL _couponBLL; 
         private List<ProductDTO> _allProducts;
         private List<CartItemDTO> _cartItems;
 
         private decimal _subtotal = 0;
-        private decimal _discount = 0;
+        private decimal _couponDiscount = 0; // ✅ THÊM: Discount từ coupon
+        private decimal _productDiscount = 0; // ✅ THÊM: Discount từ sản phẩm
         private decimal _tax = 0;
         private decimal _finalTotal = 0;
+        private string _appliedCouponCode = ""; // ✅ THÊM: Lưu mã đã dùng
 
         private const decimal TAX_RATE = 0.10m; // 10% tax
         public event EventHandler RequestScanQR;
@@ -28,6 +31,7 @@ namespace GUI
         {
             InitializeComponent();
             _productBLL = new ProductBLL();
+            _couponBLL = new CouponBLL(); // ✅ THÊM
             _cartItems = new List<CartItemDTO>();
 
             ConfigureUI();
@@ -63,8 +67,71 @@ namespace GUI
             btnRemoveItem.Click += BtnRemoveItem_Click;
             btnClearCart.Click += BtnClearCart_Click;
             btnPay.Click += BtnPay_Click;
+            btnApplyCoupon.Click += BtnApplyCoupon_Click; // ✅ THÊM
+            btnRemoveCoupon.Click += BtnRemoveCoupon_Click; // ✅ THÊM
 
             UpdateTotals();
+        }
+
+        // ✅ THÊM: Xử lý apply coupon
+        private void BtnApplyCoupon_Click(object sender, EventArgs e)
+        {
+            string code = txtCouponCode.Text.Trim().ToUpper();
+            
+            if (string.IsNullOrEmpty(code))
+            {
+                MessageBox.Show("Please enter a coupon code!", "Notification", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (_cartItems.Count == 0)
+            {
+                MessageBox.Show("Cart is empty!", "Notification", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Áp dụng coupon
+            var result = _couponBLL.ApplyCoupon(code, _subtotal);
+
+            if (result.IsValid)
+            {
+                _appliedCouponCode = code;
+                _couponDiscount = result.DiscountAmount;
+                UpdateTotals();
+
+                MessageBox.Show($"✅ {result.Message}\nDiscount: {_couponDiscount:N0} VND", 
+                    "Success", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Information);
+
+                txtCouponCode.Enabled = false;
+                btnApplyCoupon.Enabled = false;
+                btnRemoveCoupon.Visible = true;
+            }
+            else
+            {
+                MessageBox.Show($"❌ {result.Message}", "Error", 
+                    MessageBoxButtons.OK, 
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        // ✅ THÊM: Xử lý remove coupon
+        private void BtnRemoveCoupon_Click(object sender, EventArgs e)
+        {
+            _appliedCouponCode = "";
+            _couponDiscount = 0;
+            txtCouponCode.Text = "";
+            txtCouponCode.Enabled = true;
+            btnApplyCoupon.Enabled = true;
+            btnRemoveCoupon.Visible = false;
+            UpdateTotals();
+
+            MessageBox.Show("Coupon has been removed", "Notification", 
+                MessageBoxButtons.OK, 
+                MessageBoxIcon.Information);
         }
 
         private void ConfigureCartGrid()
@@ -287,15 +354,15 @@ namespace GUI
                         _allProducts.Select(p => $"  '{p.Sku}' - {p.ProductName}").Take(20));
 
                     MessageBox.Show(
-                        $"❌ Không tìm thấy sản phẩm!\n\n" +
-                        $"SKU quét được: '{sku}'\n" +
-                        $"SKU normalized: '{normalizedSku}'\n" +
-                        $"Tổng sản phẩm: {_allProducts.Count}\n\n" +
-                        $"20 SKU đầu tiên trong hệ thống:\n{allSkusDebug}",
-                        "Không tìm thấy",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                    return;
+                     $"❌ Product not found!\n\n" +
+                     $"Scanned SKU: '{sku}'\n" +
+                     $"Normalized SKU: '{normalizedSku}'\n" +
+                     $"Total products: {_allProducts.Count}\n\n" +
+                     $"First 20 SKUs in system:\n{allSkusDebug}",
+                     "Not Found",
+                     MessageBoxButtons.OK,
+                     MessageBoxIcon.Warning);
+                     return;
                 }
 
                 System.Diagnostics.Debug.WriteLine($"✅ FOUND: {product.ProductName}");
@@ -303,14 +370,14 @@ namespace GUI
                 // ✅ Thêm vào giỏ hàng
                 AddProductToCart(product);
 
-                MessageBox.Show($"✅ Đã thêm: {product.ProductName}",
+                MessageBox.Show($"✅ Added: {product.ProductName}",
                     "Thành công",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi: {ex.Message}\n\n{ex.StackTrace}",
+                MessageBox.Show($"Error: {ex.Message}\n\n{ex.StackTrace}",
                     "Lỗi",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
@@ -375,6 +442,12 @@ namespace GUI
                 });
             }
 
+            // ✅ THÊM: Reset coupon khi thay đổi giỏ hàng
+            if (!string.IsNullOrEmpty(_appliedCouponCode))
+            {
+                BtnRemoveCoupon_Click(null, null);
+            }
+
             RefreshCart();
         }
 
@@ -387,30 +460,84 @@ namespace GUI
 
         private void UpdateTotals()
         {
-            // ✅ Tính subtotal (tổng sau khi đã giảm giá)
-            _subtotal = _cartItems.Sum(c => c.TotalPrice);
-            
-            // ✅ THÊM: Tính tổng discount từ tất cả items
-            decimal totalDiscount = _cartItems.Sum(c => c.DiscountAmount);
-            
-            // Tax
-            _tax = _subtotal * TAX_RATE;
-            
-            // Final total
-            _finalTotal = _subtotal + _tax;
+            System.Diagnostics.Debug.WriteLine($"📊 ========== UPDATE TOTALS ==========");
 
-            // ✅ Hiển thị
-            lblSubtotal.Text = $"{_subtotal:N0} VNĐ";
+            if (_cartItems.Count == 0)
+            {
+                _subtotal = 0;
+                _productDiscount = 0;
+                _tax = 0;
+                _finalTotal = 0;
+
+                lblSubtotal.Text = "0 VNĐ";
+                lblTax.Text = "0 VNĐ";
+                lblProductDiscount.Text = "- 0 VNĐ";
+                lblCouponDiscount.Text = "- 0 VNĐ";
+                lblFinalTotal.Text = "0 VNĐ";
+                lblFinalTotal.ForeColor = Color.FromArgb(46, 204, 113);
+
+                return;
+            }
+
+            // ✅ DEBUG: Chi tiết từng item
+            System.Diagnostics.Debug.WriteLine($"📦 Cart items ({_cartItems.Count}):");
+            foreach (var item in _cartItems)
+            {
+                System.Diagnostics.Debug.WriteLine($"   {item.ProductName}:");
+                System.Diagnostics.Debug.WriteLine($"   - Original: {item.OriginalUnitPrice:N0} × {item.Quantity} = {item.OriginalUnitPrice * item.Quantity:N0}");
+                System.Diagnostics.Debug.WriteLine($"   - Discount: {item.DiscountAmount:N0}");
+                System.Diagnostics.Debug.WriteLine($"   - Final: {item.UnitPrice:N0} × {item.Quantity} = {item.TotalPrice:N0}");
+            }
+
+            // ✅ 1. Subtotal = GIÁ GỐC (TRƯỚC discount) - HIỂN THỊ CHO USER
+            _subtotal = _cartItems.Sum(c => c.OriginalUnitPrice * c.Quantity);
+
+            // ✅ 2. Product Discount - Tổng tiền giảm từ products
+            _productDiscount = _cartItems.Sum(c => c.DiscountAmount);
+
+            // ✅ 3. Subtotal SAU product discount (để tính tax và coupon)
+            decimal subtotalAfterProductDiscount = _subtotal - _productDiscount;
+
+            // ✅ 4. Tax - Tính trên giá SAU product discount
+            _tax = subtotalAfterProductDiscount * TAX_RATE;
+
+            // ✅ 5. Cap coupon discount
+            decimal effectiveCouponDiscount = _couponDiscount;
+            if (effectiveCouponDiscount > subtotalAfterProductDiscount)
+            {
+                effectiveCouponDiscount = subtotalAfterProductDiscount;
+                System.Diagnostics.Debug.WriteLine($"⚠️ Coupon capped: {_couponDiscount:N0} → {effectiveCouponDiscount:N0}");
+            }
+
+            // ✅ 6. Final Total = Subtotal - Product Discount + Tax - Coupon Discount
+            _finalTotal = _subtotal - _productDiscount + _tax - effectiveCouponDiscount;
+            if (_finalTotal < 0) _finalTotal = 0;
+
+            // ✅ HIỂN THỊ
+            lblSubtotal.Text = $"{_subtotal:N0} VNĐ"; // ← GIÁ GỐC
             lblTax.Text = $"{_tax:N0} VNĐ";
-            lblDiscount.Text = $"- {totalDiscount:N0} VNĐ"; // ✅ HIỂN THỊ SỐ TIỀN GIẢM THẬT
+            lblProductDiscount.Text = $"- {_productDiscount:N0} VNĐ";
+            lblCouponDiscount.Text = $"- {effectiveCouponDiscount:N0} VNĐ";
             lblFinalTotal.Text = $"{_finalTotal:N0} VNĐ";
 
-            // ✅ Debug log
-            System.Diagnostics.Debug.WriteLine($"📊 Totals Updated:");
-            System.Diagnostics.Debug.WriteLine($"   Subtotal: {_subtotal:N0} VNĐ");
-            System.Diagnostics.Debug.WriteLine($"   Discount: -{totalDiscount:N0} VNĐ");
-            System.Diagnostics.Debug.WriteLine($"   Tax: {_tax:N0} VNĐ");
-            System.Diagnostics.Debug.WriteLine($"   Final: {_finalTotal:N0} VNĐ");
+            // Color coding
+            lblFinalTotal.ForeColor = (_finalTotal == 0 && _cartItems.Count > 0)
+                ? Color.FromArgb(239, 68, 68)
+                : Color.FromArgb(46, 204, 113);
+            lblFinalTotal.Font = new Font(lblFinalTotal.Font, FontStyle.Bold);
+
+            // ✅ DEBUG LOG
+            System.Diagnostics.Debug.WriteLine($"");
+            System.Diagnostics.Debug.WriteLine($"📊 BREAKDOWN:");
+            System.Diagnostics.Debug.WriteLine($"   Subtotal (GIÁ GỐC):       {_subtotal:N0} VNĐ");
+            System.Diagnostics.Debug.WriteLine($"   Product Discount:         -{_productDiscount:N0} VNĐ");
+            System.Diagnostics.Debug.WriteLine($"   ─────────────────────────────────────────");
+            System.Diagnostics.Debug.WriteLine($"   Subtotal AFTER discount:  {subtotalAfterProductDiscount:N0} VNĐ");
+            System.Diagnostics.Debug.WriteLine($"   Tax (10%):                +{_tax:N0} VNĐ");
+            System.Diagnostics.Debug.WriteLine($"   Coupon Discount:          -{effectiveCouponDiscount:N0} VNĐ");
+            System.Diagnostics.Debug.WriteLine($"   ═════════════════════════════════════════");
+            System.Diagnostics.Debug.WriteLine($"   FINAL TOTAL:              {_finalTotal:N0} VNĐ");
+            System.Diagnostics.Debug.WriteLine($"======================================");
         }
 
         // ✅ EVENT HANDLER CHO NÚT SCAN QR
@@ -459,7 +586,7 @@ namespace GUI
 
                 if (product == null)
                 {
-                    var availableSkus = string.Join(", ",  //  'Join' viết hoa
+                    var availableSkus = string.Join(", ",  
                         _allProducts.Select(p => $"'{p.Sku}'").Take(10));
 
                     MessageBox.Show($"Product not found with SKU: {sku}\n\n" +
@@ -505,6 +632,13 @@ namespace GUI
             if (selectedItem != null)
             {
                 _cartItems.Remove(selectedItem);
+
+                // ✅ THÊM: Reset coupon khi xóa sản phẩm
+                if (!string.IsNullOrEmpty(_appliedCouponCode))
+                {
+                    BtnRemoveCoupon_Click(null, null);
+                }
+
                 RefreshCart();
             }
         }
@@ -521,19 +655,166 @@ namespace GUI
             if (result == DialogResult.Yes)
             {
                 _cartItems.Clear();
+
+                // ✅ THÊM: Reset coupon
+                if (!string.IsNullOrEmpty(_appliedCouponCode))
+                {
+                    BtnRemoveCoupon_Click(null, null);
+                }
+
                 RefreshCart();
             }
         }
 
         private async void BtnPay_Click(object sender, EventArgs e)
         {
-            // ✅ FIX: Validate cart trước
             if (_cartItems == null || _cartItems.Count == 0)
             {
                 MessageBox.Show("Cart is empty!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
+            // ✅ THÊM: Re-validate coupon ngay trước khi thanh toán
+            if (!string.IsNullOrEmpty(_appliedCouponCode))
+            {
+                var reValidateResult = _couponBLL.ApplyCoupon(_appliedCouponCode, _subtotal);
+                
+                if (!reValidateResult.IsValid)
+                {
+                    // ❌ Coupon không còn hợp lệ → Tự động remove
+                    MessageBox.Show(
+                        $"⚠️ Coupon '{_appliedCouponCode}' is no longer valid!\n\n" +
+                        $"Reason: {reValidateResult.Message}\n\n" +
+                        $"The coupon has been removed from your order.",
+                        "Coupon Expired",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+
+                    // Remove coupon khỏi order
+                    BtnRemoveCoupon_Click(null, null);
+                    return; // ← Dừng thanh toán, yêu cầu user xem lại giỏ hàng
+                }
+
+                // ✅ Coupon vẫn hợp lệ → Cập nhật discount (có thể đã thay đổi)
+                if (reValidateResult.DiscountAmount != _couponDiscount)
+                {
+                    MessageBox.Show(
+                        $"⚠️ Coupon discount has changed!\n\n" +
+                        $"Old: {_couponDiscount:N0} VND\n" +
+                        $"New: {reValidateResult.DiscountAmount:N0} VND\n\n" +
+                        $"Please review before payment.",
+                        "Coupon Updated",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+
+                    _couponDiscount = reValidateResult.DiscountAmount;
+                    UpdateTotals();
+                    return; // ← Yêu cầu user xem lại và nhấn Pay lần nữa
+                }
+            }
+
+            // Check nếu final = 0
+            if (_finalTotal == 0)
+            {
+                var confirmResult = MessageBox.Show(
+                    "Total payment = 0 VND\n\n" +
+                    "Customer does NOT need to pay.\n" +
+                    "Do you want to create FREE order?\n\n" +
+                    "Note: Order will be created with 'Completed' status immediately.",
+                    "Confirm FREE Order",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (confirmResult != DialogResult.Yes)
+                {
+                    return;
+                }
+
+                try
+                {
+                    this.Cursor = Cursors.WaitCursor;
+                    btnPay.Enabled = false;
+
+                    decimal totalDiscount = _productDiscount + _couponDiscount;
+
+                    var orderDto = new DTO.OrderDTO
+                    {
+                        UserUid = UserSessionDTO.CurrentUser?.Uid,
+                        SubTotal = _subtotal,
+                        TaxAmount = _tax,
+                        DiscountAmount = totalDiscount,
+                        TotalAmount = 0,
+                        OrderDate = DateTime.Now,
+                        OrderNote = $"POS Order - FREE (100% Discount)",
+                        CreatedBy = UserSessionDTO.CurrentUser?.FullName ?? "Unknown",
+                        CouponCode = _appliedCouponCode,
+
+                        OrderItems = _cartItems.Select(c => new DTO.OrderItemDTO
+                        {
+                            ProductUid = c.ProductId,
+                            ProductName = c.ProductName,
+                            Quantity = c.Quantity,
+                            PriceAtPurchase = c.UnitPrice,
+                            DiscountAmount = c.DiscountAmount,
+                            SubTotal = c.TotalPrice
+                        }).ToList()
+                    };
+
+                    var orderBLL = new BLL.OrderBLL();
+                    var result = orderBLL.CheckoutCash(orderDto);
+
+                    if (result.Success)
+                    {
+                        string couponInfo = !string.IsNullOrEmpty(_appliedCouponCode)
+                            ? $"\nCoupon: {_appliedCouponCode} (-{_couponDiscount:N0} VND)"
+                            : "";
+
+                        MessageBox.Show(
+                            $"✅ FREE Order created!\n\n" +
+                            $"Order ID: #{result.OrderUid}\n" +
+                            $"Original value: {_subtotal + _tax:N0} VND\n" +
+                            $"Total discount: {totalDiscount:N0} VND{couponInfo}\n" +
+                            $"Customer pays: 0 VND\n\n" +
+                            $"Thank you!",
+                            "Success",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+
+                        ExportBillAfterPayment(result.OrderUid);
+
+                        // Reset form
+                        _cartItems.Clear();
+                        _appliedCouponCode = "";
+                        _couponDiscount = 0;
+                        _productDiscount = 0;
+                        txtCouponCode.Text = "";
+                        txtCouponCode.Enabled = true;
+                        btnApplyCoupon.Enabled = true;
+                        btnRemoveCoupon.Visible = false;
+                        RefreshCart();
+                    }
+                    else
+                    {
+                        MessageBox.Show($"❌ {result.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"❌ Payment Error: {ex.Message}");
+                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    this.Cursor = Cursors.Default;
+                    btnPay.Enabled = true;
+                }
+
+                return;
+            }
+
+            // ========================================
+            // PHẦN THANH TOÁN BÌNH THƯỜNG (final > 0)
+            // ========================================
             using (var paymentForm = new GUI.Payment.frmPaymentMethod(_finalTotal))
             {
                 if (paymentForm.ShowDialog() != DialogResult.OK)
@@ -548,7 +829,7 @@ namespace GUI
                     this.Cursor = Cursors.WaitCursor;
                     btnPay.Enabled = false;
 
-                    decimal totalDiscount = _cartItems.Sum(c => c.DiscountAmount);
+                    decimal totalDiscount = _productDiscount + _couponDiscount;
 
                     var orderDto = new DTO.OrderDTO
                     {
@@ -559,7 +840,8 @@ namespace GUI
                         TotalAmount = _finalTotal,
                         OrderDate = DateTime.Now,
                         OrderNote = $"POS Order - {paymentMethod}",
-                        CreatedBy = Environment.UserName,
+                        CreatedBy = UserSessionDTO.CurrentUser?.FullName ?? "Unknown",
+                        CouponCode = _appliedCouponCode,
 
                         OrderItems = _cartItems.Select(c => new DTO.OrderItemDTO
                         {
@@ -574,30 +856,50 @@ namespace GUI
 
                     var orderBLL = new BLL.OrderBLL();
 
+                    // ========================================
+                    // CASH PAYMENT
+                    // ========================================
                     if (paymentMethod == "Cash")
                     {
                         var cashResult = orderBLL.CheckoutCash(orderDto);
 
                         if (cashResult.Success)
                         {
+                            string couponInfo = !string.IsNullOrEmpty(_appliedCouponCode)
+                                ? $"\nCoupon: {_appliedCouponCode} (-{_couponDiscount:N0} VND)"
+                                : "";
+
                             MessageBox.Show(
-                                $"✅ Thanh toán thành công!\n\n" +
+                                $"✅ Payment successful!\n\n" +
                                 $"Order ID: #{cashResult.OrderUid}\n" +
-                                $"Phương thức: Tiền mặt\n" +
-                                $"Tổng tiền: {_finalTotal:N0} VNĐ\n\n" +
-                                $"Cảm ơn quý khách!",
-                                "Thành công",
+                                $"Method: Cash\n" +
+                                $"Total: {_finalTotal:N0} VND{couponInfo}\n\n" +
+                                $"Thank you!",
+                                "Success",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Information);
 
+                            ExportBillAfterPayment(cashResult.OrderUid);
+
+                            // Reset form
                             _cartItems.Clear();
+                            _appliedCouponCode = "";
+                            _couponDiscount = 0;
+                            _productDiscount = 0;
+                            txtCouponCode.Text = "";
+                            txtCouponCode.Enabled = true;
+                            btnApplyCoupon.Enabled = true;
+                            btnRemoveCoupon.Visible = false;
                             RefreshCart();
                         }
                         else
                         {
-                            MessageBox.Show($"❌ {cashResult.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show($"❌ {cashResult.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
+                    // ========================================
+                    // MOMO PAYMENT
+                    // ========================================
                     else if (paymentMethod == "MoMo")
                     {
                         var momoResult = await orderBLL.CheckoutMoMoAsync(orderDto);
@@ -610,7 +912,9 @@ namespace GUI
                                 {
                                     System.Diagnostics.Debug.WriteLine($"✅ Opened MoMo URL: {momoResult.PaymentUrl}");
 
-                                    // Hiển thị dialog chờ thanh toán
+                                    bool paymentSuccess = false;
+                                    int confirmedOrderUid = 0;
+
                                     using (var waitForm = new GUI.Payment.frmMoMoWaitPayment(
                                         momoResult.OrderUid,
                                         momoResult.PaymentUid,
@@ -620,56 +924,85 @@ namespace GUI
                                     {
                                         var dialogResult = waitForm.ShowDialog();
 
+                                        System.Diagnostics.Debug.WriteLine($"🔍 [MoMo] Dialog result: {dialogResult}");
+                                        System.Diagnostics.Debug.WriteLine($"🔍 [MoMo] PaymentSuccess: {waitForm.PaymentSuccess}");
+
                                         if (dialogResult == DialogResult.OK && waitForm.PaymentSuccess)
                                         {
                                             bool confirmSuccess = orderBLL.ConfirmMoMoPayment(
                                                 momoResult.OrderUid,
                                                 momoResult.PaymentUid,
-                                                orderDto.OrderItems
+                                                orderDto.OrderItems,
+                                                _appliedCouponCode
                                             );
+
+                                            System.Diagnostics.Debug.WriteLine($"🔍 [MoMo] Confirm result: {confirmSuccess}");
 
                                             if (confirmSuccess)
                                             {
-                                                MessageBox.Show(
-                                                    $"✅ Thanh toán MoMo thành công!\n\n" +
-                                                    $"Order ID: #{momoResult.OrderUid}\n" +
-                                                    $"Tổng tiền: {_finalTotal:N0} VNĐ",
-                                                    "Thành công",
-                                                    MessageBoxButtons.OK,
-                                                    MessageBoxIcon.Information);
-
-                                                _cartItems.Clear();
-                                                RefreshCart();
+                                                paymentSuccess = true;
+                                                confirmedOrderUid = momoResult.OrderUid;
                                             }
                                         }
-                                        else
-                                        {
-                                            MessageBox.Show(
-                                                "Thanh toán chưa hoàn tất hoặc đã bị hủy.",
-                                                "Thông báo",
-                                                MessageBoxButtons.OK,
-                                                MessageBoxIcon.Information);
-                                        }
+                                    }
+
+                                    if (paymentSuccess)
+                                    {
+                                        string couponInfo = !string.IsNullOrEmpty(_appliedCouponCode)
+                                            ? $"\nCoupon: {_appliedCouponCode} (-{_couponDiscount:N0} VND)"
+                                            : "";
+
+                                        MessageBox.Show(
+                                            $"✅ MoMo payment successful!\n\n" +
+                                            $"Order ID: #{confirmedOrderUid}\n" +
+                                            $"Total: {_finalTotal:N0} VND{couponInfo}\n\n" +
+                                            $"Thank you!",
+                                            "Success",
+                                            MessageBoxButtons.OK,
+                                            MessageBoxIcon.Information);
+
+                                        ExportBillAfterPayment(confirmedOrderUid);
+
+                                        _cartItems.Clear();
+                                        _appliedCouponCode = "";
+                                        _couponDiscount = 0;
+                                        _productDiscount = 0;
+                                        txtCouponCode.Text = "";
+                                        txtCouponCode.Enabled = true;
+                                        btnApplyCoupon.Enabled = true;
+                                        btnRemoveCoupon.Visible = false;
+                                        RefreshCart();
+
+                                        System.Diagnostics.Debug.WriteLine($"✅ [MoMo] Form reset complete");
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show(
+                                            "Payment not completed or cancelled.\n\n" +
+                                            "Note: If you already paid, check 'Order Management'.",
+                                            "Info",
+                                            MessageBoxButtons.OK,
+                                            MessageBoxIcon.Information);
                                     }
                                 }
                                 else
                                 {
                                     MessageBox.Show(
-                                        $"Không thể mở trình duyệt tự động!\n\n" +
-                                        $"Vui lòng copy link và mở thủ công:\n\n{momoResult.PaymentUrl}",
-                                        "Lỗi",
+                                        $"Cannot open browser automatically!\n\n" +
+                                        $"Please copy and open manually:\n\n{momoResult.PaymentUrl}",
+                                        "Error",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Error);
                                 }
                             }
                             else
                             {
-                                MessageBox.Show("Không nhận được link thanh toán từ MoMo!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBox.Show("No payment URL from MoMo!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                         }
                         else
                         {
-                            MessageBox.Show($"❌ {momoResult.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show($"❌ {momoResult.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                 }
@@ -733,6 +1066,60 @@ namespace GUI
             catch
             {
                 return false;
+            }
+        }
+
+        // ✅ THÊM: Helper method để xuất PDF bill
+        private void ExportBillAfterPayment(int orderUid)
+        {
+            try
+            {
+                var result = MessageBox.Show(
+                    "💵 Payment completed successfully!\n\n" +
+                    "Do you want to export invoice PDF?",
+                    "Export Invoice",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    SaveFileDialog sfd = new SaveFileDialog
+                    {
+                        Filter = "PDF|*.pdf",
+                        FileName = $"Invoice_{orderUid}_{DateTime.Now:yyyyMMddHHmmss}.pdf"
+                    };
+
+                    if (sfd.ShowDialog() == DialogResult.OK)
+                    {
+                        this.Cursor = Cursors.WaitCursor;
+                        
+                        var invoiceBLL = new InvoiceBLL();
+                        bool ok = invoiceBLL.ExportInvoiceToPDF(orderUid, sfd.FileName);
+                        
+                        this.Cursor = Cursors.Default;
+
+                        if (ok)
+                        {
+                            if (MessageBox.Show(
+                                "✅ Invoice exported successfully!\n\nOpen file?", 
+                                "Success", 
+                                MessageBoxButtons.YesNo, 
+                                MessageBoxIcon.Information) == DialogResult.Yes)
+                            {
+                                System.Diagnostics.Process.Start(sfd.FileName);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("❌ Export failed!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.Cursor = Cursors.Default;
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

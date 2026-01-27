@@ -78,6 +78,15 @@ namespace GUI.Order
             mainPanel.Controls.Add(grpPayment);
             yPos += 120;
 
+            // ✅ THÊM: Coupon section (nếu có)
+            if (!string.IsNullOrEmpty(_order.CouponCode))
+            {
+                GroupBox grpCoupon = CreateGroupBox("🎟️ Coupon Applied", yPos, 60);
+                AddRow(grpCoupon, "Code:", _order.CouponCode, 25);
+                mainPanel.Controls.Add(grpCoupon);
+                yPos += 70;
+            }
+
             Label lblProducts = new Label
             {
                 Text = "📦 Products:",
@@ -98,7 +107,7 @@ namespace GUI.Order
             mainPanel.Controls.Add(sumPanel);
             yPos += 100;
 
-            // ✅ BUTTONS - BỎ NÚT CANCEL
+            // ✅ SỬA: BỎ NÚT PRINT, CHỈ GIỮ PDF VÀ CLOSE
             FlowLayoutPanel btnPanel = new FlowLayoutPanel
             {
                 Location = new Point(15, yPos),
@@ -107,15 +116,11 @@ namespace GUI.Order
                 Padding = new Padding(0)
             };
 
-            Button btnPDF = CreateBtn("📄 PDF", Color.FromArgb(255, 87, 34), 150);
+            Button btnPDF = CreateBtn("📄 Export PDF", Color.FromArgb(255, 87, 34), 220);
             btnPDF.Click += BtnExportPDF_Click;
             btnPanel.Controls.Add(btnPDF);
 
-            Button btnPrint = CreateBtn("🖨️ Print", Color.FromArgb(46, 204, 113), 150);
-            btnPrint.Click += BtnPrint_Click;
-            btnPanel.Controls.Add(btnPrint);
-
-            Button btnClose = CreateBtn("Close", Color.FromArgb(149, 165, 166), 150);
+            Button btnClose = CreateBtn("Close", Color.FromArgb(149, 165, 166), 220);
             btnClose.Click += (s, e) => this.Close();
             btnPanel.Controls.Add(btnClose);
 
@@ -333,22 +338,6 @@ namespace GUI.Order
             catch (Exception ex)
             {
                 this.Cursor = Cursors.Default;
-                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void BtnPrint_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string tmp = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"Invoice_{_order.Uid}.pdf");
-                if (_invoiceBLL.ExportInvoiceToPDF(_order.Uid, tmp))
-                {
-                    System.Diagnostics.Process.Start(tmp);
-                }
-            }
-            catch (Exception ex)
-            {
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

@@ -26,9 +26,8 @@ namespace GUI
         private Button currentActiveButton = null;
         private Panel pnlUserDropdown;
         private bool isUserDropdownVisible = false;
-        
+
         private frmPOS _currentPosForm;
-        private frmScanQR _currentScanQRForm;
         private Color sidebarBg = Color.FromArgb(31, 41, 55);
         private Color sidebarHover = Color.FromArgb(55, 65, 81);
         private Color activeBg = Color.FromArgb(37, 99, 235);
@@ -42,7 +41,6 @@ namespace GUI
             this.WindowState = FormWindowState.Maximized;
             CollapseAllSubMenus();
             AddHoverEvents();
-            InitializeSearchBox();
             InitializeUserInfo();
             InitializeUserDropdown();
 
@@ -55,8 +53,8 @@ namespace GUI
             if (e.CloseReason == CloseReason.UserClosing)
             {
                 DialogResult result = MessageBox.Show(
-                    "Bạn có chắc chắn muốn đăng xuất?",
-                    "Xác nhận đăng xuất",
+                    "Are you sure you want to logout?",
+                    "Confirm Logout",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question
                 );
@@ -368,8 +366,8 @@ namespace GUI
         {
             if (!UserSessionDTO.HasPermission("PRODUCT", "VIEW"))
             {
-                btnProduct.Visible = false;  
-                pnlProductSub.Visible = false;   
+                btnProduct.Visible = false;
+                pnlProductSub.Visible = false;
             }
 
             if (!UserSessionDTO.HasPermission("USER", "VIEW"))
@@ -398,34 +396,6 @@ namespace GUI
             }
         }
 
-        private void InitializeSearchBox()
-        {
-            // ✅ SET TEXT MẶC ĐỊNH (thay cho PlaceholderText)
-            txtSearch.Text = AppConstants.SEARCH_PLACEHOLDER; // "🔍  Search products, orders, customers..."
-            txtSearch.ForeColor = Color.FromArgb(107, 114, 128); // Màu xám nhạt
-
-            txtSearch.GotFocus += (s, e) =>
-            {
-                if (txtSearch.Text == AppConstants.SEARCH_PLACEHOLDER)
-                {
-                    txtSearch.Text = "";
-                    txtSearch.ForeColor = Color.FromArgb(31, 41, 55);
-                }
-            };
-
-            txtSearch.LostFocus += (s, e) =>
-            {
-                if (string.IsNullOrWhiteSpace(txtSearch.Text))
-                {
-                    txtSearch.Text = AppConstants.SEARCH_PLACEHOLDER;
-                    txtSearch.ForeColor = Color.FromArgb(107, 114, 128);
-                }
-            };
-
-            txtSearch.Padding = new Padding(12, 8, 12, 8);
-            txtSearch.Height = 40;
-        }
-
         private void OpenChildForm(Form childForm, Button clickedButton)
         {
             HideUserDropdown();
@@ -449,9 +419,6 @@ namespace GUI
             HighlightActiveButton(clickedButton);
         }
 
-        
-
-        // Hàm hỗ trợ tạo nút nhanh (Copy style của bạn)
         private Button CreateSidebarButton(string text)
         {
             return new Button
@@ -469,44 +436,32 @@ namespace GUI
             };
         }
 
-        // 1. Click nút cha Marketing -> Mở/Đóng submenu
         private void BtnMarketing_Click(object sender, EventArgs e)
         {
             HandleParentMenuClick(pnlMarketingSub, lblMarketingArrow);
         }
 
-        // 2. Click nút Danh sách -> Mở frmAllCoupons
         private void BtnCouponList_Click(object sender, EventArgs e)
         {
-            // Tạo form danh sách
             GUI.Coupon.frmAllCoupons frm = new GUI.Coupon.frmAllCoupons();
-
-            // Hứng sự kiện "Thêm mới" từ form con
             frm.RequestAddCoupon += (s, args) => OpenAddNewCouponForm();
-
-            // Hứng sự kiện "Sửa" từ form con
             frm.RequestEditCoupon += (s, id) => OpenEditCouponForm(id);
-
             OpenChildForm(frm, btnCouponList);
         }
 
-        // 3. Click nút Thêm mới -> Mở Popup
         private void BtnAddCoupon_Click(object sender, EventArgs e)
         {
             OpenAddNewCouponForm();
         }
 
-        // --- HÀM HỖ TRỢ ---
         private void OpenAddNewCouponForm()
         {
-            // Mở Submenu nếu chưa mở
             if (currentSubMenuPanel != pnlMarketingSub)
                 HandleParentMenuClick(pnlMarketingSub, lblMarketingArrow);
 
             GUI.Coupon.frmAddCoupon frm = new GUI.Coupon.frmAddCoupon(0);
             if (frm.ShowDialog() == DialogResult.OK)
             {
-                // Reload danh sách nếu đang mở form danh sách
                 if (pnlMainContent.Controls.Count > 0 && pnlMainContent.Controls[0] is GUI.Coupon.frmAllCoupons listForm)
                 {
                     listForm.LoadData();
@@ -532,7 +487,7 @@ namespace GUI
         {
             pnlProductSub.Height = 0;
             pnlCategorySub.Height = 0;
-            pnlAttributesSub.Height = 0;
+            pnlSubCategorySub.Height = 0;
             pnlUserSub.Height = 0;
             pnlRolesSub.Height = 0;
             pnlSettingsSub.Height = 0;
@@ -591,11 +546,6 @@ namespace GUI
         private void btnSubCategory_Click(object sender, EventArgs e)
         {
             HandleParentMenuClick(pnlSubCategorySub, lblSubCategoryArrow);
-        }
-
-        private void btnAttributes_Click(object sender, EventArgs e)
-        {
-            HandleParentMenuClick(pnlAttributesSub, lblAttributesArrow);
         }
 
         private void btnUser_Click(object sender, EventArgs e)
@@ -682,11 +632,6 @@ namespace GUI
                 btnSubCategory.BackColor = sidebarHover;
                 lblSubCategoryArrow.BackColor = sidebarHover;
             }
-            else if (parentPanel == pnlAttributesSub)
-            {
-                btnAttributes.BackColor = sidebarHover;
-                lblAttributesArrow.BackColor = sidebarHover;
-            }
             else if (parentPanel == pnlUserSub)
             {
                 btnUser.BackColor = sidebarHover;
@@ -725,13 +670,12 @@ namespace GUI
             AddHoverToParentButton(btnProduct, lblProductArrow);
             AddHoverToParentButton(btnCategory, lblCategoryArrow);
             AddHoverToParentButton(btnSubCategory, lblSubCategoryArrow);
-            AddHoverToParentButton(btnAttributes, lblAttributesArrow);
             AddHoverToParentButton(btnUser, lblUserArrow);
             AddHoverToParentButton(btnRoles, lblRolesArrow);
             AddHoverToParentButton(btnSettings, lblSettingsArrow);
-            AddHoverToParentButton(btnPOSMenu, lblPOSArrow); // ✅ SỬA: Đổi từ btnPOS -> btnPOSMenu
+            AddHoverToParentButton(btnPOSMenu, lblPOSArrow);
             AddHoverToParentButton(btnOrder, lblOrderArrow);
-            AddHoverToChildButton(btnInvoiceManagement);
+            AddHoverToParentButton(btnMarketing, lblMarketingArrow);
 
             AddHoverToChildButton(btnPermission);
             AddHoverToChildButton(btnProducts);
@@ -740,16 +684,16 @@ namespace GUI
             AddHoverToChildButton(btnAddCategory);
             AddHoverToChildButton(btnSubCategoryList);
             AddHoverToChildButton(btnAddSubCategory);
-            AddHoverToChildButton(btnAttributesList);
-            AddHoverToChildButton(btnAddAttribute);
             AddHoverToChildButton(btnAllUser);
             AddHoverToChildButton(btnAddUser);
             AddHoverToChildButton(btnAllRoles);
             AddHoverToChildButton(btnCreateRole);
             AddHoverToChildButton(btnProfileSetting);
             AddHoverToChildButton(btnPOS);
-            AddHoverToChildButton(btnScanQR);
             AddHoverToChildButton(btnPayment);
+            AddHoverToChildButton(btnInvoiceManagement);
+            AddHoverToChildButton(btnCouponList);
+            AddHoverToChildButton(btnAddCoupon);
         }
 
         private void AddHoverToParentButton(Button btn, Label lbl)
@@ -779,12 +723,12 @@ namespace GUI
                     if (currentActiveButton.Parent == pnlProductSub) parentBtnToKeepHovered = btnProduct;
                     else if (currentActiveButton.Parent == pnlCategorySub) parentBtnToKeepHovered = btnCategory;
                     else if (currentActiveButton.Parent == pnlSubCategorySub) parentBtnToKeepHovered = btnSubCategory;
-                    else if (currentActiveButton.Parent == pnlAttributesSub) parentBtnToKeepHovered = btnAttributes;
                     else if (currentActiveButton.Parent == pnlUserSub) parentBtnToKeepHovered = btnUser;
                     else if (currentActiveButton.Parent == pnlRolesSub) parentBtnToKeepHovered = btnRoles;
                     else if (currentActiveButton.Parent == pnlSettingsSub) parentBtnToKeepHovered = btnSettings;
-                    else if (currentActiveButton.Parent == pnlPOSSub) parentBtnToKeepHovered = btnPOSMenu; // ✅ SỬA
+                    else if (currentActiveButton.Parent == pnlPOSSub) parentBtnToKeepHovered = btnPOSMenu;
                     else if (currentActiveButton.Parent == pnlOrderSub) parentBtnToKeepHovered = btnOrder;
+                    else if (currentActiveButton.Parent == pnlMarketingSub) parentBtnToKeepHovered = btnMarketing;
 
                     if (btn == parentBtnToKeepHovered)
                     {
@@ -819,12 +763,12 @@ namespace GUI
                         if (currentActiveButton.Parent == pnlProductSub) parentBtnToKeepHovered = btnProduct;
                         else if (currentActiveButton.Parent == pnlCategorySub) parentBtnToKeepHovered = btnCategory;
                         else if (currentActiveButton.Parent == pnlSubCategorySub) parentBtnToKeepHovered = btnSubCategory;
-                        else if (currentActiveButton.Parent == pnlAttributesSub) parentBtnToKeepHovered = btnAttributes;
                         else if (currentActiveButton.Parent == pnlUserSub) parentBtnToKeepHovered = btnUser;
                         else if (currentActiveButton.Parent == pnlRolesSub) parentBtnToKeepHovered = btnRoles;
                         else if (currentActiveButton.Parent == pnlSettingsSub) parentBtnToKeepHovered = btnSettings;
-                        else if (currentActiveButton.Parent == pnlPOSSub) parentBtnToKeepHovered = btnPOSMenu; // ✅ SỬA
+                        else if (currentActiveButton.Parent == pnlPOSSub) parentBtnToKeepHovered = btnPOSMenu;
                         else if (currentActiveButton.Parent == pnlOrderSub) parentBtnToKeepHovered = btnOrder;
+                        else if (currentActiveButton.Parent == pnlMarketingSub) parentBtnToKeepHovered = btnMarketing;
 
                         if (btn == parentBtnToKeepHovered)
                         {
@@ -863,13 +807,13 @@ namespace GUI
             CollapseCurrentSubMenu();
         }
 
-        private void btnProducts_Click(object sender, EventArgs e) 
+        private void btnProducts_Click(object sender, EventArgs e)
         {
             frmAllProduct frmAllProduct = new frmAllProduct();
 
             frmAllProduct.RequestAddProduct += (s, args) =>
             {
-               OpenAddNewProductForm();
+                OpenAddNewProductForm();
             };
 
             frmAllProduct.RequestEditProduct += (s, productId) =>
@@ -928,23 +872,13 @@ namespace GUI
             OpenChildForm(new SubCategory.frmCreate(), btnAddSubCategory);
         }
 
-        private void btnAttributesList_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAttributesList);
-        }
-
-        private void btnAddAttribute_Click(object sender, EventArgs e)
-        {
-            OpenChildForm(new Form() { BackColor = Color.FromArgb(249, 250, 251) }, btnAddAttribute);
-        }
-
         private void btnAllUser_Click(object sender, EventArgs e)
         {
             frmAllUsers frm = new frmAllUsers();
 
             frm.RequestAddUser += (s, args) =>
             {
-                OpenAddNewUserForm();   
+                OpenAddNewUserForm();
             };
 
             frm.RequestEditUser += (s, user) =>
@@ -1006,53 +940,10 @@ namespace GUI
             OpenPOSForm();
         }
 
-        private void btnScanQR_Click(object sender, EventArgs e)
-        {
-            OpenScanQRForm();
-        }
-
         private void OpenPOSForm()
         {
             _currentPosForm = new frmPOS();
-            _currentPosForm.RequestScanQR += (s, args) =>
-            {
-                OpenScanQRForm();
-            };
-
             OpenChildForm(_currentPosForm, btnPOS);
-        }
-
-        private void OpenScanQRForm()
-        {
-            _currentScanQRForm = new frmScanQR();
-
-            _currentScanQRForm.QRCodeScanned += (s, scannedData) =>
-            {
-                if (_currentPosForm != null)
-                {
-                    try
-                    {
-                        var qrCodeBLL = new QRCodeBLL();
-                        string sku = qrCodeBLL.ParseQRCode(scannedData);
-                        _currentPosForm.AddProductBySku(sku);
-                        OpenPOSForm();
-
-                        MessageBox.Show($"✅ Product added (SKU: {sku}) to cart!",
-                                        "Success",
-                                        MessageBoxButtons.OK,
-                                        MessageBoxIcon.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Error processing QR Code: {ex.Message}",
-                                        "Error",
-                                        MessageBoxButtons.OK,
-                                        MessageBoxIcon.Error);
-                    }
-                }
-            };
-
-            OpenChildForm(_currentScanQRForm, btnScanQR);
         }
 
         private void btnPayment_Click(object sender, EventArgs e)

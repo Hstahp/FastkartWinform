@@ -23,7 +23,7 @@ namespace DTO
         public DateTime OrderDate { get; set; }
         public string OrderNote { get; set; }
         public string CreatedBy { get; set; }
-
+        public string CouponCode { get; set; }
         // Navigation
         public List<OrderItemDTO> OrderItems { get; set; } = new List<OrderItemDTO>();
         public PaymentDTO Payment { get; set; }

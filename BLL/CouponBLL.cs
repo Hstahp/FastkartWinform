@@ -30,14 +30,14 @@ namespace BLL
 
             var coupon = _couponDAL.GetCouponByCode(code);
 
-            if (coupon == null) { result.Message = "Mã giảm giá không tồn tại!"; return result; }
+            if (coupon == null) { result.Message = "Coupon code does not exist!"; return result; }
 
             DateTime now = DateTime.Now;
-            if (now < coupon.StartDate || now > coupon.EndDate) { result.Message = "Mã chưa đến đợt hoặc đã hết hạn."; return result; }
+            if (now < coupon.StartDate || now > coupon.EndDate) { result.Message = "Coupon has not started yet or has expired."; return result; }
 
-            if (coupon.UsageLimit > 0 && coupon.UsedCount >= coupon.UsageLimit) { result.Message = "Mã đã hết lượt sử dụng."; return result; }
+            if (coupon.UsageLimit > 0 && coupon.UsedCount >= coupon.UsageLimit) { result.Message = "Coupon usage limit has been reached."; return result; }
 
-            if (currentSubTotal < coupon.MinOrderValue) { result.Message = $"Đơn hàng tối thiểu phải từ {coupon.MinOrderValue:N0} để dùng mã này."; return result; }
+            if (currentSubTotal < coupon.MinOrderValue) { result.Message = $"Minimum order value must be at least {coupon.MinOrderValue:N0} VND to use this coupon."; return result; }
 
             decimal calculatedDiscount = 0;
             if (coupon.DiscountType == 1) // %
@@ -51,11 +51,21 @@ namespace BLL
                 calculatedDiscount = coupon.DiscountValue;
             }
 
-            if (calculatedDiscount > currentSubTotal) calculatedDiscount = currentSubTotal;
+            if (calculatedDiscount > currentSubTotal)
+            {
+                calculatedDiscount = currentSubTotal;
+                result.Message = $"⚠️ Coupon applied successfully!\n\n" +
+                                $"Note: Discount value exceeds order total.\n" +
+                                $"Maximum discount: {currentSubTotal:N0} VND\n" +
+                                $"(Total after tax will be: {currentSubTotal * 1.10m:N0} VND)";
+            }
+            else
+            {
+                result.Message = "Coupon applied successfully!";
+            }
 
             result.IsValid = true;
             result.DiscountAmount = calculatedDiscount;
-            result.Message = "Áp dụng mã thành công!";
 
             return result;
         }

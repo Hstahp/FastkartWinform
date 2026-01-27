@@ -28,14 +28,14 @@ namespace GUI
             // Use ValidationHelper
             if (!ValidationHelper.IsNotEmpty(email))
             {
-                MessageBox.Show("Vui lòng nhập địa chỉ email của bạn.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please enter your email address.", "Notification", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtEmail.Focus();
                 return;
             }
 
             if (!ValidationHelper.IsValidEmail(email))
             {
-                MessageBox.Show("Vui lòng nhập địa chỉ email hợp lệ.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please enter a valid email address.", "Notification", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtEmail.Focus();
                 return;
             }
@@ -51,7 +51,7 @@ namespace GUI
 
             if (success)
             {
-                MessageBox.Show("Đã gửi mã OTP thành công. Vui lòng kiểm tra email!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("OTP code has been sent successfully. Please check your email!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 frmOtp frm = new frmOtp(email);
                 frm.Show();
@@ -59,7 +59,7 @@ namespace GUI
             }
             else
             {
-                MessageBox.Show("Có lỗi xảy ra, hoặc email không tồn tại. Vui lòng thử lại.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("An error occurred, or the email does not exist. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

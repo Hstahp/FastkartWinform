@@ -152,7 +152,7 @@ namespace DAL
         }
 
         /// <summary>
-        /// ✅ THÊM: Cập nhật Order Status (dùng khi confirm MoMo payment)
+        /// ✅ FIXED: Cập nhật Order Status (không dùng UpdatedAt vì column không tồn tại)
         /// </summary>
         public bool UpdateOrderStatus(int orderUid, string status)
         {
@@ -160,8 +160,7 @@ namespace DAL
             {
                 string query = @"
                     UPDATE [Order] 
-                    SET Status = @Status,
-                        UpdatedAt = GETDATE()
+                    SET Status = @Status
                     WHERE Uid = @OrderUid";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
