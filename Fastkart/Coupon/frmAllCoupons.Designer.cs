@@ -18,8 +18,8 @@
             System.Windows.Forms.DataGridViewCellStyle headerStyle = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle rowStyle = new System.Windows.Forms.DataGridViewCellStyle();
 
-            // Style riêng cho cột Action để CHẶN màu xanh khi click
-            System.Windows.Forms.DataGridViewCellStyle iconCellStyle = new System.Windows.Forms.DataGridViewCellStyle();
+            // Style cho cột Action
+            System.Windows.Forms.DataGridViewCellStyle actionCellStyle = new System.Windows.Forms.DataGridViewCellStyle();
 
             this.pnlHeader = new System.Windows.Forms.Panel();
             this.btnAdd = new System.Windows.Forms.Button();
@@ -34,8 +34,9 @@
             this.colValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colLimit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colUsed = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colEdit = new System.Windows.Forms.DataGridViewImageColumn();
-            this.colDelete = new System.Windows.Forms.DataGridViewImageColumn();
+
+            // THAY ĐỔI: Gộp 2 cột thành 1 cột Action
+            this.colAction = new System.Windows.Forms.DataGridViewImageColumn();
 
             this.pnlHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCoupons)).BeginInit();
@@ -114,13 +115,12 @@
             headerStyle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
             headerStyle.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             headerStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
-            // FIX: Set SelectionBackColor trùng BackColor cho Header
             headerStyle.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(243)))), ((int)(((byte)(244)))), ((int)(((byte)(246)))));
             headerStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
             headerStyle.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvCoupons.ColumnHeadersDefaultCellStyle = headerStyle;
 
-            // --- Style Chung cho Dòng (Vẫn giữ màu tím khi select dòng chữ) ---
+            // --- Style Chung cho Dòng ---
             rowStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             rowStyle.BackColor = System.Drawing.Color.White;
             rowStyle.Font = new System.Drawing.Font("Segoe UI", 10F);
@@ -131,7 +131,7 @@
             rowStyle.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvCoupons.DefaultCellStyle = rowStyle;
 
-            // Thêm cột
+            // Thêm cột (Đã thay colEdit/colDelete bằng colAction)
             this.dgvCoupons.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colId,
             this.colCode,
@@ -139,15 +139,14 @@
             this.colValue,
             this.colLimit,
             this.colUsed,
-            this.colEdit,
-            this.colDelete});
+            this.colAction}); // <--- Cột mới
 
             this.dgvCoupons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvCoupons.Location = new System.Drawing.Point(0, 80);
             this.dgvCoupons.Name = "dgvCoupons";
             this.dgvCoupons.Size = new System.Drawing.Size(1000, 520);
             this.dgvCoupons.TabIndex = 1;
-            this.dgvCoupons.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvCoupons_CellContentClick);
+            // Lưu ý: Đã bỏ Event CellContentClick ở đây để gán trong Code Behind cho gọn
 
             // 
             // colId
@@ -197,37 +196,18 @@
             this.colUsed.Name = "colUsed";
             this.colUsed.Width = 90;
 
-            // --- CẤU HÌNH STYLE RIÊNG CHO CỘT ICON ---
-            // QUAN TRỌNG: Phải set style riêng biệt hoàn toàn mới đè được style chung
-            iconCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            iconCellStyle.NullValue = null;
-            iconCellStyle.Padding = new System.Windows.Forms.Padding(12);
-            iconCellStyle.BackColor = System.Drawing.Color.White;
-
-            // FIX TRIỆT ĐỂ: Khi click vào, ép màu nền vẫn là Trắng (thay vì Tím/Xanh)
-            iconCellStyle.SelectionBackColor = System.Drawing.Color.White;
-            iconCellStyle.SelectionForeColor = System.Drawing.Color.Black;
-
             // 
-            // colEdit
+            // colAction
             // 
-            this.colEdit.HeaderText = "Action";
-            this.colEdit.Name = "colEdit";
-            this.colEdit.Width = 50;
-            this.colEdit.Image = global::GUI.Properties.Resources.icon_edit;
-            this.colEdit.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
-            this.colEdit.DefaultCellStyle = iconCellStyle; // <--- ÁP DỤNG STYLE RIÊNG
-            this.colEdit.HeaderCell.Style.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-
-            // 
-            // colDelete
-            // 
-            this.colDelete.HeaderText = "";
-            this.colDelete.Name = "colDelete";
-            this.colDelete.Width = 50;
-            this.colDelete.Image = global::GUI.Properties.Resources.icon_delete;
-            this.colDelete.ImageLayout = System.Windows.Forms.DataGridViewImageCellLayout.Zoom;
-            this.colDelete.DefaultCellStyle = iconCellStyle; // <--- ÁP DỤNG STYLE RIÊNG
+            this.colAction.HeaderText = "Action";
+            this.colAction.Name = "colAction";
+            this.colAction.Width = 100; // Đủ rộng cho 2 icon
+            // Thiết lập style riêng cho cột Action để căn giữa
+            actionCellStyle.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            actionCellStyle.BackColor = System.Drawing.Color.White;
+            actionCellStyle.SelectionBackColor = System.Drawing.Color.White; // Chặn màu xanh khi select
+            actionCellStyle.SelectionForeColor = System.Drawing.Color.Black;
+            this.colAction.DefaultCellStyle = actionCellStyle;
 
             // 
             // frmAllCoupons
@@ -259,7 +239,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colValue;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLimit;
         private System.Windows.Forms.DataGridViewTextBoxColumn colUsed;
-        private System.Windows.Forms.DataGridViewImageColumn colEdit;
-        private System.Windows.Forms.DataGridViewImageColumn colDelete;
+
+        // Cột gộp
+        private System.Windows.Forms.DataGridViewImageColumn colAction;
     }
 }
