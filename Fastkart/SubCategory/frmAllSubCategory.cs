@@ -45,7 +45,7 @@ namespace GUI.SubCategory
             // 1. CHECK QUYỀN XEM
             if (!UserSessionDTO.HasPermission(PermCode.FUNC_SUBCATEGORY, PermCode.TYPE_VIEW))
             {
-                MessageBox.Show("Bạn không có quyền truy cập trang Quản lý Sản phẩm!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("You do not have permission to access the Product Management page.!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 this.Close();
                 return;
             }
@@ -157,7 +157,7 @@ namespace GUI.SubCategory
                 // 1. Click XEM
                 if (relativeX >= padding && relativeX < padding + iconSize)
                 {
-                    MessageBox.Show("Xem sản phẩm: " + SubCategoryId);
+                    MessageBox.Show("View products: " + SubCategoryId);
                 }
                 // 2. Click SỬA (Có quyền mới click được)
                 else if (canEdit && relativeX >= padding + 30 && relativeX < padding + 30 + iconSize)

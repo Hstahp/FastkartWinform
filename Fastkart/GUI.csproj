@@ -402,6 +402,7 @@
     <None Include="Resources\bin %281%29.png" />
     <None Include="Resources\compose %281%29.png" />
     <None Include="Resources\view %281%29.png" />
+    <None Include="Resources\loading.jpg" />
     <Content Include="SqlServerTypes\readme.htm" />
     <Content Include="SqlServerTypes\x64\msvcr120.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

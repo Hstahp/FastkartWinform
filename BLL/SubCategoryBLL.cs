@@ -163,7 +163,7 @@ namespace BLL
             }
             catch (Exception ex)
             {
-                throw new Exception($"Lỗi nghiệp vụ khi xóa danh mục ID {id}. Chi tiết: {ex.Message}");
+                throw new Exception($"Business error when deleting ID category {id}. Detail: {ex.Message}");
             }
         }
 

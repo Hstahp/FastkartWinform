@@ -244,7 +244,7 @@
             this.txtName.Location = new System.Drawing.Point(185, 67);
             this.txtName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtName.Name = "txtName";
-            this.txtName.PlaceholderText = "Nhập tên danh mục...";
+            this.txtName.PlaceholderText = "Enter category name...";
             this.txtName.SelectedText = "";
             this.txtName.Size = new System.Drawing.Size(250, 30);
             this.txtName.TabIndex = 21;
@@ -275,7 +275,7 @@
             this.txtPosition.Location = new System.Drawing.Point(185, 229);
             this.txtPosition.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtPosition.Name = "txtPosition";
-            this.txtPosition.PlaceholderText = "Tự động tăng";
+            this.txtPosition.PlaceholderText = "Automatic increase";
             this.txtPosition.SelectedText = "";
             this.txtPosition.Size = new System.Drawing.Size(250, 30);
             this.txtPosition.TabIndex = 19;

@@ -45,6 +45,10 @@
             this.labelProductDescription = new System.Windows.Forms.Label();
             this.labelPanelDescription = new System.Windows.Forms.Label();
             this.guna2PanelInfo = new Guna.UI2.WinForms.Guna2Panel();
+            this.dtpExpiryDate = new System.Windows.Forms.DateTimePicker();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.dtpManufactureDate = new System.Windows.Forms.DateTimePicker();
             this.txtWeight = new Guna.UI2.WinForms.Guna2TextBox();
             this.labelWeight = new System.Windows.Forms.Label();
             this.cboBrand = new Guna.UI2.WinForms.Guna2ComboBox();
@@ -71,10 +75,6 @@
             this.toggleIsFeatured = new Guna.UI2.WinForms.Guna2ToggleSwitch();
             this.labelIsFeatured = new System.Windows.Forms.Label();
             this.labelPanelInfo = new System.Windows.Forms.Label();
-            this.dtpManufactureDate = new System.Windows.Forms.DateTimePicker();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.dtpExpiryDate = new System.Windows.Forms.DateTimePicker();
             this.guna2PanelMain.SuspendLayout();
             this.guna2PanelInventory.SuspendLayout();
             this.guna2PanelPrice.SuspendLayout();
@@ -137,7 +137,7 @@
             this.guna2PanelInventory.Location = new System.Drawing.Point(23, 940);
             this.guna2PanelInventory.Name = "guna2PanelInventory";
             this.guna2PanelInventory.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelInventory.Size = new System.Drawing.Size(1257, 238);
+            this.guna2PanelInventory.Size = new System.Drawing.Size(1215, 238);
             this.guna2PanelInventory.TabIndex = 5;
             // 
             // label1
@@ -289,7 +289,7 @@
             this.guna2PanelPrice.Location = new System.Drawing.Point(23, 794);
             this.guna2PanelPrice.Name = "guna2PanelPrice";
             this.guna2PanelPrice.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelPrice.Size = new System.Drawing.Size(1257, 130);
+            this.guna2PanelPrice.Size = new System.Drawing.Size(1215, 130);
             this.guna2PanelPrice.TabIndex = 4;
             // 
             // txtDiscount
@@ -379,7 +379,7 @@
             this.guna2PanelImages.Location = new System.Drawing.Point(23, 626);
             this.guna2PanelImages.Name = "guna2PanelImages";
             this.guna2PanelImages.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelImages.Size = new System.Drawing.Size(1257, 152);
+            this.guna2PanelImages.Size = new System.Drawing.Size(1215, 152);
             this.guna2PanelImages.TabIndex = 3;
             // 
             // picProduct
@@ -450,17 +450,18 @@
             this.guna2PanelDescription.Location = new System.Drawing.Point(23, 440);
             this.guna2PanelDescription.Name = "guna2PanelDescription";
             this.guna2PanelDescription.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelDescription.Size = new System.Drawing.Size(1257, 175);
+            this.guna2PanelDescription.Size = new System.Drawing.Size(1215, 175);
             this.guna2PanelDescription.TabIndex = 2;
             // 
             // rtbDescription
             // 
             this.rtbDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtbDescription.BackColor = System.Drawing.SystemColors.Window;
             this.rtbDescription.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.rtbDescription.Location = new System.Drawing.Point(203, 51);
             this.rtbDescription.Name = "rtbDescription";
-            this.rtbDescription.Size = new System.Drawing.Size(804, 100);
+            this.rtbDescription.Size = new System.Drawing.Size(762, 100);
             this.rtbDescription.TabIndex = 7;
             this.rtbDescription.Text = "";
             // 
@@ -526,8 +527,44 @@
             this.guna2PanelInfo.Location = new System.Drawing.Point(23, 23);
             this.guna2PanelInfo.Name = "guna2PanelInfo";
             this.guna2PanelInfo.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelInfo.Size = new System.Drawing.Size(1257, 400);
+            this.guna2PanelInfo.Size = new System.Drawing.Size(1215, 400);
             this.guna2PanelInfo.TabIndex = 0;
+            // 
+            // dtpExpiryDate
+            // 
+            this.dtpExpiryDate.Location = new System.Drawing.Point(807, 297);
+            this.dtpExpiryDate.Name = "dtpExpiryDate";
+            this.dtpExpiryDate.Size = new System.Drawing.Size(200, 22);
+            this.dtpExpiryDate.TabIndex = 34;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.label3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.label3.Location = new System.Drawing.Point(680, 297);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(81, 20);
+            this.label3.TabIndex = 33;
+            this.label3.Text = "ExpiryDate";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.label2.Location = new System.Drawing.Point(680, 260);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(124, 20);
+            this.label2.TabIndex = 32;
+            this.label2.Text = "ManufactureDate";
+            // 
+            // dtpManufactureDate
+            // 
+            this.dtpManufactureDate.Location = new System.Drawing.Point(807, 260);
+            this.dtpManufactureDate.Name = "dtpManufactureDate";
+            this.dtpManufactureDate.Size = new System.Drawing.Size(200, 22);
+            this.dtpManufactureDate.TabIndex = 31;
             // 
             // txtWeight
             // 
@@ -698,7 +735,7 @@
             this.txtProductName.Location = new System.Drawing.Point(203, 63);
             this.txtProductName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtProductName.Name = "txtProductName";
-            this.txtProductName.PlaceholderText = "Nhập tên sản phẩm...";
+            this.txtProductName.PlaceholderText = "Enter the product name...";
             this.txtProductName.SelectedText = "";
             this.txtProductName.Size = new System.Drawing.Size(250, 30);
             this.txtProductName.TabIndex = 21;
@@ -728,8 +765,8 @@
             this.txtPosition.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.txtPosition.Location = new System.Drawing.Point(807, 334);
             this.txtPosition.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtPosition.Name = "cboPosition";
-            this.txtPosition.PlaceholderText = "Tự động tăng";
+            this.txtPosition.Name = "txtPosition";
+            this.txtPosition.PlaceholderText = "Automatic increase";
             this.txtPosition.SelectedText = "";
             this.txtPosition.Size = new System.Drawing.Size(250, 30);
             this.txtPosition.TabIndex = 19;
@@ -895,42 +932,6 @@
             this.labelPanelInfo.Size = new System.Drawing.Size(205, 28);
             this.labelPanelInfo.TabIndex = 4;
             this.labelPanelInfo.Text = "Product Information";
-            // 
-            // dtpManufactureDate
-            // 
-            this.dtpManufactureDate.Location = new System.Drawing.Point(807, 260);
-            this.dtpManufactureDate.Name = "dtpManufactureDate";
-            this.dtpManufactureDate.Size = new System.Drawing.Size(200, 22);
-            this.dtpManufactureDate.TabIndex = 31;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.label2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.label2.Location = new System.Drawing.Point(680, 260);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(124, 20);
-            this.label2.TabIndex = 32;
-            this.label2.Text = "ManufactureDate";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.label3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.label3.Location = new System.Drawing.Point(680, 297);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(81, 20);
-            this.label3.TabIndex = 33;
-            this.label3.Text = "ExpiryDate";
-            // 
-            // dtpExpiryDate
-            // 
-            this.dtpExpiryDate.Location = new System.Drawing.Point(807, 297);
-            this.dtpExpiryDate.Name = "dtpExpiryDate";
-            this.dtpExpiryDate.Size = new System.Drawing.Size(200, 22);
-            this.dtpExpiryDate.TabIndex = 34;
             // 
             // frmCreate
             // 
