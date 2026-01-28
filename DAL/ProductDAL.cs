@@ -217,14 +217,14 @@ namespace DAL
             return !_context.Product.Any(p =>
                 p.ProductName.ToLower() == productName.ToLower() &&
                 p.SubCategoryUid == subCategoryUid &&
-                p.Uid != currentProductId);
+                p.Uid != currentProductId && !p.Deleted);
         }
 
         public bool IsSkuUnique(string sku, int currentProductId)
         {
             return !_context.Product.Any(p =>
                 p.Sku.ToLower() == sku.ToLower() &&
-                p.Uid != currentProductId);
+                p.Uid != currentProductId && !p.Deleted);
         }
 
         public bool IsLockedSubcategory(int id)
