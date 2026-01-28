@@ -46,7 +46,7 @@ namespace GUI.Category
             // 1. CHECK QUYỀN XEM
             if (!UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_VIEW))
             {
-                MessageBox.Show("Bạn không có quyền truy cập trang Quản lý Sản phẩm!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("You do not have permission to access the Product Management page.!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 this.Close();
                 return;
             }
@@ -160,7 +160,7 @@ namespace GUI.Category
                 // 1. Click XEM
                 if (relativeX >= padding && relativeX < padding + iconSize)
                 {
-                    MessageBox.Show("Xem sản phẩm: " + categoryId);
+                    MessageBox.Show("View products: " + categoryId);
                 }
                 // 2. Click SỬA (Có quyền mới click được)
                 else if (canEdit && relativeX >= padding + 30 && relativeX < padding + 30 + iconSize)
@@ -225,9 +225,13 @@ namespace GUI.Category
 
             foreach (var p in products)
             {
+
                 int rowIndex = dgvProducts.Rows.Add(false, null, p.CategoryName, p.Position, p.Status, "", p.Uid);
 
                 var dgvRow = dgvProducts.Rows[rowIndex];
+
+                Image placeholder = Properties.Resources.loading;
+                dgvRow.Cells["colImage"].Value = placeholder;
 
                 if (!string.IsNullOrEmpty(p.Thumbnail))
                 {

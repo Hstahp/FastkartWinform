@@ -51,8 +51,8 @@ namespace GUI.Category
             // Lúc này Form đã hiện lên (Handle created), nên gọi Close() an toàn 100%
             if (!UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_CREATE))
             {
-                MessageBox.Show("Bạn không có quyền thêm sản phẩm mới!",
-                                "Truy cập bị từ chối",
+                MessageBox.Show("You do not have permission to add new products.!",
+                                "Access denied",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Warning);
                 this.Close(); // Đóng form

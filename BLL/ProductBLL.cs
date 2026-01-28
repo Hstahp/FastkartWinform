@@ -323,6 +323,7 @@ namespace BLL
             bool skuChanged = (oldSku != cleanedSku);
             
             // ✅  Truyền currentProductId thay vì 0
+
             if (!_productDAL.IsSkuUnique(cleanedSku, currentProductId))
             {
                 MessageBox.Show("SKU already exists, please re-enter", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -330,6 +331,7 @@ namespace BLL
             }
 
             //  Truyền currentProductId thay vì 0
+
             if (!_productDAL.IsProductNameUnique(cleanedProductName, productDTO.SubCategoryUid, currentProductId))
             {
                 MessageBox.Show($"The product name '{cleanedProductName}' already exists in this subcategory.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -552,6 +554,11 @@ namespace BLL
 
             System.Diagnostics.Debug.WriteLine($"\n📊 SUMMARY: Success={successCount}, Failed={failCount}, Total={productsWithoutQR.Count}");
             return successCount;
+        }
+
+        public void UpdateDiscount(int newDiscount, int Uid)
+        {
+            _productDAL.UpdateDiscount(newDiscount, Uid);
         }
     }
 }

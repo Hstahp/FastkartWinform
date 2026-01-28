@@ -142,7 +142,7 @@
             this.guna2PanelInventory.Location = new System.Drawing.Point(23, 940);
             this.guna2PanelInventory.Name = "guna2PanelInventory";
             this.guna2PanelInventory.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelInventory.Size = new System.Drawing.Size(1236, 238);
+            this.guna2PanelInventory.Size = new System.Drawing.Size(1215, 238);
             this.guna2PanelInventory.TabIndex = 5;
             // 
             // label1
@@ -294,7 +294,7 @@
             this.guna2PanelPrice.Location = new System.Drawing.Point(23, 794);
             this.guna2PanelPrice.Name = "guna2PanelPrice";
             this.guna2PanelPrice.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelPrice.Size = new System.Drawing.Size(1236, 130);
+            this.guna2PanelPrice.Size = new System.Drawing.Size(1215, 130);
             this.guna2PanelPrice.TabIndex = 4;
             // 
             // txtDiscount
@@ -384,7 +384,7 @@
             this.guna2PanelImages.Location = new System.Drawing.Point(23, 626);
             this.guna2PanelImages.Name = "guna2PanelImages";
             this.guna2PanelImages.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelImages.Size = new System.Drawing.Size(1236, 152);
+            this.guna2PanelImages.Size = new System.Drawing.Size(1215, 152);
             this.guna2PanelImages.TabIndex = 3;
             // 
             // picProduct
@@ -455,7 +455,7 @@
             this.guna2PanelDescription.Location = new System.Drawing.Point(23, 440);
             this.guna2PanelDescription.Name = "guna2PanelDescription";
             this.guna2PanelDescription.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelDescription.Size = new System.Drawing.Size(1236, 175);
+            this.guna2PanelDescription.Size = new System.Drawing.Size(1215, 175);
             this.guna2PanelDescription.TabIndex = 2;
             // 
             // rtbDescription
@@ -465,7 +465,7 @@
             this.rtbDescription.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.rtbDescription.Location = new System.Drawing.Point(203, 51);
             this.rtbDescription.Name = "rtbDescription";
-            this.rtbDescription.Size = new System.Drawing.Size(783, 100);
+            this.rtbDescription.Size = new System.Drawing.Size(762, 100);
             this.rtbDescription.TabIndex = 7;
             this.rtbDescription.Text = "";
             // 
@@ -531,7 +531,7 @@
             this.guna2PanelInfo.Location = new System.Drawing.Point(23, 23);
             this.guna2PanelInfo.Name = "guna2PanelInfo";
             this.guna2PanelInfo.Padding = new System.Windows.Forms.Padding(20);
-            this.guna2PanelInfo.Size = new System.Drawing.Size(1236, 400);
+            this.guna2PanelInfo.Size = new System.Drawing.Size(1215, 400);
             this.guna2PanelInfo.TabIndex = 0;
             // 
             // dtpExpiryDate
@@ -739,7 +739,7 @@
             this.txtProductName.Location = new System.Drawing.Point(203, 63);
             this.txtProductName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtProductName.Name = "txtProductName";
-            this.txtProductName.PlaceholderText = "Nhập tên sản phẩm...";
+            this.txtProductName.PlaceholderText = "Enter the product name...";
             this.txtProductName.SelectedText = "";
             this.txtProductName.Size = new System.Drawing.Size(250, 30);
             this.txtProductName.TabIndex = 21;
@@ -770,7 +770,7 @@
             this.txtPosition.Location = new System.Drawing.Point(807, 334);
             this.txtPosition.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtPosition.Name = "txtPosition";
-            this.txtPosition.PlaceholderText = "Tự động tăng";
+            this.txtPosition.PlaceholderText = "Automatic increase";
             this.txtPosition.SelectedText = "";
             this.txtPosition.Size = new System.Drawing.Size(250, 30);
             this.txtPosition.TabIndex = 19;

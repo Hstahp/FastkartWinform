@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Runtime.Remoting.Contexts;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -64,6 +65,12 @@ namespace DAL
             }
             catch (Exception ex)
             {
+                MessageBox.Show(
+                    ex.ToString(),  
+                    "DAL ERROR",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
                 return new List<Product>();
             }
         }
@@ -205,19 +212,19 @@ namespace DAL
             return _context.Product.Count(p => !p.Deleted);
         }
 
-        public bool IsProductNameUnique(string productName, int subCategoryUid, int currentProductId = 0)
+        public bool IsProductNameUnique(string productName, int subCategoryUid, int currentProductId)
         {
             return !_context.Product.Any(p =>
                 p.ProductName.ToLower() == productName.ToLower() &&
                 p.SubCategoryUid == subCategoryUid &&
-                p.Uid != currentProductId);
+                p.Uid != currentProductId && !p.Deleted);
         }
 
-        public bool IsSkuUnique(string sku, int currentProductId = 0)
+        public bool IsSkuUnique(string sku, int currentProductId)
         {
             return !_context.Product.Any(p =>
                 p.Sku.ToLower() == sku.ToLower() &&
-                p.Uid != currentProductId);
+                p.Uid != currentProductId && !p.Deleted);
         }
 
         public bool IsLockedSubcategory(int id)
@@ -355,6 +362,26 @@ namespace DAL
             catch (Exception ex)
             {
                 return null;
+            }
+        }
+
+        public void UpdateDiscount(int newDiscount, int Uid)
+        {
+            try
+            {
+                var product = _context.Product.FirstOrDefault(p => p.Uid == Uid);
+
+                product.Discount = newDiscount;
+                if(newDiscount == -1)
+                {
+                    product.Status = "Inactive";
+                }
+                _context.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                
             }
         }
     }
