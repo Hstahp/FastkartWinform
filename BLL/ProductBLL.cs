@@ -604,7 +604,7 @@ namespace BLL
                             // ✅ Update database
                             product.QRCodeUrl = qrUrl;
                             product.UpdatedAt = DateTime.Now;
-                            product.UpdatedBy = Environment.UserName; // ✅ THÊM: Track who updated
+                            product.UpdatedBy = Environment.UserName; 
 
                             bool updated = _productDAL.UpdateProduct(product);
                             if (updated)
@@ -641,9 +641,5 @@ namespace BLL
             return successCount;
         }
 
-        public void UpdateDiscount(int newDiscount, int Uid)
-        {
-            _productDAL.UpdateDiscount(newDiscount, Uid);
-        }
     }
 }

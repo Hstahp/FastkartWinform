@@ -365,24 +365,5 @@ namespace DAL
             }
         }
 
-        public void UpdateDiscount(int newDiscount, int Uid)
-        {
-            try
-            {
-                var product = _context.Product.FirstOrDefault(p => p.Uid == Uid);
-
-                product.Discount = newDiscount;
-                if(newDiscount == -1)
-                {
-                    product.Status = "Inactive";
-                }
-                _context.SaveChanges();
-
-            }
-            catch (Exception ex)
-            {
-                
-            }
-        }
     }
 }

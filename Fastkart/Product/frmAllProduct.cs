@@ -205,27 +205,6 @@ namespace GUI
             RequestEditProduct?.Invoke(this, productId);
         }
 
-        public int ApplyExpiryDiscount(DateTime ExpiryDate, DateTime ManufactureDate)
-        {
-            int totalDays = (ExpiryDate.Date - ManufactureDate.Date).Days;
-            int daysLeft = (ExpiryDate.Date - DateTime.Today).Days;
-            int newDiscount = 0;
-
-            if (totalDays <= 0 || daysLeft <= 0)
-            {
-                return -1;
-            }
-
-            double ratio = (double)daysLeft / totalDays;
-
-            if (ratio <= 0.2)
-                newDiscount = 50;
-            else if (ratio <= 0.5)
-                newDiscount = 30;
-
-            return newDiscount;
-        }
-
         private async void LoadData()
         {
             int total = _productBLL.Count(keyword, filter);
@@ -240,11 +219,6 @@ namespace GUI
 
             foreach (var p in products)
             {
-                int newDiscount =  ApplyExpiryDiscount(p.ExpiryDate, p.ManufactureDate);
-                if(newDiscount != 0)
-                {
-                    _productBLL.UpdateDiscount(newDiscount, p.Uid);
-                }
 
                 string formattedPrice = p.Price.HasValue
                     ? p.Price.Value.ToString("#,##0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN")) + " VNĐ"
