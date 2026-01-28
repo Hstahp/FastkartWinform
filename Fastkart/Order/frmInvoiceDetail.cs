@@ -2,6 +2,7 @@
 using DTO;
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace GUI.Order
@@ -33,8 +34,8 @@ namespace GUI.Order
         private void InitializeUI()
         {
             this.Text = $"Invoice #{_order.Uid}";
-            this.Size = new Size(500, 700);
-            this.StartPosition = FormStartPosition.CenterScreen; // ✅ CENTER SCREEN
+            this.Size = new Size(500, 750); // ✅ Tăng height để chứa discount breakdown
+            this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.White;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -102,12 +103,12 @@ namespace GUI.Order
             mainPanel.Controls.Add(dgv);
             yPos += 155;
 
+            // ✅ SỬA: Tăng height của summary panel để chứa discount breakdown
             Panel sumPanel = CreateSummaryPanel();
             sumPanel.Location = new Point(15, yPos);
             mainPanel.Controls.Add(sumPanel);
-            yPos += 100;
+            yPos += 140; // ✅ Tăng từ 100 lên 140
 
-            // ✅ SỬA: BỎ NÚT PRINT, CHỈ GIỮ PDF VÀ CLOSE
             FlowLayoutPanel btnPanel = new FlowLayoutPanel
             {
                 Location = new Point(15, yPos),
@@ -208,19 +209,24 @@ namespace GUI.Order
         {
             Panel p = new Panel
             {
-                Size = new Size(455, 90),
+                Size = new Size(455, 130), // ✅ Tăng từ 90 lên 130
                 BackColor = Color.FromArgb(249, 250, 251),
                 Padding = new Padding(10)
             };
 
             AddSumRow(p, "Subtotal:", "lblSubTotal", 5);
             AddSumRow(p, "Tax:", "lblTax", 25);
-            AddSumRow(p, "Discount:", "lblDiscount", 45);
+            
+            // ✅ THÊM: Hiển thị product discount (nếu có)
+            AddSumRow(p, "Product Discount:", "lblProductDiscount", 45, Color.FromArgb(46, 125, 50));
+            
+            // ✅ THÊM: Hiển thị coupon discount (nếu có)
+            AddSumRow(p, "Coupon Discount:", "lblCouponDiscount", 65, Color.FromArgb(237, 100, 166));
 
             Label lbl = new Label
             {
                 Text = "TOTAL:",
-                Location = new Point(10, 70),
+                Location = new Point(10, 90), // ✅ Dịch xuống
                 AutoSize = true,
                 Font = new Font("Segoe UI", 11, FontStyle.Bold)
             };
@@ -230,7 +236,7 @@ namespace GUI.Order
             {
                 Name = "lblTotalValue",
                 Text = "0đ",
-                Location = new Point(350, 70),
+                Location = new Point(350, 90), // ✅ Dịch xuống
                 AutoSize = true,
                 Font = new Font("Segoe UI", 12, FontStyle.Bold),
                 ForeColor = Color.FromArgb(231, 76, 60)
@@ -240,7 +246,7 @@ namespace GUI.Order
             return p;
         }
 
-        private void AddSumRow(Panel p, string lbl, string name, int y)
+        private void AddSumRow(Panel p, string lbl, string name, int y, Color? valueColor = null)
         {
             Label l1 = new Label
             {
@@ -258,7 +264,8 @@ namespace GUI.Order
                 Text = "0đ",
                 Location = new Point(350, y),
                 AutoSize = true,
-                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = valueColor ?? Color.Black // ✅ Cho phép custom color
             };
             p.Controls.Add(l2);
         }
@@ -297,11 +304,72 @@ namespace GUI.Order
 
                 Find("lblSubTotal").Text = $"{_order.SubTotal:N0}đ";
                 Find("lblTax").Text = $"{_order.TaxAmount:N0}đ";
-                Find("lblDiscount").Text = $"{_order.DiscountAmount:N0}đ";
+
+                // ✅ DEBUG: Kiểm tra OrderItems có DiscountAmount không
+                System.Diagnostics.Debug.WriteLine($"📊 ========== INVOICE DETAIL DEBUG ==========");
+                System.Diagnostics.Debug.WriteLine($"Order #{_order.Uid}:");
+                System.Diagnostics.Debug.WriteLine($"  SubTotal: {_order.SubTotal:N0}đ");
+                System.Diagnostics.Debug.WriteLine($"  TaxAmount: {_order.TaxAmount:N0}đ");
+                System.Diagnostics.Debug.WriteLine($"  DiscountAmount (TOTAL): {_order.DiscountAmount:N0}đ");
+                System.Diagnostics.Debug.WriteLine($"  CouponCode: '{_order.CouponCode ?? "NULL"}'");
+                System.Diagnostics.Debug.WriteLine($"");
+                System.Diagnostics.Debug.WriteLine($"OrderItems ({_order.OrderItems?.Count ?? 0}):");
+
+                decimal productDiscount = 0;
+                if (_order.OrderItems != null && _order.OrderItems.Any())
+                {
+                    foreach (var item in _order.OrderItems)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"  - {item.ProductName}:");
+                        System.Diagnostics.Debug.WriteLine($"    Qty: {item.Quantity}");
+                        System.Diagnostics.Debug.WriteLine($"    PriceAtPurchase: {item.PriceAtPurchase:N0}");
+                        System.Diagnostics.Debug.WriteLine($"    DiscountAmount (PER UNIT): {item.DiscountAmount:N0}");
+                        System.Diagnostics.Debug.WriteLine($"    SubTotal: {item.SubTotal:N0}");
+                        System.Diagnostics.Debug.WriteLine($"    Total Discount for this item: {item.DiscountAmount * item.Quantity:N0}");
+
+                        productDiscount += item.DiscountAmount * item.Quantity;
+                    }
+                }
+
+                // ✅ Tính coupon discount
+                decimal couponDiscount = _order.DiscountAmount - productDiscount;
+
+                System.Diagnostics.Debug.WriteLine($"");
+                System.Diagnostics.Debug.WriteLine($"CALCULATED:");
+                System.Diagnostics.Debug.WriteLine($"  Product Discount: {productDiscount:N0}đ");
+                System.Diagnostics.Debug.WriteLine($"  Coupon Discount: {couponDiscount:N0}đ");
+                System.Diagnostics.Debug.WriteLine($"  Total Discount: {_order.DiscountAmount:N0}đ");
+                System.Diagnostics.Debug.WriteLine($"=========================================");
+
+                // Hiển thị product discount
+                if (productDiscount > 0)
+                {
+                    Find("lblProductDiscount").Text = $"-{productDiscount:N0}đ";
+                    Find("lblProductDiscount").ForeColor = Color.FromArgb(46, 125, 50);
+                }
+                else
+                {
+                    Find("lblProductDiscount").Text = "0đ";
+                    Find("lblProductDiscount").ForeColor = Color.Gray;
+                }
+
+                // Hiển thị coupon discount
+                if (couponDiscount > 0 && !string.IsNullOrEmpty(_order.CouponCode))
+                {
+                    Find("lblCouponDiscount").Text = $"-{couponDiscount:N0}đ";
+                    Find("lblCouponDiscount").ForeColor = Color.FromArgb(237, 100, 166);
+                }
+                else
+                {
+                    Find("lblCouponDiscount").Text = "0đ";
+                    Find("lblCouponDiscount").ForeColor = Color.Gray;
+                }
+
                 Find("lblTotalValue").Text = $"{_order.TotalAmount:N0}đ";
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"❌ LoadOrderDetail Error: {ex.Message}");
                 MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

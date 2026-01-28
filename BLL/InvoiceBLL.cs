@@ -140,23 +140,24 @@ namespace BLL
 
                 AddSummaryRow(totalTable, "Subtotal:", $"{order.SubTotal:N0} VND", normalFont, boldFont);
 
-                // Hiển thị discount breakdown nếu có coupon
-                if (!string.IsNullOrEmpty(order.CouponCode))
-                {
-                    // Tính product discount vs coupon discount (giả sử tổng discount đã lưu)
-                    decimal productDiscount = order.OrderItems.Sum(item => item.DiscountAmount);
-                    decimal couponDiscount = order.DiscountAmount - productDiscount;
+                // ✅ CẢI THIỆN: Hiển thị discount breakdown rõ ràng hơn
+                decimal productDiscount = order.OrderItems.Sum(item => item.DiscountAmount * item.Quantity);
+                decimal couponDiscount = order.DiscountAmount - productDiscount;
 
-                    if (productDiscount > 0)
-                    {
-                        AddSummaryRow(totalTable, "Product Discount:", $"-{productDiscount:N0} VND", normalFont, boldFont);
-                    }
-                    if (couponDiscount > 0)
-                    {
-                        AddSummaryRow(totalTable, $"Coupon ({order.CouponCode}):", $"-{couponDiscount:N0} VND", normalFont, boldFont);
-                    }
+                // Hiển thị product discount
+                if (productDiscount > 0)
+                {
+                    AddSummaryRow(totalTable, "Product Discount:", $"-{productDiscount:N0} VND", normalFont, boldFont, new BaseColor(46, 125, 50));
                 }
-                else if (order.DiscountAmount > 0)
+
+                // Hiển thị coupon discount với tên coupon
+                if (couponDiscount > 0 && !string.IsNullOrEmpty(order.CouponCode))
+                {
+                    AddSummaryRow(totalTable, $"Coupon Discount ({order.CouponCode}):", $"-{couponDiscount:N0} VND", normalFont, boldFont, new BaseColor(237, 100, 166));
+                }
+
+                // Nếu chỉ có discount chung (không tách được)
+                if (productDiscount == 0 && couponDiscount == 0 && order.DiscountAmount > 0)
                 {
                     AddSummaryRow(totalTable, "Discount:", $"-{order.DiscountAmount:N0} VND", normalFont, boldFont);
                 }
@@ -251,11 +252,21 @@ namespace BLL
                         OrderItems = new List<OrderItemDTO>()
                     };
 
+                    // ✅ DEBUG: Log Order data
+                    System.Diagnostics.Debug.WriteLine($"📋 [InvoiceBLL] Loading Order #{orderUid}:");
+                    System.Diagnostics.Debug.WriteLine($"   SubTotal: {order.SubTotal:N0}");
+                    System.Diagnostics.Debug.WriteLine($"   TaxAmount: {order.TaxAmount:N0}");
+                    System.Diagnostics.Debug.WriteLine($"   DiscountAmount: {order.DiscountAmount:N0}");
+                    System.Diagnostics.Debug.WriteLine($"   CouponCode: '{order.CouponCode}'");
+
                     reader.Close();
 
+                    // ✅ FIX: Thêm DiscountAmount vào query để lấy chính xác discount của từng item
                     string itemsQuery = @"
                         SELECT oi.Uid, oi.ProductUid, p.ProductName, p.Sku,
-                               oi.Quantity, oi.PriceAtPurchase, oi.DiscountAmount, oi.SubTotal
+                               oi.Quantity, oi.PriceAtPurchase, 
+                               ISNULL(oi.DiscountAmount, 0) as DiscountAmount, 
+                               oi.SubTotal
                         FROM OrderItem oi
                         INNER JOIN Product p ON oi.ProductUid = p.Uid
                         WHERE oi.OrderUid = @OrderUid";
@@ -266,7 +277,7 @@ namespace BLL
                     reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                        order.OrderItems.Add(new OrderItemDTO
+                        var item = new OrderItemDTO
                         {
                             Uid = reader.GetInt32(0),
                             ProductUid = reader.GetInt32(1),
@@ -274,12 +285,30 @@ namespace BLL
                             ProductSku = reader.IsDBNull(3) ? "" : reader.GetString(3),
                             Quantity = reader.GetInt32(4),
                             PriceAtPurchase = reader.GetDecimal(5),
-                            DiscountAmount = reader.GetDecimal(6),
+                            DiscountAmount = reader.GetDecimal(6), 
                             SubTotal = reader.GetDecimal(7)
-                        });
+                        };
+
+                        // ✅ DEBUG: Log mỗi OrderItem
+                        System.Diagnostics.Debug.WriteLine($"   Item: {item.ProductName}");
+                        System.Diagnostics.Debug.WriteLine($"      Qty: {item.Quantity}, Price: {item.PriceAtPurchase:N0}");
+                        System.Diagnostics.Debug.WriteLine($"      DiscountAmount (per unit): {item.DiscountAmount:N0}");
+                        System.Diagnostics.Debug.WriteLine($"      SubTotal: {item.SubTotal:N0}");
+
+                        order.OrderItems.Add(item);
                     }
 
                     reader.Close();
+
+                    // ✅ DEBUG: Summary calculation
+                    decimal productDiscount = order.OrderItems.Sum(i => i.DiscountAmount * i.Quantity);
+                    decimal couponDiscount = order.DiscountAmount - productDiscount;
+                    System.Diagnostics.Debug.WriteLine($"");
+                    System.Diagnostics.Debug.WriteLine($"📊 Calculated in InvoiceBLL:");
+                    System.Diagnostics.Debug.WriteLine($"   Product Discount: {productDiscount:N0}đ");
+                    System.Diagnostics.Debug.WriteLine($"   Coupon Discount: {couponDiscount:N0}đ");
+                    System.Diagnostics.Debug.WriteLine($"=======================================");
+
                     return order;
                 }
             }
@@ -316,6 +345,24 @@ namespace BLL
             valueCell.Border = Rectangle.NO_BORDER;
             valueCell.HorizontalAlignment = Element.ALIGN_RIGHT;
             valueCell.Padding = 3f;
+
+            table.AddCell(labelCell);
+            table.AddCell(valueCell);
+        }
+
+        private void AddSummaryRow(PdfPTable table, string label, string value,
+            iTextSharp.text.Font labelFont, iTextSharp.text.Font valueFont, BaseColor valueColor)
+        {
+            PdfPCell labelCell = new PdfPCell(new Phrase(label, labelFont));
+            labelCell.Border = Rectangle.NO_BORDER;
+            labelCell.HorizontalAlignment = Element.ALIGN_RIGHT;
+            labelCell.Padding = 3f;
+
+            PdfPCell valueCell = new PdfPCell(new Phrase(value, valueFont));
+            valueCell.Border = Rectangle.NO_BORDER;
+            valueCell.HorizontalAlignment = Element.ALIGN_RIGHT;
+            valueCell.Padding = 3f;
+            valueCell.BackgroundColor = valueColor;
 
             table.AddCell(labelCell);
             table.AddCell(valueCell);

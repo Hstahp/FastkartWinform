@@ -398,10 +398,9 @@ namespace GUI
             // ✅ TÍNH GIÁ SAU KHI GIẢM
             decimal originalPrice = product.Price ?? 0;
             decimal discountPercent = product.Discount ?? 0;
-            decimal discountAmountPerUnit = originalPrice * (discountPercent / 100m); // Discount cho 1 sp
+            decimal discountAmountPerUnit = originalPrice * (discountPercent / 100m);
             decimal finalPrice = originalPrice - discountAmountPerUnit;
 
-            // ✅ Debug log
             System.Diagnostics.Debug.WriteLine($"💰 AddProductToCart: {product.ProductName}");
             System.Diagnostics.Debug.WriteLine($"   Original Price: {originalPrice:N0} VNĐ");
             System.Diagnostics.Debug.WriteLine($"   Discount: {discountPercent}% ({discountAmountPerUnit:N0} VNĐ/unit)");
@@ -420,11 +419,8 @@ namespace GUI
                     return;
                 }
 
-                // ✅ Tăng số lượng
                 existingItem.Quantity++;
                 existingItem.TotalPrice = existingItem.Quantity * existingItem.UnitPrice;
-                
-                // ✅ THÊM: Cập nhật tổng discount
                 existingItem.DiscountAmount = existingItem.Quantity * discountAmountPerUnit;
             }
             else
@@ -433,24 +429,61 @@ namespace GUI
                 {
                     ProductId = product.Uid,
                     ProductName = product.ProductName,
-                    OriginalUnitPrice = originalPrice,      // ✅ Giá gốc
-                    UnitPrice = finalPrice,                 // Giá sau giảm
+                    OriginalUnitPrice = originalPrice,
+                    UnitPrice = finalPrice,
                     Quantity = 1,
                     TotalPrice = finalPrice,
-                    DiscountAmount = discountAmountPerUnit, // ✅ Tiền đã giảm
+                    DiscountAmount = discountAmountPerUnit,
                     AvailableStock = product.StockQuantity ?? 0
                 });
             }
 
-            // ✅ THÊM: Reset coupon khi thay đổi giỏ hàng
+            // ✅ FIX: KHÔNG auto-remove coupon, CHỈ re-validate SILENT
             if (!string.IsNullOrEmpty(_appliedCouponCode))
             {
-                BtnRemoveCoupon_Click(null, null);
+                System.Diagnostics.Debug.WriteLine($"🎟️ Re-validating coupon '{_appliedCouponCode}' after cart change...");
+
+                // Tính subtotal mới
+                decimal newSubtotal = _cartItems.Sum(c => c.OriginalUnitPrice * c.Quantity);
+
+                // Re-validate
+                var reValidateResult = _couponBLL.ApplyCoupon(_appliedCouponCode, newSubtotal);
+
+                if (reValidateResult.IsValid)
+                {
+                    // ✅ Cập nhật discount SILENT (không show message)
+                    decimal oldDiscount = _couponDiscount;
+                    _couponDiscount = reValidateResult.DiscountAmount;
+
+                    System.Diagnostics.Debug.WriteLine($"   ✅ Coupon still valid!");
+                    System.Diagnostics.Debug.WriteLine($"   Old discount: {oldDiscount:N0}");
+                    System.Diagnostics.Debug.WriteLine($"   New discount: {_couponDiscount:N0}");
+                }
+                else
+                {
+                    // ❌ Coupon không còn hợp lệ → SHOW WARNING và remove
+                    System.Diagnostics.Debug.WriteLine($"   ❌ Coupon no longer valid: {reValidateResult.Message}");
+
+                    MessageBox.Show(
+                        $"⚠️ Coupon '{_appliedCouponCode}' is no longer valid after adding product!\n\n" +
+                        $"Reason: {reValidateResult.Message}\n\n" +
+                        $"The coupon has been removed.",
+                        "Coupon Removed",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+
+                    // Remove coupon
+                    _appliedCouponCode = "";
+                    _couponDiscount = 0;
+                    txtCouponCode.Text = "";
+                    txtCouponCode.Enabled = true;
+                    btnApplyCoupon.Enabled = true;
+                    btnRemoveCoupon.Visible = false;
+                }
             }
 
             RefreshCart();
         }
-
         private void RefreshCart()
         {
             dgvCart.DataSource = null;
@@ -633,16 +666,54 @@ namespace GUI
             {
                 _cartItems.Remove(selectedItem);
 
-                // ✅ THÊM: Reset coupon khi xóa sản phẩm
+                // ✅ FIX: Re-validate coupon thay vì auto-remove
                 if (!string.IsNullOrEmpty(_appliedCouponCode))
                 {
-                    BtnRemoveCoupon_Click(null, null);
+                    decimal newSubtotal = _cartItems.Sum(c => c.OriginalUnitPrice * c.Quantity);
+
+                    // Nếu giỏ rỗng → Auto remove
+                    if (_cartItems.Count == 0)
+                    {
+                        _appliedCouponCode = "";
+                        _couponDiscount = 0;
+                        txtCouponCode.Text = "";
+                        txtCouponCode.Enabled = true;
+                        btnApplyCoupon.Enabled = true;
+                        btnRemoveCoupon.Visible = false;
+                    }
+                    else
+                    {
+                        // Re-validate
+                        var reValidateResult = _couponBLL.ApplyCoupon(_appliedCouponCode, newSubtotal);
+
+                        if (reValidateResult.IsValid)
+                        {
+                            // Update discount silent
+                            _couponDiscount = reValidateResult.DiscountAmount;
+                        }
+                        else
+                        {
+                            // Remove coupon with warning
+                            MessageBox.Show(
+                                $"⚠️ Coupon '{_appliedCouponCode}' is no longer valid!\n\n" +
+                                $"Reason: {reValidateResult.Message}",
+                                "Coupon Removed",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+
+                            _appliedCouponCode = "";
+                            _couponDiscount = 0;
+                            txtCouponCode.Text = "";
+                            txtCouponCode.Enabled = true;
+                            btnApplyCoupon.Enabled = true;
+                            btnRemoveCoupon.Visible = false;
+                        }
+                    }
                 }
 
                 RefreshCart();
             }
         }
-
         private void BtnClearCart_Click(object sender, EventArgs e)
         {
             if (_cartItems.Count == 0) return;
@@ -677,11 +748,25 @@ namespace GUI
             // ✅ THÊM: Re-validate coupon ngay trước khi thanh toán
             if (!string.IsNullOrEmpty(_appliedCouponCode))
             {
-                var reValidateResult = _couponBLL.ApplyCoupon(_appliedCouponCode, _subtotal);
+                // ✅ IMPORTANT: Tính lại subtotal TRƯỚC validate
+                decimal currentSubtotal = _cartItems.Sum(c => c.OriginalUnitPrice * c.Quantity);
+                decimal currentProductDiscount = _cartItems.Sum(c => c.DiscountAmount);
+                decimal subtotalAfterProductDiscount = currentSubtotal - currentProductDiscount;
+                
+                // ✅ DEBUG
+                System.Diagnostics.Debug.WriteLine($"🎟️ Re-validating coupon '{_appliedCouponCode}':");
+                System.Diagnostics.Debug.WriteLine($"   Current Subtotal (before product discount): {currentSubtotal:N0}");
+                System.Diagnostics.Debug.WriteLine($"   Product Discount: {currentProductDiscount:N0}");
+                System.Diagnostics.Debug.WriteLine($"   Subtotal after product discount: {subtotalAfterProductDiscount:N0}");
+                
+                // ✅ FIX: ApplyCoupon dựa trên GIÁ GỐC (currentSubtotal), KHÔNG phải subtotal SAU discount
+                var reValidateResult = _couponBLL.ApplyCoupon(_appliedCouponCode, currentSubtotal);
+                
+                System.Diagnostics.Debug.WriteLine($"   Validation result: {reValidateResult.IsValid}");
+                System.Diagnostics.Debug.WriteLine($"   New discount: {reValidateResult.DiscountAmount:N0}");
                 
                 if (!reValidateResult.IsValid)
                 {
-                    // ❌ Coupon không còn hợp lệ → Tự động remove
                     MessageBox.Show(
                         $"⚠️ Coupon '{_appliedCouponCode}' is no longer valid!\n\n" +
                         $"Reason: {reValidateResult.Message}\n\n" +
@@ -690,12 +775,11 @@ namespace GUI
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
 
-                    // Remove coupon khỏi order
                     BtnRemoveCoupon_Click(null, null);
-                    return; // ← Dừng thanh toán, yêu cầu user xem lại giỏ hàng
+                    return;
                 }
 
-                // ✅ Coupon vẫn hợp lệ → Cập nhật discount (có thể đã thay đổi)
+                // ✅ Cập nhật discount nếu thay đổi
                 if (reValidateResult.DiscountAmount != _couponDiscount)
                 {
                     MessageBox.Show(
@@ -709,7 +793,7 @@ namespace GUI
 
                     _couponDiscount = reValidateResult.DiscountAmount;
                     UpdateTotals();
-                    return; // ← Yêu cầu user xem lại và nhấn Pay lần nữa
+                    return;
                 }
             }
 
@@ -755,7 +839,7 @@ namespace GUI
                             ProductName = c.ProductName,
                             Quantity = c.Quantity,
                             PriceAtPurchase = c.UnitPrice,
-                            DiscountAmount = c.DiscountAmount,
+                            DiscountAmount = c.DiscountAmount / c.Quantity, // ✅ FIX: Lưu PER UNIT
                             SubTotal = c.TotalPrice
                         }).ToList()
                     };
@@ -849,7 +933,7 @@ namespace GUI
                             ProductName = c.ProductName,
                             Quantity = c.Quantity,
                             PriceAtPurchase = c.UnitPrice,
-                            DiscountAmount = c.DiscountAmount,
+                            DiscountAmount = c.DiscountAmount / c.Quantity, // ✅ FIX: Lưu PER UNIT
                             SubTotal = c.TotalPrice
                         }).ToList()
                     };
@@ -1086,19 +1170,21 @@ namespace GUI
                     SaveFileDialog sfd = new SaveFileDialog
                     {
                         Filter = "PDF|*.pdf",
-                        FileName = $"Invoice_{orderUid}_{DateTime.Now:yyyyMMddHHmmss}.pdf"
+                        FileName = $"Invoice_{orderUid}_{DateTime.Now:yyyyMMddHHmmss}.pdf",
+                        Title = "Save Invoice PDF"
                     };
 
                     if (sfd.ShowDialog() == DialogResult.OK)
                     {
                         this.Cursor = Cursors.WaitCursor;
                         
+                        // ✅ THAY ĐỔI: Gọi trực tiếp InvoiceBLL thay vì mở form
                         var invoiceBLL = new InvoiceBLL();
-                        bool ok = invoiceBLL.ExportInvoiceToPDF(orderUid, sfd.FileName);
+                        bool exportSuccess = invoiceBLL.ExportInvoiceToPDF(orderUid, sfd.FileName);
                         
                         this.Cursor = Cursors.Default;
 
-                        if (ok)
+                        if (exportSuccess)
                         {
                             if (MessageBox.Show(
                                 "✅ Invoice exported successfully!\n\nOpen file?", 
@@ -1106,7 +1192,20 @@ namespace GUI
                                 MessageBoxButtons.YesNo, 
                                 MessageBoxIcon.Information) == DialogResult.Yes)
                             {
-                                System.Diagnostics.Process.Start(sfd.FileName);
+                                try
+                                {
+                                    System.Diagnostics.Process.Start(sfd.FileName);
+                                }
+                                catch (Exception openEx)
+                                {
+                                    MessageBox.Show(
+                                        $"File saved but cannot open automatically.\n\n" +
+                                        $"Location: {sfd.FileName}\n\n" +
+                                        $"Error: {openEx.Message}",
+                                        "Info",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Information);
+                                }
                             }
                         }
                         else
@@ -1119,7 +1218,8 @@ namespace GUI
             catch (Exception ex)
             {
                 this.Cursor = Cursors.Default;
-                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine($"❌ ExportBillAfterPayment Error: {ex.Message}");
+                MessageBox.Show($"Error exporting invoice: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
