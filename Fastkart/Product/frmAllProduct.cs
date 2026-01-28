@@ -84,7 +84,7 @@ namespace GUI
                 int y = e.CellBounds.Y + (e.CellBounds.Height - size) / 2;
 
                 // 1. Vẽ nút Xem (Luôn hiện)
-                e.Graphics.DrawImage(Properties.Resources.view, new Rectangle(startX, y, size, size));
+                e.Graphics.DrawImage(Properties.Resources.qrcode_icon, new Rectangle(startX, y, size, size));
 
                 // 2. Vẽ nút Sửa (Nếu có quyền)
                 if (canEdit)

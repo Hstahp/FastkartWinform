@@ -271,6 +271,7 @@ namespace DAL
                 entityToUpdate.StockStatusUid = productEntity.StockStatusUid;
 
                 entityToUpdate.Thumbnail = productEntity.Thumbnail;
+                entityToUpdate.QRCodeUrl = productEntity.QRCodeUrl; // ✅ THÊM DÒNG NÀY
                 entityToUpdate.Slug = productEntity.Slug;
                 entityToUpdate.Status = productEntity.Status;
                 entityToUpdate.IsFeatured = productEntity.IsFeatured;
@@ -288,7 +289,6 @@ namespace DAL
             catch (Exception ex)
             {
                 throw new Exception("DAL Error during UpdateProduct: " + ex.Message, ex);
-
             }
         }
 

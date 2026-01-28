@@ -214,6 +214,33 @@ namespace BLL
 
             string jsonThumbnailArray = Newtonsoft.Json.JsonConvert.SerializeObject(uploadedUrls);
 
+            // ✅ 2. THÊM: Generate QR Code (GIỐNG NHƯ UpdateProduct)
+            string qrCodeUrl = null;
+            try
+            {
+                var qrCodeService = new QRCodeBLL();
+                string labelBase64 = qrCodeService.GenerateLabelBase64(
+                    cleanedSku.ToUpper(),
+                    cleanedProductName,
+                    productDTO.Price ?? 0
+                );
+
+                if (!string.IsNullOrEmpty(labelBase64))
+                {
+                    qrCodeUrl = cloudinaryService.UploadProductThumbnail(labelBase64);
+                    System.Diagnostics.Debug.WriteLine($"✅ QR Code generated for new product: {qrCodeUrl}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"⚠️ QR Code generation failed for SKU: {cleanedSku}");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"❌ QR Code generation error: {ex.Message}");
+                // Không fail toàn bộ, chỉ log warning
+            }
+
             int newPosition;
             if (productDTO.Position == null)
             {
@@ -234,6 +261,7 @@ namespace BLL
                 Price = productDTO.Price ?? 0m,
                 Discount = productDTO.Discount ?? 0,
                 Thumbnail = jsonThumbnailArray,
+                QRCodeUrl = qrCodeUrl, // ✅ THÊM: Lưu QR Code URL
                 Status = productDTO.Status,
                 Position = newPosition,
                 Description = productDTO.Description,
@@ -248,7 +276,6 @@ namespace BLL
                 StockStatusUid = productDTO.StockStatusUid,
                 ManufactureDate = productDTO.ManufactureDate,
                 ExpiryDate = productDTO.ExpiryDate,
-
                 CreatedAt = DateTime.Now,
                 Deleted = false
             };
@@ -316,11 +343,22 @@ namespace BLL
             var existingProduct = _productDAL.GetProductById(currentProductId);
             if (existingProduct == null)
             {
-                throw new Exception("Không tìm thấy sản phẩm");
+                throw new Exception("Product not found");
             }
 
             string oldSku = existingProduct.Sku?.ToUpper();
             bool skuChanged = (oldSku != cleanedSku);
+            
+            // ✅ DEBUG: Log SKU change detection
+            System.Diagnostics.Debug.WriteLine($"");
+            System.Diagnostics.Debug.WriteLine($"🔍 ========== UPDATE PRODUCT ==========");
+            System.Diagnostics.Debug.WriteLine($"   Product ID: {currentProductId}");
+            System.Diagnostics.Debug.WriteLine($"   Product Name: {cleanedProductName}");
+            System.Diagnostics.Debug.WriteLine($"   Old SKU: '{oldSku}'");
+            System.Diagnostics.Debug.WriteLine($"   New SKU: '{cleanedSku}'");
+            System.Diagnostics.Debug.WriteLine($"   SKU Changed: {skuChanged}");
+            System.Diagnostics.Debug.WriteLine($"   Old QR URL: {existingProduct.QRCodeUrl}");
+            System.Diagnostics.Debug.WriteLine($"=======================================");
             
             // ✅  Truyền currentProductId thay vì 0
             if (!_productDAL.IsSkuUnique(cleanedSku, currentProductId))
@@ -340,6 +378,7 @@ namespace BLL
             {
                 throw new Exception($"The subcategory is currently locked; you should switch to a different subcategory or reactivate the subcategory.");
             }
+            
             int quantity = productDTO.Quantity ?? 0;
             int stockQuantity = productDTO.StockQuantity ?? 0;
 
@@ -352,6 +391,7 @@ namespace BLL
                     MessageBoxIcon.Warning);
                 return false;
             }
+            
             string finalSlug = productDTO.Slug;
             if (string.IsNullOrEmpty(finalSlug))
             {
@@ -381,12 +421,12 @@ namespace BLL
                         }
                         else
                         {
-                            throw new Exception("Lỗi hệ thống Cloudinary: Tải ảnh lên thất bại.");
+                            throw new Exception("Cloudinary system error: Image upload failed.");
                         }
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception($"Lỗi hệ thống khi upload Cloudinary: {ex.Message}", ex);
+                        throw new Exception($"System error uploading to Cloudinary: {ex.Message}", ex);
                     }
                 }
             }
@@ -394,11 +434,23 @@ namespace BLL
             string jsonThumbnailArray = Newtonsoft.Json.JsonConvert.SerializeObject(finalUrls);
             string qrCodeUrl = existingProduct.QRCodeUrl; // Giữ nguyên URL cũ
 
+            // ✅ SỬA: REGENERATE QR CODE KHI SKU THAY ĐỔI (VỚI DEBUG CHI TIẾT)
             if (skuChanged)
             {
+                System.Diagnostics.Debug.WriteLine($"");
+                System.Diagnostics.Debug.WriteLine($"🔄 ========== QR CODE REGENERATION ==========");
+                System.Diagnostics.Debug.WriteLine($"   SKU changed detected! Starting regeneration...");
+                
                 try
                 {
                     var qrCodeService = new QRCodeBLL();
+                    
+                    // ✅ 1. Generate Label Base64
+                    System.Diagnostics.Debug.WriteLine($"   Step 1: Generating Label Base64...");
+                    System.Diagnostics.Debug.WriteLine($"      SKU: '{cleanedSku}'");
+                    System.Diagnostics.Debug.WriteLine($"      Name: '{cleanedProductName}'");
+                    System.Diagnostics.Debug.WriteLine($"      Price: {productDTO.Price ?? 0:N0} VNĐ");
+                    
                     string labelBase64 = qrCodeService.GenerateLabelBase64(
                         cleanedSku,
                         cleanedProductName,
@@ -407,13 +459,46 @@ namespace BLL
 
                     if (!string.IsNullOrEmpty(labelBase64))
                     {
-                        qrCodeUrl = cloudinaryService.UploadProductThumbnail(labelBase64);
+                        System.Diagnostics.Debug.WriteLine($"   ✅ Label Base64 generated successfully!");
+                        System.Diagnostics.Debug.WriteLine($"      Length: {labelBase64.Length} characters");
+                        
+                        // ✅ 2. Upload to Cloudinary
+                        System.Diagnostics.Debug.WriteLine($"   Step 2: Uploading to Cloudinary...");
+                        string newQrCodeUrl = cloudinaryService.UploadProductThumbnail(labelBase64);
+                        
+                        if (!string.IsNullOrEmpty(newQrCodeUrl))
+                        {
+                            qrCodeUrl = newQrCodeUrl; // ✅ CẬP NHẬT URL MỚI
+                            System.Diagnostics.Debug.WriteLine($"   ✅✅✅ SUCCESS! QR Code uploaded!");
+                            System.Diagnostics.Debug.WriteLine($"      Old URL: {existingProduct.QRCodeUrl}");
+                            System.Diagnostics.Debug.WriteLine($"      NEW URL: {qrCodeUrl}");
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine($"   ❌ FAILED: Cloudinary upload returned NULL!");
+                            System.Diagnostics.Debug.WriteLine($"      Keeping old QR URL: {qrCodeUrl}");
+                        }
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"   ❌ FAILED: Label Base64 generation returned NULL!");
+                        System.Diagnostics.Debug.WriteLine($"      Keeping old QR URL: {qrCodeUrl}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"QR Code regeneration failed: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"   ❌❌❌ EXCEPTION during QR Code regeneration!");
+                    System.Diagnostics.Debug.WriteLine($"      Message: {ex.Message}");
+                    System.Diagnostics.Debug.WriteLine($"      Stack: {ex.StackTrace}");
+                    System.Diagnostics.Debug.WriteLine($"      Keeping old QR URL: {qrCodeUrl}");
+                    // ⚠️ Không throw, để product vẫn được update
                 }
+                
+                System.Diagnostics.Debug.WriteLine($"============================================");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"ℹ️ SKU unchanged, keeping old QR Code URL");
             }
 
             DAL.EF.Product productEntity = new DAL.EF.Product
