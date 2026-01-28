@@ -4,6 +4,7 @@ using DTO;
 using Helpers;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,10 +13,12 @@ namespace BLL
     public class OrderBLL
     {
         private OrderDAL _orderDAL;
+        private CouponDAL _couponDAL; 
 
         public OrderBLL()
         {
             _orderDAL = new OrderDAL();
+            _couponDAL = new CouponDAL(); 
         }
 
         // ========================================
@@ -27,74 +30,143 @@ namespace BLL
         /// </summary>
         public CheckoutResultDTO CheckoutCash(OrderDTO orderDto)
         {
+            var result = new CheckoutResultDTO { Success = false };
+
             try
             {
-                // 1. Validate
-                if (orderDto.OrderItems == null || orderDto.OrderItems.Count == 0)
+                using (var conn = new SqlConnection(Common.AppConstants.DBConnectDocker))
                 {
-                    return new CheckoutResultDTO { Success = false, Message = "Cart is empty!" };
-                }
-
-                // 2. Tạo Order
-                var orderEntity = new Order
-                {
-                    UserUid = orderDto.UserUid ?? 0,
-                    TotalAmount = orderDto.TotalAmount,
-                    SubTotal = orderDto.SubTotal,
-                    TaxAmount = orderDto.TaxAmount,
-                    DiscountAmount = orderDto.DiscountAmount,
-                    Status = "Completed",
-                    OrderDate = DateTime.Now,
-                    OrderNote = orderDto.OrderNote,
-                    CreatedBy = orderDto.CreatedBy ?? Environment.UserName,
-                    Deleted = false
-                };
-
-                int orderUid = _orderDAL.CreateOrder(orderEntity);
-                System.Diagnostics.Debug.WriteLine($"✅ [Cash] Order created: ID={orderUid}");
-
-                // 3. Lưu OrderItems + Update Stock
-                foreach (var item in orderDto.OrderItems)
-                {
-                    var orderItemEntity = new OrderItem
+                    conn.Open();
+                    using (var transaction = conn.BeginTransaction())
                     {
-                        OrderUid = orderUid,
-                        ProductUid = item.ProductUid,
-                        Quantity = item.Quantity,
-                        PriceAtPurchase = item.PriceAtPurchase,
-                        DiscountAmount = item.DiscountAmount,
-                        SubTotal = item.SubTotal
-                    };
+                        try
+                        {
+                            // ✅ THÊM: Debug log để kiểm tra
+                            System.Diagnostics.Debug.WriteLine($"💾 CheckoutCash - Creating Order:");
+                            System.Diagnostics.Debug.WriteLine($"   SubTotal: {orderDto.SubTotal:N0}");
+                            System.Diagnostics.Debug.WriteLine($"   TaxAmount: {orderDto.TaxAmount:N0}");
+                            System.Diagnostics.Debug.WriteLine($"   DiscountAmount: {orderDto.DiscountAmount:N0}");
+                            System.Diagnostics.Debug.WriteLine($"   TotalAmount: {orderDto.TotalAmount:N0}");
+                            System.Diagnostics.Debug.WriteLine($"   CouponCode: '{orderDto.CouponCode}'"); // ✅ Kiểm tra giá trị
 
-                    _orderDAL.AddOrderItem(orderItemEntity);
-                    _orderDAL.UpdateProductStock(item.ProductUid, item.Quantity);
+                            // 1. Tạo Order
+                            string orderQuery = @"
+                                INSERT INTO [Order] (
+                                    UserUid, SubTotal, TaxAmount, DiscountAmount, TotalAmount, 
+                                    OrderDate, Status, OrderNote, CreatedBy, CouponCode, Deleted
+                                )
+                                VALUES (
+                                    @UserUid, @SubTotal, @TaxAmount, @DiscountAmount, @TotalAmount, 
+                                    @OrderDate, @Status, @OrderNote, @CreatedBy, @CouponCode, 0
+                                );
+                                SELECT CAST(SCOPE_IDENTITY() as int);";
+
+                            var orderCmd = new SqlCommand(orderQuery, conn, transaction);
+                            orderCmd.Parameters.AddWithValue("@UserUid", 
+                                orderDto.UserUid.HasValue ? (object)orderDto.UserUid.Value : DBNull.Value);
+                            orderCmd.Parameters.AddWithValue("@SubTotal", orderDto.SubTotal);
+                            orderCmd.Parameters.AddWithValue("@TaxAmount", orderDto.TaxAmount);
+                            orderCmd.Parameters.AddWithValue("@DiscountAmount", orderDto.DiscountAmount);
+                            orderCmd.Parameters.AddWithValue("@TotalAmount", orderDto.TotalAmount);
+                            orderCmd.Parameters.AddWithValue("@OrderDate", orderDto.OrderDate);
+                            orderCmd.Parameters.AddWithValue("@Status", "Completed"); // Cash = instant
+                            orderCmd.Parameters.AddWithValue("@OrderNote", 
+                                string.IsNullOrEmpty(orderDto.OrderNote) ? (object)DBNull.Value : orderDto.OrderNote);
+                            orderCmd.Parameters.AddWithValue("@CreatedBy", 
+                                string.IsNullOrEmpty(orderDto.CreatedBy) ? (object)DBNull.Value : orderDto.CreatedBy);
+                            
+                            // ✅ FIX: Đảm bảo CouponCode được lưu đúng
+                            orderCmd.Parameters.AddWithValue("@CouponCode", 
+                                string.IsNullOrEmpty(orderDto.CouponCode) ? (object)DBNull.Value : orderDto.CouponCode);
+
+                            int orderUid = (int)orderCmd.ExecuteScalar();
+                            
+                            // ✅ Debug: Confirm order created
+                            System.Diagnostics.Debug.WriteLine($"✅ Order created with Uid: {orderUid}");
+
+                            // 2. Thêm OrderItems
+                            string itemQuery = @"
+                                INSERT INTO OrderItem (OrderUid, ProductUid, Quantity, PriceAtPurchase, DiscountAmount, SubTotal)
+                                VALUES (@OrderUid, @ProductUid, @Quantity, @PriceAtPurchase, @DiscountAmount, @SubTotal)";
+
+                            foreach (var item in orderDto.OrderItems)
+                            {
+                                var itemCmd = new SqlCommand(itemQuery, conn, transaction);
+                                itemCmd.Parameters.AddWithValue("@OrderUid", orderUid);
+                                itemCmd.Parameters.AddWithValue("@ProductUid", item.ProductUid);
+                                itemCmd.Parameters.AddWithValue("@Quantity", item.Quantity);
+                                itemCmd.Parameters.AddWithValue("@PriceAtPurchase", item.PriceAtPurchase);
+                                itemCmd.Parameters.AddWithValue("@DiscountAmount", item.DiscountAmount);
+                                itemCmd.Parameters.AddWithValue("@SubTotal", item.SubTotal);
+                                itemCmd.ExecuteNonQuery();
+
+                                // ✅ Cập nhật stock
+                                string stockQuery = @"
+                                    UPDATE Product 
+                                    SET Quantity = Quantity - @QuantitySold 
+                                    WHERE Uid = @ProductUid";
+
+                                var stockCmd = new SqlCommand(stockQuery, conn, transaction);
+                                stockCmd.Parameters.AddWithValue("@QuantitySold", item.Quantity);
+                                stockCmd.Parameters.AddWithValue("@ProductUid", item.ProductUid);
+                                stockCmd.ExecuteNonQuery();
+                            }
+
+                            // 3. Tạo Payment
+                            string paymentQuery = @"
+                                INSERT INTO Payment (OrderUid, PaymentMethod, PaymentStatus, Amount, TransactionDate)
+                                VALUES (@OrderUid, 'Cash', 'Completed', @Amount, @TransactionDate);
+                                SELECT CAST(SCOPE_IDENTITY() as int);";
+
+                            var paymentCmd = new SqlCommand(paymentQuery, conn, transaction);
+                            paymentCmd.Parameters.AddWithValue("@OrderUid", orderUid);
+                            paymentCmd.Parameters.AddWithValue("@Amount", orderDto.TotalAmount);
+                            paymentCmd.Parameters.AddWithValue("@TransactionDate", DateTime.Now);
+                            int paymentUid = (int)paymentCmd.ExecuteScalar();
+
+                            // ✅ THÊM: Mark coupon as used (nếu có)
+                            if (!string.IsNullOrEmpty(orderDto.CouponCode))
+                            {
+                                System.Diagnostics.Debug.WriteLine($"📋 Marking coupon '{orderDto.CouponCode}' as used");
+                                
+                                string couponQuery = @"
+                                    UPDATE Coupons 
+                                    SET UsedCount = UsedCount + 1 
+                                    WHERE Code = @Code AND Deleted = 0";
+
+                                var couponCmd = new SqlCommand(couponQuery, conn, transaction);
+                                couponCmd.Parameters.AddWithValue("@Code", orderDto.CouponCode);
+                                int affectedRows = couponCmd.ExecuteNonQuery();
+                                
+                                System.Diagnostics.Debug.WriteLine($"   Coupon updated: {affectedRows} rows affected");
+                            }
+
+                            transaction.Commit();
+
+                            result.Success = true;
+                            result.OrderUid = orderUid;
+                            result.PaymentUid = paymentUid;
+                            result.Message = "Cash payment successful!";
+
+                            System.Diagnostics.Debug.WriteLine($"✅ CheckoutCash SUCCESS - Order #{orderUid}");
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            System.Diagnostics.Debug.WriteLine($"❌ CheckoutCash Error: {ex.Message}");
+                            result.Message = $"Transaction failed: {ex.Message}";
+                            throw;
+                        }
+                    }
                 }
-
-                // 4. Tạo Payment
-                var paymentEntity = new Payment
-                {
-                    OrderUid = orderUid,
-                    PaymentMethod = "Cash",
-                    PaymentStatus = "Completed",
-                    Amount = orderDto.TotalAmount,
-                    TransactionDate = DateTime.Now
-                };
-
-                int paymentUid = _orderDAL.CreatePayment(paymentEntity);
-
-                return new CheckoutResultDTO
-                {
-                    Success = true,
-                    OrderUid = orderUid,
-                    PaymentUid = paymentUid,
-                    Message = "Checkout successful!"
-                };
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"❌ [Cash] Error: {ex.Message}");
-                return new CheckoutResultDTO { Success = false, Message = $"Error: {ex.Message}" };
+                System.Diagnostics.Debug.WriteLine($"❌ CheckoutCash Error: {ex.Message}\n{ex.StackTrace}");
+                result.Message = $"Error: {ex.Message}";
             }
+
+            return result;
         }
 
         /// <summary>
@@ -120,6 +192,7 @@ namespace BLL
                     OrderDate = DateTime.Now,
                     OrderNote = orderDto.OrderNote + " [MoMo QR]",
                     CreatedBy = orderDto.CreatedBy ?? Environment.UserName,
+                    CouponCode = orderDto.CouponCode,
                     Deleted = false
                 };
 
@@ -187,7 +260,7 @@ namespace BLL
         /// <summary>
         /// ✅ Xác nhận thanh toán MoMo thành công (sau khi polling detect payment)
         /// </summary>
-        public bool ConfirmMoMoPayment(int orderUid, int paymentUid, List<OrderItemDTO> orderItems)
+        public bool ConfirmMoMoPayment(int orderUid, int paymentUid, List<OrderItemDTO> orderItems, string couponCode = null) // ✅ SỬA
         {
             try
             {
@@ -205,6 +278,13 @@ namespace BLL
 
                 // 4. Update Order Status
                 _orderDAL.UpdateOrderStatus(orderUid, "Completed");
+
+                // Cập nhật UsedCount cho MoMo
+                if (!string.IsNullOrEmpty(couponCode))
+                {
+                    _couponDAL.IncrementUsedCount(couponCode);
+                    System.Diagnostics.Debug.WriteLine($"✅ [MoMo] Coupon '{couponCode}' used count updated");
+                }
 
                 System.Diagnostics.Debug.WriteLine($"✅ [MoMo] Payment confirmed: Order={orderUid}, TxnID={transactionId}");
 

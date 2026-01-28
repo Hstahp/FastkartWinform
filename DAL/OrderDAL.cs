@@ -26,12 +26,13 @@ namespace DAL
         {
             using (SqlConnection conn = GetOpenConnection())
             {
+                // ✅ FIX: THÊM CouponCode vào INSERT
                 string query = @"
                     INSERT INTO [Order] (UserUid, TotalAmount, SubTotal, TaxAmount, DiscountAmount, 
-                                        Status, OrderDate, OrderNote, CreatedBy, Deleted)
+                                        Status, OrderDate, OrderNote, CreatedBy, CouponCode, Deleted)
                     OUTPUT INSERTED.Uid
                     VALUES (@UserUid, @TotalAmount, @SubTotal, @TaxAmount, @DiscountAmount, 
-                            @Status, @OrderDate, @OrderNote, @CreatedBy, @Deleted)";
+                            @Status, @OrderDate, @OrderNote, @CreatedBy, @CouponCode, @Deleted)";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.Add("@UserUid", SqlDbType.Int).Value = order.UserUid > 0 ? (object)order.UserUid : DBNull.Value;
@@ -43,9 +44,21 @@ namespace DAL
                 cmd.Parameters.AddWithValue("@OrderDate", order.OrderDate);
                 cmd.Parameters.AddWithValue("@OrderNote", order.OrderNote ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@CreatedBy", order.CreatedBy ?? Environment.UserName);
-                cmd.Parameters.AddWithValue("@Deleted", false); // ✅ THÊM: Default = false
+                
+                // ✅ FIX: THÊM parameter CouponCode
+                cmd.Parameters.AddWithValue("@CouponCode", 
+                    string.IsNullOrEmpty(order.CouponCode) ? (object)DBNull.Value : order.CouponCode);
+                
+                cmd.Parameters.AddWithValue("@Deleted", false);
 
-                return (int)cmd.ExecuteScalar();
+                // ✅ THÊM: Debug log
+                System.Diagnostics.Debug.WriteLine($"💾 [CreateOrder] Saving CouponCode: '{order.CouponCode ?? "NULL"}'");
+
+                int orderUid = (int)cmd.ExecuteScalar();
+                
+                System.Diagnostics.Debug.WriteLine($"✅ [CreateOrder] Order #{orderUid} created with CouponCode = '{order.CouponCode ?? "NULL"}'");
+                
+                return orderUid;
             }
         }
 
@@ -152,7 +165,7 @@ namespace DAL
         }
 
         /// <summary>
-        /// ✅ THÊM: Cập nhật Order Status (dùng khi confirm MoMo payment)
+        /// ✅ FIXED: Cập nhật Order Status (không dùng UpdatedAt vì column không tồn tại)
         /// </summary>
         public bool UpdateOrderStatus(int orderUid, string status)
         {
@@ -160,8 +173,7 @@ namespace DAL
             {
                 string query = @"
                     UPDATE [Order] 
-                    SET Status = @Status,
-                        UpdatedAt = GETDATE()
+                    SET Status = @Status
                     WHERE Uid = @OrderUid";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -296,10 +308,10 @@ namespace DAL
 
             using (SqlConnection conn = GetOpenConnection())
             {
-                // 1. Lấy Order
+                // ✅ FIX: Thêm CouponCode vào SELECT
                 string orderQuery = @"
                     SELECT o.Uid, o.UserUid, o.OrderDate, o.TotalAmount, o.SubTotal, 
-                           o.TaxAmount, o.DiscountAmount, o.Status, o.OrderNote, o.CreatedBy
+                           o.TaxAmount, o.DiscountAmount, o.Status, o.OrderNote, o.CreatedBy, o.CouponCode
                     FROM [Order] o
                     WHERE o.Uid = @OrderUid AND o.Deleted = 0";
 
@@ -322,6 +334,7 @@ namespace DAL
                             Status = reader.GetString(7),
                             OrderNote = reader.IsDBNull(8) ? null : reader.GetString(8),
                             CreatedBy = reader.IsDBNull(9) ? null : reader.GetString(9),
+                            CouponCode = reader.IsDBNull(10) ? null : reader.GetString(10), // ✅ THÊM
                             OrderItems = new List<OrderItemDTO>()
                         };
                     }
