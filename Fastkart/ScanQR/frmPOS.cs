@@ -40,8 +40,8 @@ namespace GUI
 
         private void FrmPOS_Load(object sender, EventArgs e)
         {
-            // Check permissions
-            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_VIEW))
+            // ✅ SỬA: Đổi từ PRODUCT sang ORDER
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_ORDER, PermCode.TYPE_VIEW))
             {
                 MessageBox.Show("You do not have permission to access POS!",
                     "Access Denied",
@@ -51,7 +51,13 @@ namespace GUI
                 return;
             }
 
-            // ✅ Load tất cả products vào bộ nhớ để lookup nhanh
+            // ✅ THÊM: Kiểm tra quyền CREATE cho nút thanh toán
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_ORDER, PermCode.TYPE_CREATE))
+            {
+                btnPay.Enabled = false;
+                btnPay.Text = "🚫 No Permission";
+            }
+
             LoadAllProducts();
             ConfigureCartGrid();
         }

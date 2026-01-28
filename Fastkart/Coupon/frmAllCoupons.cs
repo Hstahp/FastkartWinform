@@ -1,8 +1,9 @@
-﻿using System;
+﻿using BLL; // Nhớ check lại namespace BLL của em
+using Common;
+using DTO; // Nhớ check lại namespace DTO của em
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-using BLL; // Nhớ check lại namespace BLL của em
-using DTO; // Nhớ check lại namespace DTO của em
 
 namespace GUI.Coupon
 {
@@ -26,32 +27,125 @@ namespace GUI.Coupon
             dgvCoupons.CellMouseClick += dgvCoupons_CellMouseClick;
             dgvCoupons.CellPainting += dgvCoupons_CellPainting;
             dgvCoupons.MouseMove += dgvCoupons_MouseMove;
-
-            // --- QUAN TRỌNG: SỬA LỖI FORMAT EXCEPTION ---
-            // Thêm dòng này để xử lý khi dữ liệu null mà cột lại là Image
             dgvCoupons.DataError += dgvCoupons_DataError;
+
+            this.Load += frmAllCoupons_Load;
+        }
+
+        private void frmAllCoupons_Load(object sender, EventArgs e)
+        {
+            // ✅ Kiểm tra quyền VIEW
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_COUPON, PermCode.TYPE_VIEW))
+            {
+                MessageBox.Show("You do not have permission to access Coupon Management!",
+                    "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.Close();
+                return;
+            }
+
+            // ✅ Kiểm tra quyền CREATE (ẩn nút Add BÊN TRONG form này)
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_COUPON, PermCode.TYPE_CREATE))
+            {
+                if (btnAdd != null) btnAdd.Visible = false;
+            }
 
             LoadData();
         }
 
-        // --- HÀM XỬ LÝ LỖI (MỚI THÊM) ---
-        private void dgvCoupons_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        // ✅ VẼ ICON THEO QUYỀN (CHỈ 1 LẦN)
+        private void dgvCoupons_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            // Hàm này chặn cái popup lỗi khó chịu kia lại
-            // Nếu lỗi xảy ra ở cột Image (cột Action) hoặc bất kỳ lỗi format nào, ta chỉ cần Cancel nó đi
-            e.Cancel = true;
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && dgvCoupons.Columns[e.ColumnIndex].Name == "colAction")
+            {
+                e.PaintBackground(e.CellBounds, true);
+
+                bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_COUPON, PermCode.TYPE_EDIT);
+                bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_COUPON, PermCode.TYPE_DELETE);
+
+                int size = 20;
+                int padding = 5;
+                int startX = e.CellBounds.X + padding;
+                int y = e.CellBounds.Y + (e.CellBounds.Height - size) / 2;
+
+                // Vẽ nút Sửa (Nếu có quyền)
+                if (canEdit)
+                {
+                    e.Graphics.DrawImage(Properties.Resources.edit, new Rectangle(startX, y, size, size));
+                }
+
+                // Vẽ nút Xóa (Nếu có quyền)
+                if (canDelete)
+                {
+                    e.Graphics.DrawImage(Properties.Resources.delete, new Rectangle(startX + 30, y, size, size));
+                }
+
+                e.Handled = true;
+            }
         }
 
+        // ✅ XỬ LÝ CLICK THEO QUYỀN (CHỈ 1 LẦN)
+        private void dgvCoupons_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+            if (dgvCoupons.Columns[e.ColumnIndex].Name == "colAction")
+            {
+                if (dgvCoupons.Rows[e.RowIndex].Cells["colId"].Value == null) return;
+
+                bool canEdit = UserSessionDTO.HasPermission(PermCode.FUNC_COUPON, PermCode.TYPE_EDIT);
+                bool canDelete = UserSessionDTO.HasPermission(PermCode.FUNC_COUPON, PermCode.TYPE_DELETE);
+
+                int relativeX = e.X - dgvCoupons.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false).Left;
+                int iconSize = 20;
+                int padding = 5;
+
+                int couponId = Convert.ToInt32(dgvCoupons.Rows[e.RowIndex].Cells["colId"].Value);
+
+                // Click SỬA
+                if (canEdit && relativeX >= padding && relativeX < padding + iconSize)
+                {
+                    RequestEditCoupon?.Invoke(this, couponId);
+                }
+                // Click XÓA
+                else if (canDelete && relativeX >= padding + 30 && relativeX < padding + 30 + iconSize)
+                {
+                    if (MessageBox.Show("Are you sure you want to delete this coupon?",
+                        "Confirm",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        string error;
+                        if (_couponBLL.DeleteCoupon(couponId, out error))
+                        {
+                            MessageBox.Show("Deleted successfully!");
+                            LoadData();
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Error: {error}");
+                        }
+                    }
+                }
+            }
+        }
+
+        // ✅ XỬ LÝ LỖI FORMAT
+        private void dgvCoupons_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            e.Cancel = true; // Chặn popup lỗi
+        }
+
+        // ✅ LOAD DATA
         public void LoadData(string keyword = "")
         {
             try
             {
-                _couponBLL = new CouponBLL();
                 dgvCoupons.DataSource = _couponBLL.GetAllCoupons(keyword);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message);
+                MessageBox.Show("Error loading data: " + ex.Message, "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -63,76 +157,6 @@ namespace GUI.Coupon
         private void btnAdd_Click(object sender, EventArgs e)
         {
             RequestAddCoupon?.Invoke(this, EventArgs.Empty);
-        }
-
-        // --- VẼ 2 ICON ---
-        private void dgvCoupons_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
-        {
-            if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && dgvCoupons.Columns[e.ColumnIndex].Name == "colAction")
-            {
-                e.Paint(e.CellBounds, DataGridViewPaintParts.All & ~DataGridViewPaintParts.ContentForeground);
-
-                Image imgEdit = GUI.Properties.Resources.icon_edit;
-                Image imgDelete = GUI.Properties.Resources.icon_delete;
-
-                int cellWidth = e.CellBounds.Width;
-                int cellHeight = e.CellBounds.Height;
-                int iconSize = 16;
-
-                // Tính toán vị trí
-                int xEdit = e.CellBounds.X + (cellWidth / 4) - (iconSize / 2);
-                int yEdit = e.CellBounds.Y + (cellHeight - iconSize) / 2;
-
-                int xDelete = e.CellBounds.X + (3 * cellWidth / 4) - (iconSize / 2);
-                int yDelete = e.CellBounds.Y + (cellHeight - iconSize) / 2;
-
-                if (imgEdit != null) e.Graphics.DrawImage(imgEdit, new Rectangle(xEdit, yEdit, iconSize, iconSize));
-                if (imgDelete != null) e.Graphics.DrawImage(imgDelete, new Rectangle(xDelete, yDelete, iconSize, iconSize));
-
-                e.Handled = true;
-            }
-        }
-
-        // --- XỬ LÝ CLICK ---
-        private void dgvCoupons_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
-
-            if (dgvCoupons.Columns[e.ColumnIndex].Name == "colAction")
-            {
-                if (dgvCoupons.Rows[e.RowIndex].Cells["colId"].Value == null) return;
-                int id = Convert.ToInt32(dgvCoupons.Rows[e.RowIndex].Cells["colId"].Value);
-
-                int cellWidth = dgvCoupons.Columns[e.ColumnIndex].Width;
-
-                if (e.X < cellWidth / 2)
-                {
-                    // EDIT
-                    RequestEditCoupon?.Invoke(this, id);
-                }
-                else
-                {
-                    // DELETE
-                    DialogResult result = MessageBox.Show(
-                        "Bạn có chắc chắn muốn xóa mã giảm giá này không?",
-                        "Xác nhận xóa",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning);
-
-                    if (result == DialogResult.Yes)
-                    {
-                        string error = "";
-                        if (_couponBLL.DeleteCoupon(id, out error))
-                        {
-                            LoadData();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Lỗi: " + error, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                }
-            }
         }
 
         private void dgvCoupons_MouseMove(object sender, MouseEventArgs e)

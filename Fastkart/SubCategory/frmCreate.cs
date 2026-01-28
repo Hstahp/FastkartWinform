@@ -17,38 +17,32 @@ namespace GUI.SubCategory
     {
         private SubCategoryBLL _subCaregoryBLL;
 
-
         public frmCreate()
         {
             InitializeComponent();
             _subCaregoryBLL = new SubCategoryBLL();
 
-            // Cấu hình Form
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Width = 730;
 
-            // Đăng ký sự kiện Shown để check quyền an toàn
             this.Shown += FrmCreate_Shown;
             this.Load += FrmCreate_Load;
-
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
         }
 
-        // --- 1. CHECK QUYỀN TẠI SỰ KIỆN SHOWN (AN TOÀN NHẤT) ---
+        // ✅ FIX: Sửa message cho đúng
         private void FrmCreate_Shown(object sender, EventArgs e)
         {
-            // Kiểm tra quyền THÊM SẢN PHẨM (PRODUCT.CREATE)
-            // Lúc này Form đã hiện lên (Handle created), nên gọi Close() an toàn 100%
             if (!UserSessionDTO.HasPermission(PermCode.FUNC_SUBCATEGORY, PermCode.TYPE_CREATE))
             {
-                MessageBox.Show("You do not have permission to add new products.!",
-                                "Access denied",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Warning);
-                this.Close(); // Đóng form
+                MessageBox.Show("You do not have permission to add new subcategories!",
+                    "Access Denied",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                this.Close();
             }
         }
 
@@ -56,7 +50,6 @@ namespace GUI.SubCategory
         {
             loadCategory();
         }
-
 
         private void loadCategory()
         {
@@ -79,10 +72,7 @@ namespace GUI.SubCategory
                 SubCategoryName = txtName.Text,
                 CategoryUid = Convert.ToInt32(cboCategory.SelectedValue),
                 Status = radioActive.Checked ? "Active" : "Inactive",
-
                 Description = rtbDescription.Text,
-
-
                 CreatedAt = DateTime.Now,
                 CreatedBy = Environment.UserName,
                 Deleted = false,
@@ -99,7 +89,7 @@ namespace GUI.SubCategory
                 }
                 else
                 {
-                    MessageBox.Show("Failed to add the Subcategory. Please check the input data and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Failed to add the subcategory. Please check the input data and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
@@ -112,7 +102,7 @@ namespace GUI.SubCategory
         {
             if (string.IsNullOrWhiteSpace(txtName.Text))
             {
-                MessageBox.Show("Please enter the product name.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please enter the subcategory name.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
@@ -125,7 +115,6 @@ namespace GUI.SubCategory
             if (cboCategory.Items.Count > 0) cboCategory.SelectedIndex = 0;
             rtbDescription.Clear();
             radioActive.Checked = true;
-
         }
     }
 }

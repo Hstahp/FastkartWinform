@@ -1,4 +1,5 @@
 ﻿using BLL;
+using Common;
 using DAL.EF;
 using DTO;
 using Newtonsoft.Json;
@@ -51,6 +52,19 @@ namespace GUI.Product
 
         private void frmEdit_Load(object sender, EventArgs e)
         {
+            // ✅ THÊM: Kiểm tra quyền EDIT ngay khi form load
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_EDIT))
+            {
+                MessageBox.Show(
+                    "You do not have permission to edit products!",
+                    "Access Denied",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                this.Close();
+                return;
+            }
+
+            // Load dữ liệu product hiện tại...
             LoadProductData(_productId);
         }
 

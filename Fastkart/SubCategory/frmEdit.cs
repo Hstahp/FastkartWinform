@@ -32,28 +32,28 @@ namespace GUI.SubCategory
             this.Width = 730;
 
             // Đăng ký sự kiện Shown để check quyền an toàn
-            this.Shown += FrmCreate_Shown;
-            this.Load += FrmCreate_Load;
+            this.Shown += FrmEdit_Shown;
+            this.Load += FrmEdit_Load;
 
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
         }
 
         // --- 1. CHECK QUYỀN TẠI SỰ KIỆN SHOWN (AN TOÀN NHẤT) ---
-        private void FrmCreate_Shown(object sender, EventArgs e)
+        private void FrmEdit_Shown(object sender, EventArgs e)
         {
-            // Kiểm tra quyền THÊM SẢN PHẨM (PRODUCT.CREATE)
+            // Kiểm tra quyền SỬA SẢN PHẨM (PRODUCT.EDIT)
             // Lúc này Form đã hiện lên (Handle created), nên gọi Close() an toàn 100%
-            if (!UserSessionDTO.HasPermission(PermCode.FUNC_SUBCATEGORY, PermCode.TYPE_CREATE))
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_SUBCATEGORY, PermCode.TYPE_EDIT))
             {
-                MessageBox.Show("You do not have permission to add new products.!",
-                                "Access denied",
+                MessageBox.Show("You do not have permission to edit subcategories!",
+                                "Access Denied",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Warning);
                 this.Close(); // Đóng form
             }
         }
 
-        private void FrmCreate_Load(object sender, EventArgs e)
+        private void FrmEdit_Load(object sender, EventArgs e)
         {
             loadCategory();
             LoadSubcategoryData(_id);
@@ -107,7 +107,7 @@ namespace GUI.SubCategory
                 return;
             }
 
-            var newSubCategory = new ProductSubCategoryDTO
+            var updateSubCategory = new ProductSubCategoryDTO
             {
                 Uid = _id,
                 SubCategoryName = txtName.Text,
@@ -123,7 +123,7 @@ namespace GUI.SubCategory
 
             try
             {
-                bool success = _subCaregoryBLL.Update(newSubCategory);
+                bool success = _subCaregoryBLL.Update(updateSubCategory);
 
                 if (success)
                 {
@@ -154,7 +154,7 @@ namespace GUI.SubCategory
         {
             if (string.IsNullOrWhiteSpace(txtName.Text))
             {
-                MessageBox.Show("Please enter the product name.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please enter the subcategory name.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 

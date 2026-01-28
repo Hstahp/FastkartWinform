@@ -23,7 +23,7 @@
             this.btnSettings = new System.Windows.Forms.Button();
             this.lblSettingsArrow = new System.Windows.Forms.Label();
             this.pnlMarketingSub = new System.Windows.Forms.Panel();
-            this.btnAddCoupon = new System.Windows.Forms.Button();
+          
             this.btnCouponList = new System.Windows.Forms.Button();
             this.btnMarketing = new System.Windows.Forms.Button();
             this.lblMarketingArrow = new System.Windows.Forms.Label();
@@ -198,7 +198,7 @@
             // pnlMarketingSub
             // 
             this.pnlMarketingSub.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(17)))), ((int)(((byte)(24)))), ((int)(((byte)(39)))));
-            this.pnlMarketingSub.Controls.Add(this.btnAddCoupon);
+       
             this.pnlMarketingSub.Controls.Add(this.btnCouponList);
             this.pnlMarketingSub.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlMarketingSub.Location = new System.Drawing.Point(0, 1152);
@@ -210,22 +210,9 @@
             // 
             // btnAddCoupon
             // 
-            this.btnAddCoupon.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnAddCoupon.FlatAppearance.BorderSize = 0;
-            this.btnAddCoupon.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(65)))), ((int)(((byte)(81)))));
-            this.btnAddCoupon.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAddCoupon.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAddCoupon.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(213)))), ((int)(((byte)(219)))));
-            this.btnAddCoupon.Location = new System.Drawing.Point(0, 85);
-            this.btnAddCoupon.Margin = new System.Windows.Forms.Padding(0);
-            this.btnAddCoupon.Name = "btnAddCoupon";
-            this.btnAddCoupon.Padding = new System.Windows.Forms.Padding(96, 0, 0, 0);
-            this.btnAddCoupon.Size = new System.Drawing.Size(520, 77);
-            this.btnAddCoupon.TabIndex = 4;
-            this.btnAddCoupon.Text = "   Add Coupon";
-            this.btnAddCoupon.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnAddCoupon.UseVisualStyleBackColor = true;
-            this.btnAddCoupon.Click += new System.EventHandler(this.BtnAddCoupon_Click);
+          
+            
+            
             // 
             // btnCouponList
             // 

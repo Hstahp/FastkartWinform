@@ -63,7 +63,24 @@ namespace GUI.Product
         // --- 2. LOAD DỮ LIỆU TẠI SỰ KIỆN LOAD ---
         private void FrmCreate_Load(object sender, EventArgs e)
         {
-            // Chỉ load dữ liệu, KHÔNG check quyền ở đây để tránh lỗi Invoke
+            // ✅ THÊM: Kiểm tra quyền CREATE ngay khi form load
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_CREATE))
+            {
+                MessageBox.Show(
+                    "You do not have permission to create products!",
+                    "Access Denied",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                this.Close();
+                return;
+            }
+
+            // Phần code load dữ liệu hiện tại...
+            LoadData();
+        }
+
+        private void LoadData()
+        {
             loadCategory();
             loadBrand();
             loadUnit();
@@ -331,10 +348,6 @@ namespace GUI.Product
             return true;
         }
 
-
-        
-
-        
         private void ClearForm()
         {
             txtProductName.Clear();

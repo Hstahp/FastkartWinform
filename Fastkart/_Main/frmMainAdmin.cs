@@ -364,22 +364,120 @@ namespace GUI
 
         private void ApplySidebarPermissions()
         {
-            if (!UserSessionDTO.HasPermission("PRODUCT", "VIEW"))
+            // ✅ Product permissions
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_VIEW))
             {
                 btnProduct.Visible = false;
                 pnlProductSub.Visible = false;
             }
+            else
+            {
+                // ✅ SỬA: Disable thay vì ẩn
+                if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_CREATE))
+                {
+                    if (btnAddProduct != null)
+                    {
+                        btnAddProduct.Enabled = false;
+                        btnAddProduct.ForeColor = Color.FromArgb(107, 114, 128); // Gray
+                        btnAddProduct.Cursor = Cursors.No;
+                    }
+                }
+            }
 
-            if (!UserSessionDTO.HasPermission("USER", "VIEW"))
+            // ✅ Category permissions
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_VIEW))
+            {
+                btnCategory.Visible = false;
+                pnlCategorySub.Visible = false;
+            }
+            else
+            {
+                // ✅ SỬA: Disable thay vì ẩn
+                if (!UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_CREATE))
+                {
+                    if (btnAddCategory != null)
+                    {
+                        btnAddCategory.Enabled = false;
+                        btnAddCategory.ForeColor = Color.FromArgb(107, 114, 128);
+                        btnAddCategory.Cursor = Cursors.No;
+                    }
+                }
+            }
+
+            // ✅ SubCategory permissions
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_SUBCATEGORY, PermCode.TYPE_VIEW))
+            {
+                btnSubCategory.Visible = false;
+                pnlSubCategorySub.Visible = false;
+            }
+            else
+            {
+                // ✅ SỬA: Disable thay vì ẩn
+                if (!UserSessionDTO.HasPermission(PermCode.FUNC_SUBCATEGORY, PermCode.TYPE_CREATE))
+                {
+                    if (btnAddSubCategory != null)
+                    {
+                        btnAddSubCategory.Enabled = false;
+                        btnAddSubCategory.ForeColor = Color.FromArgb(107, 114, 128);
+                        btnAddSubCategory.Cursor = Cursors.No;
+                    }
+                }
+            }
+
+            // ✅ User permissions
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_VIEW))
             {
                 btnUser.Visible = false;
                 pnlUserSub.Visible = false;
             }
+            else
+            {
+                // ✅ SỬA: Disable thay vì ẩn
+                if (!UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_CREATE))
+                {
+                    if (btnAddUser != null)
+                    {
+                        btnAddUser.Enabled = false;
+                        btnAddUser.ForeColor = Color.FromArgb(107, 114, 128);
+                        btnAddUser.Cursor = Cursors.No;
+                    }
+                }
+            }
 
-            if (!UserSessionDTO.HasPermission("ROLE", "VIEW"))
+            // ✅ Role permissions
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_ROLE, PermCode.TYPE_VIEW))
             {
                 btnRoles.Visible = false;
                 pnlRolesSub.Visible = false;
+            }
+            else
+            {
+                // ✅ SỬA: Disable thay vì ẩn
+                if (!UserSessionDTO.HasPermission(PermCode.FUNC_ROLE, PermCode.TYPE_CREATE))
+                {
+                    if (btnCreateRole != null)
+                    {
+                        btnCreateRole.Enabled = false;
+                        btnCreateRole.ForeColor = Color.FromArgb(107, 114, 128);
+                        btnCreateRole.Cursor = Cursors.No;
+                    }
+                }
+            }
+
+            // ✅ Coupon permissions (KHÔNG CÓ button Add New trong sidebar)
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_COUPON, PermCode.TYPE_VIEW))
+            {
+                btnMarketing.Visible = false;
+                pnlMarketingSub.Visible = false;
+            }
+
+            // ✅ Order permissions
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_ORDER, PermCode.TYPE_VIEW))
+            {
+                btnPOSMenu.Visible = false;
+                pnlPOSSub.Visible = false;
+                btnOrder.Visible = false;
+                pnlOrderSub.Visible = false;
             }
         }
 
@@ -693,7 +791,7 @@ namespace GUI
             AddHoverToChildButton(btnPayment);
             AddHoverToChildButton(btnInvoiceManagement);
             AddHoverToChildButton(btnCouponList);
-            AddHoverToChildButton(btnAddCoupon);
+ 
         }
 
         private void AddHoverToParentButton(Button btn, Label lbl)
@@ -826,8 +924,19 @@ namespace GUI
 
         private void btnAddProduct_Click(object sender, EventArgs e)
         {
+            // ✅ THÊM: Kiểm tra quyền trước khi thực thi
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_PRODUCT, PermCode.TYPE_CREATE))
+            {
+                MessageBox.Show("You do not have permission to add new products!",
+                    "Access Denied",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             OpenChildForm(new Product.frmCreate(), btnAddProduct);
         }
+
 
         private void btnCategoryList_Click(object sender, EventArgs e)
         {
@@ -847,6 +956,15 @@ namespace GUI
 
         private void btnAddCategory_Click(object sender, EventArgs e)
         {
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_CREATE))
+            {
+                MessageBox.Show("You do not have permission to add new categories!",
+                    "Access Denied",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             OpenChildForm(new Category.frmCreate(), btnAddCategory);
         }
 
@@ -869,6 +987,15 @@ namespace GUI
 
         private void btnAddSubCategory_Click(object sender, EventArgs e)
         {
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_SUBCATEGORY, PermCode.TYPE_CREATE))
+            {
+                MessageBox.Show("You do not have permission to add new subcategories!",
+                    "Access Denied",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             OpenChildForm(new SubCategory.frmCreate(), btnAddSubCategory);
         }
 
@@ -903,6 +1030,15 @@ namespace GUI
 
         private void btnAddUser_Click(object sender, EventArgs e)
         {
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_USER, PermCode.TYPE_CREATE))
+            {
+                MessageBox.Show("You do not have permission to add new users!",
+                    "Access Denied",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             OpenAddNewUserForm();
         }
 
@@ -913,6 +1049,15 @@ namespace GUI
 
         private void btnCreateRole_Click(object sender, EventArgs e)
         {
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_ROLE, PermCode.TYPE_CREATE))
+            {
+                MessageBox.Show("You do not have permission to create roles!",
+                    "Access Denied",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+
             OpenAddNewRoleForm();
         }
 

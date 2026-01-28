@@ -4,13 +4,9 @@ using DTO;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GUI.Category
@@ -23,49 +19,48 @@ namespace GUI.Category
         private string oldProductThumbnail;
         private Image defaultPlaceholderImage;
 
-
         public frmEdit(int categoryId)
         {
             InitializeComponent();
             _caregoryBLL = new CategoryBLL();
+            _categoryId = categoryId;
 
-            // Cấu hình Form
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Width = 730;
 
-            // Đăng ký sự kiện Shown để check quyền an toàn
-            this.Shown += FrmCreate_Shown;
-            this.Load += FrmCreate_Load;
+            this.Shown += FrmEdit_Shown;
+            this.Load += FrmEdit_Load;
 
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-
-
-            // Gán sự kiện cho các nút (Đảm bảo đã khai báo trong Designer)
             this.btnSelectImage.Click += new System.EventHandler(this.btnSelectImage_Click);
             this.btnRemoveImage.Click += new System.EventHandler(this.btnRemoveImage_Click);
-            _categoryId = categoryId;
         }
 
-        // --- 1. CHECK QUYỀN TẠI SỰ KIỆN SHOWN (AN TOÀN NHẤT) ---
-        private void FrmCreate_Shown(object sender, EventArgs e)
+        private void FrmEdit_Shown(object sender, EventArgs e)
         {
-            // Kiểm tra quyền THÊM SẢN PHẨM (PRODUCT.CREATE)
-            // Lúc này Form đã hiện lên (Handle created), nên gọi Close() an toàn 100%
-            if (!UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_CREATE))
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_EDIT))
             {
-                MessageBox.Show("You do not have permission to add new products.!",
-                                "Access denied",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Warning);
-                this.Close(); // Đóng form
+                MessageBox.Show("You do not have permission to edit categories!",
+                    "Access Denied",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                this.Close();
             }
         }
 
-        private void FrmCreate_Load(object sender, EventArgs e)
+        private void FrmEdit_Load(object sender, EventArgs e)
         {
+            if (!UserSessionDTO.HasPermission(PermCode.FUNC_CATEGORY, PermCode.TYPE_EDIT))
+            {
+                MessageBox.Show("You do not have permission to edit categories!", 
+                    "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.Close();
+                return;
+            }
+            
             LoadCategoryData(_categoryId);
         }
 
@@ -157,14 +152,10 @@ namespace GUI.Category
             {
                 Uid = _categoryId,
                 CategoryName = txtName.Text,
-
                 Status = radioActive.Checked ? "Active" : "Inactive",
                 Position = int.TryParse(txtPosition.Text, out int pos) ? pos : (int?)null,
-
                 Description = rtbDescription.Text,
-
                 Thumbnail = this._selectedImagePath,
-
                 UpdatedAt = DateTime.Now,
                 UpdatedBy = Environment.UserName,
                 Deleted = false,
@@ -176,40 +167,24 @@ namespace GUI.Category
 
                 if (success)
                 {
-                    MessageBox.Show(
-                        "Category updated successfully!",
-                        "Success",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
+                    MessageBox.Show("Category updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    MessageBox.Show(
-                        "Failed to update the product. Please check the input data and try again.",
-                        "Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
+                    MessageBox.Show("Failed to update the category. Please check the input data and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    $"An error occurred while saving the data.\nDetails: {ex.Message}",
-                    "System Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
+                MessageBox.Show($"An error occurred while saving the data.\nDetails: {ex.Message}", "System Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
 
         private bool ValidateProductInput()
         {
             if (string.IsNullOrWhiteSpace(txtName.Text))
             {
-                MessageBox.Show("Please enter the product name.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please enter the category name.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
@@ -217,15 +192,13 @@ namespace GUI.Category
             {
                 if (!int.TryParse(txtPosition.Text, out int positionValue))
                 {
-                    MessageBox.Show("Position must be a number.", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Position must be a number.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
                 }
 
                 if (positionValue < 0)
                 {
-                    MessageBox.Show("Position cannot be negative.", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Position cannot be negative.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
                 }
             }
@@ -240,9 +213,7 @@ namespace GUI.Category
             rtbDescription.Clear();
             this._selectedImagePath = null;
             picProduct.Image = defaultPlaceholderImage;
-
             radioActive.Checked = true;
-
         }
     }
 }
